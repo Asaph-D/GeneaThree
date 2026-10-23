@@ -17,7 +17,7 @@ const Hero: React.FC = () => {
             Un assistant pose les questions une à une. La démonstration dessine le lignage à mesure que les réponses arrivent.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <MovingBorder to="/assistant">Commencer un arbre</MovingBorder>
+            <MovingBorder to="/assistant?new=1">Commencer un arbre</MovingBorder>
             <Link to="/demo" className="rounded-full border border-zinc-300 bg-white/80 px-4 py-2.5 text-sm font-medium text-zinc-900 backdrop-blur hover:border-primary-400 dark:border-white/15 dark:bg-zinc-950/70 dark:text-zinc-100">
               Voir la démonstration
             </Link>

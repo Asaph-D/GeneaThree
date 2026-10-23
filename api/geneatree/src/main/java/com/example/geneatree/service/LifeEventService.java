@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,17 +33,14 @@ public class LifeEventService {
     public LifeEventDTO getLifeEventById(String id) {
         return lifeEventRepository.findById(id)
                 .map(lifeEventConverter::convertToDTO)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Life event", id));
     }
 
     public LifeEventDTO updateLifeEvent(String id, LifeEventDTO dto) {
-        Optional<LifeEvent> existing = lifeEventRepository.findById(id);
-        if (existing.isPresent()) {
-            LifeEvent updated = lifeEventConverter.convertToEntity(dto);
-            updated.setId(id);
-            return lifeEventConverter.convertToDTO(lifeEventRepository.save(updated));
-        }
-        return null;
+        if (!lifeEventRepository.existsById(id)) throw new ResourceNotFoundException("Life event", id);
+        LifeEvent updated = lifeEventConverter.convertToEntity(dto);
+        updated.setId(id);
+        return lifeEventConverter.convertToDTO(lifeEventRepository.save(updated));
     }
 
     public List<LifeEventDTO> getEventsByPerson(String personId) {
@@ -55,6 +51,7 @@ public class LifeEventService {
     }
 
     public void deleteLifeEvent(String id) {
+        if (!lifeEventRepository.existsById(id)) throw new ResourceNotFoundException("Life event", id);
         lifeEventRepository.deleteById(id);
     }
 }

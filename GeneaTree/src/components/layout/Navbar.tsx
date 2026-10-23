@@ -9,7 +9,7 @@ interface NavbarProps {
 
 const links = [
   { to: '/quick-start', label: 'Horizons' },
-  { to: '/atelier', label: 'Créer' },
+  { to: '/atelier', label: 'Découvrir' },
   { to: '/demo', label: 'Démonstration' },
   { to: '/about', label: 'À propos' },
   { to: '/faq', label: 'FAQ' },
@@ -73,7 +73,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
                 {item.label}
               </NavLink>
             ))}
-            <Link to="/assistant" className="ml-3 inline-flex items-center rounded-lg bg-primary-600 px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-primary-700">
+            <Link to="/assistant?new=1" className="ml-3 inline-flex items-center rounded-lg bg-primary-600 px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-primary-700">
               Commencer
             </Link>
           </div>
@@ -106,7 +106,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
               </NavLink>
             ))}
             <Link
-              to="/assistant"
+              to="/assistant?new=1"
               onClick={() => setIsMenuOpen(false)}
               className="mt-1 block rounded-xl bg-primary-600 px-3 py-3 text-center text-[15px] font-medium text-white hover:bg-primary-700"
             >

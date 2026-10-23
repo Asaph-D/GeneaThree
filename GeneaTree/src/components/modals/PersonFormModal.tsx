@@ -8,7 +8,7 @@ export interface PersonFormModalProps {
   person?: Person | null;
   allPersons: Person[];
   marriages?: Marriage[];
-  onSave: (personData: PartialPerson & { unionSpouseId?: string; marriageDate?: string }) => void;
+  onSave: (personData: PartialPerson & { unionSpouseId?: string; marriageDate?: string; parentExistingChildren?: boolean }) => void;
   relatedPersonId?: string;
   relationshipType?: 'child' | 'parent' | 'spouse' | null;
   selectedPerson: Person | null;
@@ -51,6 +51,7 @@ const PersonFormModal: React.FC<PersonFormModalProps> = ({
   const [photoUrl, setPhotoUrl] = useState('');
   const [unionSpouseId, setUnionSpouseId] = useState('');
   const [marriageDate, setMarriageDate] = useState('');
+  const [parentExistingChildren, setParentExistingChildren] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
   const related = allPersons.find((item) => item.id === relatedPersonId);
@@ -63,6 +64,7 @@ const PersonFormModal: React.FC<PersonFormModalProps> = ({
     if (!isOpen) return;
     setErrors([]);
     setMarriageDate('');
+    setParentExistingChildren(false);
     setUnionSpouseId(unions.length === 1 ? otherSpouseId(unions[0], related?.id) : '');
     if (person) {
       setFirstName(person.firstName || '');
@@ -160,6 +162,7 @@ const PersonFormModal: React.FC<PersonFormModalProps> = ({
       deathPlace: person?.deathPlace || blank,
       unionSpouseId: unionSpouseId || undefined,
       marriageDate: marriageDate || undefined,
+      parentExistingChildren,
     });
   };
 
@@ -277,6 +280,21 @@ const PersonFormModal: React.FC<PersonFormModalProps> = ({
           {isNew && (relationshipType === 'spouse' || (relationshipType === 'parent' && related && related.parentIds.length === 1)) && (
             <label className={labelClass}>Date d’union
               <input type="date" className={inputClass} value={marriageDate} max={today} onChange={(event) => setMarriageDate(event.target.value)} />
+            </label>
+          )}
+
+          {isNew && relationshipType === 'spouse' && related && related.childrenIds.length > 0 && (
+            <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-[13px] text-amber-950 dark:border-amber-400/25 dark:bg-amber-500/10 dark:text-amber-100">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={parentExistingChildren}
+                onChange={(event) => setParentExistingChildren(event.target.checked)}
+              />
+              <span>
+                <strong>Parenter les enfants de {related.firstName}</strong>
+                <span className="mt-0.5 block text-amber-800/80 dark:text-amber-100/70">Le nouveau conjoint sera ajouté comme second parent uniquement aux enfants qui ne sont encore rattachés à aucune union.</span>
+              </span>
             </label>
           )}
 

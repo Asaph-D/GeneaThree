@@ -35,7 +35,7 @@ public class PersonService {
     public PersonDTO getPersonById(String id) {
         return personRepository.findById(id)
                 .map(personConverter::convertToDTO)
-                .orElseThrow(() -> new RuntimeException("Person not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Person", id));
     }
 
     public PersonDTO createPerson(PersonDTO personDTO) {
@@ -45,7 +45,7 @@ public class PersonService {
 
     public PersonDTO updatePerson(String id, PersonDTO personDTO) {
         if (!personRepository.existsById(id)) {
-            throw new RuntimeException("Person not found");
+            throw new ResourceNotFoundException("Person", id);
         }
         personDTO.setId(id);
         Person person = personConverter.convertToEntity(personDTO);
@@ -53,31 +53,32 @@ public class PersonService {
     }
 
     public void deletePerson(String id) {
+        if (!personRepository.existsById(id)) throw new ResourceNotFoundException("Person", id);
         personRepository.deleteById(id);
     }
 
     public List<PersonDTO> getParentsOf(String id) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found"));
+        Person person = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Person", id));
         return person.getParents().stream().map(personConverter::convertToDTO).toList();
     }
 
     public List<PersonDTO> getChildrenOf(String id) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found"));
+        Person person = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Person", id));
         return person.getChildren().stream().map(personConverter::convertToDTO).toList();
     }
 
     public List<PersonDTO> getSpousesOf(String id) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found"));
+        Person person = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Person", id));
         return person.getSpouses().stream().map(personConverter::convertToDTO).toList();
     }
 
     public List<PersonDTO> getSiblingsOf(String id) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found"));
+        Person person = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Person", id));
         return person.getSiblings().stream().map(personConverter::convertToDTO).toList();
     }
 
     public List<LifeEventDTO> getEventsOf(String id) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new RuntimeException("Person not found"));
+        Person person = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Person", id));
         return person.getEvents().stream().map(lifeEventConverter::convertToDTO).toList();
     }
 } 

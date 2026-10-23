@@ -1,8 +1,9 @@
 // src/pages/DemoPage.tsx
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { ChevronLeft, ChevronRight, PanelLeft, X } from 'lucide-react';
+import { Bot, ChevronLeft, ChevronRight, PanelLeft, X } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { loadFamily, saveFamily } from '../services/familyGateway';
 import DemoControls from '../components/demo/DemoControls';
 import FamilyStats from '../components/demo/FamilyStats';
@@ -283,7 +284,7 @@ const DemoPage: React.FC = () => {
     setIsPersonFormModalOpen(true);
   };
 
-  const handleSavePerson = async (personData: PartialPerson & { unionSpouseId?: string; marriageDate?: string }) => {
+  const handleSavePerson = async (personData: PartialPerson & { unionSpouseId?: string; marriageDate?: string; parentExistingChildren?: boolean }) => {
     const blankPlace = { city: '', region: '', country: '' };
     const persist = async (persons: Person[], marriages: Marriage[]) => {
       setFamilyData(persons);
@@ -365,15 +366,23 @@ const DemoPage: React.FC = () => {
       };
 
       if (addRelationshipType === 'spouse') {
+        const unassignedChildren = personData.parentExistingChildren
+          ? related.childrenIds.filter((childId) => !nextMarriages.some((marriage) => marriage.childrenIds?.includes(childId)))
+          : [];
         created.spouseIds = [related.id];
+        created.childrenIds = unassignedChildren;
         touch(related.id).spouseIds.push(newId);
+        unassignedChildren.forEach((childId) => {
+          const child = touch(childId);
+          child.parentIds = [...new Set([...child.parentIds, newId])];
+        });
         nextMarriages.push({
           id: `marriage-${Date.now()}`,
           spouse1Id: related.id,
           spouse2Id: newId,
           marriageDate: personData.marriageDate || '',
           location: blankPlace,
-          childrenIds: [],
+          childrenIds: unassignedChildren,
           rank: nextMarriages.filter((marriage) => marriage.spouse1Id === related.id).length + 1,
         });
       } else if (addRelationshipType === 'child') {
@@ -647,6 +656,14 @@ const DemoPage: React.FC = () => {
         )}
       </div>
       <div className="relative min-h-0 min-w-0 flex-1" ref={treeContainerRef}>
+        <Link
+          to="/assistant?from=demo"
+          className="absolute right-3 top-3 z-30 inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white/90 px-3 py-2 text-[13px] font-medium text-primary-800 shadow-md backdrop-blur hover:bg-primary-50 dark:border-primary-400/30 dark:bg-zinc-950/90 dark:text-primary-200 dark:hover:bg-zinc-900"
+          title="Ouvrir l’assistant sans perdre cet arbre"
+        >
+          <Bot size={16} />
+          <span className="hidden sm:inline">Assistant</span>
+        </Link>
         {narrow && !sidebarOpen && (
           <button
             type="button"

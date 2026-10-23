@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,8 +18,12 @@ import lombok.Setter;
 public class LifeEvent {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @PrePersist
+    void assignId() {
+        if (id == null || id.isBlank()) id = UUID.randomUUID().toString();
+    }
 
     private String type;
     private String date;

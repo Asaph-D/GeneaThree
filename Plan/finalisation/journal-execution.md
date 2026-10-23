@@ -15,7 +15,12 @@
 
 - [x] Créer le dossier de pilotage de finalisation.
 - [x] Définir phases, backlog et checklist de livraison.
-- [x] Exposer l'atelier sur `/atelier`.
+- [x] Transformer `/atelier` en vitrine publicitaire et partenaires.
+- [x] Ajouter l’accès assistant depuis `/demo` et conserver séparément arbre validé et brouillon.
+- [x] Ajouter l’action explicite « Parenter les enfants de X ».
+- [x] Refaire FAQ et À propos dans le langage visuel du site.
+- [x] Valider dates, identifiants, réciprocité et cycles avant toute sauvegarde atomique.
+- [x] Retourner des erreurs RFC 9457 cohérentes sur les ressources CRUD absentes.
 - [x] Centraliser l'URL API.
 - [x] Aligner le corps de `createPerson` sur `PersonDTO`.
 - [x] Relancer build et lint.
@@ -42,8 +47,21 @@ P0-04 : concevoir et tester la sauvegarde atomique du snapshot familial.
 - [x] Ajouter un Dockerfile Spring Boot multi-étapes.
 - [x] Ajouter le Blueprint Render et sa documentation.
 
+## 2026-10-23 — Phase 1, snapshot atomique
+
+- [x] Ajouter le contrat versionné `FamilySnapshotDTO`.
+- [x] Ajouter `GET`, `PUT` et `DELETE /api/family`.
+- [x] Valider les identifiants dupliqués et les références inconnues avant écriture.
+- [x] Remplacer le lignage dans une transaction unique.
+- [x] Raccorder `familyGateway` au nouvel endpoint.
+- [x] Retourner les erreurs de snapshot au format `application/problem+json`.
+- [x] Conserver les identifiants UUID fournis par le frontend.
+- [x] Tester la sauvegarde/relecture et la conservation des données après rejet : 2 tests, 0 échec.
+- [x] Exécuter la suite backend complète : 3 tests, 0 échec.
+- [x] Vérifier le modal `/demo` : choix obligatoire de l'union, parents et `Marriage.childrenIds` correctement mis à jour.
+
 ### Décisions
 
 - `/quick-start` reste la page Horizons afin de ne pas casser les liens existants.
-- L'atelier reçoit la route explicite `/atelier`.
+- `/atelier` devient une vitrine partenaires ; la création se concentre sur `/assistant` et `/demo`.
 - Le mode local reste le défaut documenté tant que la sauvegarde backend n'est pas atomique.

@@ -17,7 +17,11 @@ Permettre à une famille de créer, enregistrer, relire et modifier un lignage c
 
 Durée cible : 2 à 4 jours.
 
-- [x] Exposer l'atelier sur une route dédiée et visible.
+- [x] Transformer `/atelier` en vitrine publicitaire et partenaires.
+- [x] Faire de `/demo` l’éditeur principal synchronisé avec `/assistant`.
+- [x] Protéger l’arbre enregistré et persister le brouillon assistant.
+- [x] Ajouter « Parenter les enfants de X » lors de l’ajout d’un conjoint.
+- [x] Harmoniser la FAQ et la page À propos avec le produit réel.
 - [x] Centraliser l'URL de l'API dans la configuration Vite.
 - [x] Aligner les requêtes front sur les DTO Spring existants.
 - [x] Corriger les erreurs ESLint bloquantes.
@@ -30,11 +34,12 @@ Critère de sortie : build et lint front verts, test de contexte backend vert sa
 
 Durée cible : 1 à 2 semaines.
 
-- [ ] Définir un contrat versionné `FamilySnapshot` partagé par OpenAPI.
-- [ ] Ajouter un endpoint transactionnel de lecture et sauvegarde d'un arbre complet.
-- [ ] Associer chaque enfant à un foyer précis plutôt qu'à tous les conjoints.
-- [ ] Ajouter validations de dates, identifiants, cycles et relations réciproques.
-- [ ] Remplacer les erreurs génériques par des réponses RFC 9457.
+- [x] Définir un contrat versionné `FamilySnapshot` exposé par OpenAPI.
+- [x] Ajouter un endpoint transactionnel de lecture et sauvegarde d'un arbre complet.
+- [x] Associer chaque enfant à une union précise plutôt qu'à tous les conjoints.
+- [x] Ajouter validations de dates, identifiants, cycles et relations réciproques.
+- [x] Retourner les erreurs de validation du snapshot au format RFC 9457.
+- [x] Étendre les réponses RFC 9457 aux anciens contrôleurs CRUD.
 - [x] Réserver l'initialisation de démonstration au profil `demo`.
 
 Critère de sortie : une sauvegarde est atomique; les fixtures monogame, polygame et recomposée passent les tests d'intégration.

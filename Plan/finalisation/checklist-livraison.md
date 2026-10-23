@@ -2,8 +2,10 @@
 
 ## Fonctionnel
 
-- [ ] Créer un lignage depuis l'atelier.
-- [ ] Enregistrer personnes, unions et enfants atomiquement.
+- [x] Créer un lignage depuis l’assistant puis le reprendre dans la démonstration.
+- [x] Revenir à l’arbre enregistré sans valider un brouillon assistant.
+- [x] Attribuer explicitement les enfants antérieurs à un nouveau conjoint.
+- [x] Enregistrer personnes, unions et enfants atomiquement.
 - [ ] Recharger le navigateur sans perte ni duplication.
 - [ ] Modifier et supprimer une personne avec confirmation.
 - [ ] Exporter un arbre lisible.
@@ -25,7 +27,7 @@
 - [x] `npm run lint` réussit sans erreur bloquante.
 - [ ] Tests unitaires front réussis.
 - [x] Tests backend réussis sans PostgreSQL local.
-- [ ] Tests d'intégration du snapshot familial réussis.
+- [x] Tests d'intégration du snapshot familial réussis.
 - [ ] Parcours E2E principal réussi sur mobile et ordinateur.
 
 ## Exploitation

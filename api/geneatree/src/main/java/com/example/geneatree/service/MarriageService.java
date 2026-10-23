@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,17 +33,14 @@ public class MarriageService {
     public MarriageDTO getMarriageById(String id) {
         return marriageRepository.findById(id)
                 .map(marriageConverter::convertToDTO)
-                .orElse(null);
+                .orElseThrow(() -> new ResourceNotFoundException("Marriage", id));
     }
 
     public MarriageDTO updateMarriage(String id, MarriageDTO dto) {
-        Optional<Marriage> existing = marriageRepository.findById(id);
-        if (existing.isPresent()) {
-            Marriage updated = marriageConverter.convertToEntity(dto);
-            updated.setId(id);
-            return marriageConverter.convertToDTO(marriageRepository.save(updated));
-        }
-        return null;
+        if (!marriageRepository.existsById(id)) throw new ResourceNotFoundException("Marriage", id);
+        Marriage updated = marriageConverter.convertToEntity(dto);
+        updated.setId(id);
+        return marriageConverter.convertToDTO(marriageRepository.save(updated));
     }
 
     public List<MarriageDTO> getMarriagesByPerson(String personId) {
@@ -55,6 +51,7 @@ public class MarriageService {
     }
 
     public void deleteMarriage(String id) {
+        if (!marriageRepository.existsById(id)) throw new ResourceNotFoundException("Marriage", id);
         marriageRepository.deleteById(id);
     }
 }

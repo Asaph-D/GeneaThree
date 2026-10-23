@@ -4,10 +4,13 @@
 
 | ID | Travail | Dépendance | État |
 | --- | --- | --- | --- |
-| P0-01 | Exposer l'atelier sur `/atelier` | Aucune | Terminé |
+| P0-01 | Transformer `/atelier` en vitrine partenaires | Aucune | Terminé |
+| P0-07 | Synchroniser `/demo` et `/assistant` sans perte accidentelle | P0-03 | Terminé |
+| P0-08 | Proposer le parentage explicite des enfants antérieurs | P0-07 | Terminé |
+| P1-04 | Aligner FAQ et À propos sur le produit | Aucune | Terminé |
 | P0-02 | Configurer `VITE_API_BASE_URL` | Aucune | Terminé |
 | P0-03 | Aligner `createPerson` sur `PersonDTO` | P0-02 | Terminé |
-| P0-04 | Implémenter la sauvegarde atomique d'un arbre | Contrat snapshot | À faire |
+| P0-04 | Implémenter la sauvegarde atomique d'un arbre | Contrat snapshot | Terminé |
 | P0-05 | Isoler les tests backend avec H2 ou Testcontainers | Profil test | Terminé |
 | P0-06 | Corriger les 11 erreurs ESLint | Aucune | Terminé |
 | P0-07 | Retirer les identifiants PostgreSQL du dépôt | Variables d'environnement | Terminé |

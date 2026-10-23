@@ -18,20 +18,14 @@ export async function loadFamily(): Promise<{ persons: Person[]; marriages: Marr
     return loadLocalFamily();
   }
 
-  const [peopleRes, marriagesRes] = await Promise.all([
-    fetch(`${API_BASE}/people`),
-    fetch(`${API_BASE}/marriages`),
-  ]);
-
-  if (!peopleRes.ok || !marriagesRes.ok) {
+  const response = await fetch(`${API_BASE}/family`);
+  if (!response.ok) {
     throw new Error('Le serveur généalogique ne répond pas.');
   }
-
-  const people = (await peopleRes.json()) as unknown[];
-  const marriages = (await marriagesRes.json()) as unknown[];
+  const snapshot = await response.json() as { persons?: unknown[]; marriages?: unknown[] };
   return {
-    persons: people.map(normalizePerson),
-    marriages: marriages.map(normalizeMarriage),
+    persons: (snapshot.persons ?? []).map(normalizePerson),
+    marriages: (snapshot.marriages ?? []).map(normalizeMarriage),
   };
 }
 
@@ -40,7 +34,7 @@ export async function clearFamily(): Promise<void> {
     saveLocalFamily([], []);
     return;
   }
-  const res = await fetch(`${API_BASE}/reset`, { method: 'POST' });
+  const res = await fetch(`${API_BASE}/family`, { method: 'DELETE' });
   if (!res.ok) {
     throw new Error('Le serveur n’a pas pu réinitialiser le lignage.');
   }
@@ -52,33 +46,24 @@ export async function saveFamily(persons: Person[], marriages: Marriage[]): Prom
     return;
   }
 
-  for (const person of persons) {
-    const res = await fetch(`${API_BASE}/people`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+  const response = await fetch(`${API_BASE}/family`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      version: 1,
+      persons: persons.map((person) => ({
         ...person,
         birthPlace: placeToString(person.birthPlace),
         deathPlace: placeToString(person.deathPlace),
-      }),
-    });
-    if (!res.ok) {
-      throw new Error(`Le serveur a refusé l'enregistrement de ${person.firstName || 'une personne'}.`);
-    }
-  }
-
-  for (const marriage of marriages) {
-    const res = await fetch(`${API_BASE}/marriages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+      })),
+      marriages: marriages.map((marriage) => ({
         ...marriage,
         location: placeToString(marriage.location),
-      }),
-    });
-    if (!res.ok) {
-      throw new Error("Le serveur a refusé l'enregistrement d'une union.");
-    }
+      })),
+    }),
+  });
+  if (!response.ok) {
+    throw new Error("Le serveur a refusé l'enregistrement atomique du lignage.");
   }
 }
 

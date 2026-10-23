@@ -1,8 +1,8 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HelpCircle, Mic, RotateCcw, Send, SkipForward, Undo2 } from 'lucide-react';
 import TreeVisualization from '../components/demo/TreeVisualization';
-import { saveFamily } from '../services/familyGateway';
+import { loadFamily, saveFamily } from '../services/familyGateway';
 import { GenderType, Location, Marriage, Person } from '../types/family';
 
 type Phase =
@@ -79,6 +79,28 @@ interface Pending {
   queue: KinKind | null;
 }
 
+interface AssistantSession {
+  phase: Phase;
+  draft: Draft;
+  pending: Pending;
+  messages: { role: 'assistant' | 'user'; text: string }[];
+}
+
+const ASSISTANT_SESSION_KEY = 'geneatree.assistant.session.v1';
+
+function readAssistantSession(): AssistantSession | null {
+  if (new URLSearchParams(window.location.search).get('new') === '1') {
+    localStorage.removeItem(ASSISTANT_SESSION_KEY);
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(localStorage.getItem(ASSISTANT_SESSION_KEY) || 'null') as AssistantSession | null;
+    return parsed?.draft?.anchor?.id ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
 interface SpeechRec {
   lang: string;
   start: () => void;
@@ -98,6 +120,76 @@ function uid(prefix: string) {
 
 function emptyBits(id: string): Bits {
   return { id, firstName: '', lastName: '', gender: 'unknown', birthDate: '', city: '', deceased: false };
+}
+
+function bitsFromPerson(person: Person): Bits {
+  return {
+    id: person.id,
+    firstName: person.firstName,
+    lastName: person.lastName,
+    gender: person.gender,
+    birthDate: person.birthDate,
+    city: person.birthPlace?.city ?? '',
+    deceased: person.deceased,
+  };
+}
+
+function draftFromFamily(persons: Person[], marriages: Marriage[], focusId: string): Draft | null {
+  const anchor = persons.find((person) => person.id === focusId) ?? persons[0];
+  if (!anchor) return null;
+  const personById = new Map(persons.map((person) => [person.id, person]));
+  const anchorUnions = marriages
+    .filter((marriage) => marriage.spouse1Id === anchor.id || marriage.spouse2Id === anchor.id)
+    .sort((left, right) => (left.rank ?? 0) - (right.rank ?? 0));
+  const spouses = anchorUnions.flatMap((marriage, index) => {
+    const spouseId = marriage.spouse1Id === anchor.id ? marriage.spouse2Id : marriage.spouse1Id;
+    const spouse = personById.get(spouseId);
+    return spouse ? [{ ...bitsFromPerson(spouse), rank: marriage.rank ?? index + 1 }] : [];
+  });
+  const children = anchor.childrenIds.flatMap((childId) => {
+    const child = personById.get(childId);
+    if (!child) return [];
+    const union = anchorUnions.find((marriage) => marriage.childrenIds?.includes(childId));
+    const unionSpouseId = union ? (union.spouse1Id === anchor.id ? union.spouse2Id : union.spouse1Id) : null;
+    return [{ ...bitsFromPerson(child), unionSpouseId }];
+  });
+  return {
+    anchor: bitsFromPerson(anchor),
+    spouses,
+    children,
+    parents: anchor.parentIds.flatMap((id) => personById.has(id) ? [bitsFromPerson(personById.get(id)!)] : []),
+    siblings: (anchor.siblingIds ?? []).flatMap((id) => personById.has(id) ? [bitsFromPerson(personById.get(id)!)] : []),
+    branches: [],
+    extraSpouses: [],
+    extraChildren: [],
+  };
+}
+
+function mergeFamilies(base: { persons: Person[]; marriages: Marriage[] }, changed: { persons: Person[]; marriages: Marriage[] }) {
+  const persons = new Map(base.persons.map((person) => [person.id, person]));
+  changed.persons.forEach((person) => {
+    const previous = persons.get(person.id);
+    persons.set(person.id, previous ? {
+      ...previous,
+      ...person,
+      birthPlace: { ...previous.birthPlace, city: person.birthPlace.city },
+      photoUrl: person.photoUrl || previous.photoUrl,
+      biography: person.biography || previous.biography,
+      occupation: person.occupation || previous.occupation,
+      notes: person.notes || previous.notes,
+      contact: Object.keys(person.contact ?? {}).length ? person.contact : previous.contact,
+      eventIds: person.eventIds?.length ? person.eventIds : previous.eventIds,
+    } : person);
+  });
+  const marriages = [...base.marriages];
+  changed.marriages.forEach((marriage) => {
+    const index = marriages.findIndex((current) =>
+      (current.spouse1Id === marriage.spouse1Id && current.spouse2Id === marriage.spouse2Id)
+      || (current.spouse1Id === marriage.spouse2Id && current.spouse2Id === marriage.spouse1Id));
+    if (index < 0) marriages.push(marriage);
+    else marriages[index] = { ...marriage, ...marriages[index], childrenIds: marriage.childrenIds };
+  });
+  return { persons: [...persons.values()], marriages };
 }
 
 function freshPending(): Pending {
@@ -602,9 +694,11 @@ function finishKin(draft: Draft, source: Pending): { draft: Draft; phase: Phase;
 }
 const AssistantPage: React.FC = () => {
   const navigate = useNavigate();
-  const [anchorId] = useState(() => uid('as'));
-  const [phase, setPhase] = useState<Phase>('anchor-first');
-  const [draft, setDraft] = useState<Draft>(() => ({
+  const [openedFromDemo] = useState(() => new URLSearchParams(window.location.search).get('from') === 'demo');
+  const [initialSession] = useState(readAssistantSession);
+  const [anchorId] = useState(() => initialSession?.draft.anchor.id ?? uid('as'));
+  const [phase, setPhase] = useState<Phase>(initialSession?.phase ?? 'anchor-first');
+  const [draft, setDraft] = useState<Draft>(() => initialSession?.draft ?? ({
     anchor: emptyBits(anchorId),
     spouses: [],
     children: [],
@@ -614,17 +708,35 @@ const AssistantPage: React.FC = () => {
     extraSpouses: [],
     extraChildren: [],
   }));
-  const [pending, setPending] = useState<Pending>(freshPending);
+  const [pending, setPending] = useState<Pending>(() => initialSession?.pending ?? freshPending());
   const [text, setText] = useState('');
   const [notice, setNotice] = useState('');
   const [history, setHistory] = useState<{ phase: Phase; draft: Draft; pending: Pending }[]>([]);
   const [saving, setSaving] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; text: string }[]>([
+  const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; text: string }[]>(initialSession?.messages ?? [
     { role: 'assistant', text: 'Quel est le prénom qui ouvre l’arbre ?' },
   ]);
+  const [savedTreeSize, setSavedTreeSize] = useState(0);
+  const [baseFamily, setBaseFamily] = useState<{ persons: Person[]; marriages: Marriage[] }>({ persons: [], marriages: [] });
+  const [savedFamily, setSavedFamily] = useState<{ persons: Person[]; marriages: Marriage[] } | null>(null);
+  const [editingSavedTree, setEditingSavedTree] = useState(openedFromDemo);
   const spokenRef = useRef('');
   const threadRef = useRef<HTMLDivElement>(null);
+
+  const hydrateSavedFamily = useCallback((snapshot: { persons: Person[]; marriages: Marriage[] }) => {
+    if (snapshot.persons.length === 0) return;
+    const focusId = localStorage.getItem('focusPerson') || snapshot.persons[0].id;
+    const loadedDraft = draftFromFamily(snapshot.persons, snapshot.marriages, focusId);
+    if (!loadedDraft) return;
+    setBaseFamily(snapshot);
+    setDraft(loadedDraft);
+    setPhase('grow');
+    setPending(freshPending());
+    setHistory([]);
+    setEditingSavedTree(true);
+    setMessages([{ role: 'assistant', text: `L’arbre de ${fullName(loadedDraft.anchor)} est chargé. Quel lien souhaitez-vous ajouter ?` }]);
+  }, []);
 
   useEffect(() => {
     document.title = 'Assistant — GeneaTreePro';
@@ -640,7 +752,22 @@ const AssistantPage: React.FC = () => {
     if (node) node.scrollTop = node.scrollHeight;
   }, [messages, helpOpen]);
 
+  useEffect(() => {
+    void loadFamily()
+      .then((snapshot) => {
+        setSavedTreeSize(snapshot.persons.length);
+        setSavedFamily(snapshot);
+        if (openedFromDemo) hydrateSavedFamily(snapshot);
+      })
+      .catch(() => setSavedTreeSize(0));
+  }, [hydrateSavedFamily, openedFromDemo]);
+
+  useEffect(() => {
+    localStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify({ phase, draft, pending, messages } satisfies AssistantSession));
+  }, [phase, draft, pending, messages]);
+
   const family = useMemo(() => buildFamily(draft), [draft]);
+  const workingFamily = useMemo(() => mergeFamilies(baseFamily, family), [baseFamily, family]);
   const kind = kindOf(phase);
   const optional = phase === 'anchor-birth' || phase === 'anchor-city';
 
@@ -940,6 +1067,8 @@ const AssistantPage: React.FC = () => {
   };
 
   const resetDraft = () => {
+    setBaseFamily({ persons: [], marriages: [] });
+    setEditingSavedTree(false);
     setDraft({ anchor: emptyBits(anchorId), spouses: [], children: [], parents: [], siblings: [], branches: [], extraSpouses: [], extraChildren: [] });
     setPending(freshPending());
     setPhase('anchor-first');
@@ -972,7 +1101,8 @@ const AssistantPage: React.FC = () => {
     try {
       localStorage.setItem('geneatree.example', 'custom');
       localStorage.setItem('focusPerson', draft.anchor.id);
-      await saveFamily(family.persons, family.marriages);
+      await saveFamily(workingFamily.persons, workingFamily.marriages);
+      localStorage.removeItem(ASSISTANT_SESSION_KEY);
       navigate('/demo');
     } catch (error) {
       setNotice(error instanceof Error ? error.message : 'L’enregistrement a échoué.');
@@ -989,10 +1119,17 @@ const AssistantPage: React.FC = () => {
         <div className="relative flex items-center justify-between border-b border-zinc-200/80 px-4 py-3 dark:border-white/10">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">Assistant</p>
-            <h1 className="font-serif text-xl text-zinc-950 dark:text-white">Nouvel arbre</h1>
+            <h1 className="font-serif text-xl text-zinc-950 dark:text-white">{editingSavedTree && draft.anchor.firstName ? `Arbre de ${draft.anchor.firstName}` : 'Nouvel arbre'}</h1>
           </div>
           <p className="text-[11px] uppercase tracking-[0.14em] text-zinc-500">{labelFor(kind)}</p>
         </div>
+        {savedTreeSize > 0 && !editingSavedTree && savedFamily && (
+          <div className="relative border-b border-primary-200 bg-primary-50/90 px-4 py-2 text-[13px] dark:border-primary-400/20 dark:bg-primary-500/10">
+            <button type="button" onClick={() => hydrateSavedFamily(savedFamily)} className="font-semibold text-primary-700 hover:underline dark:text-primary-200">
+              Reprendre mon arbre
+            </button>
+          </div>
+        )}
         <div ref={threadRef} className="relative flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
           {messages.map((message, index) => (
             <div key={`${message.role}-${index}`} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -1017,28 +1154,15 @@ const AssistantPage: React.FC = () => {
             ))}
             {phase === 'grow' && (
               <div className="mb-2 w-full space-y-1.5">
-                <button type="button" disabled={saving || family.persons.length === 0} onClick={openDemo} className="rounded-full bg-zinc-950 px-3 py-1.5 text-xs text-white disabled:opacity-50 dark:bg-white dark:text-zinc-950">
+                <button type="button" disabled={saving || workingFamily.persons.length === 0} onClick={openDemo} className="rounded-full bg-zinc-950 px-3 py-1.5 text-xs text-white disabled:opacity-50 dark:bg-white dark:text-zinc-950">
                   {saving ? 'Ouverture…' : 'Ouvrir l’arbre'}
                 </button>
-                <div className="max-h-[min(26rem,50dvh)] space-y-1 overflow-y-auto overscroll-contain">
-                {([
-                  ['Fratrie', [['brother', 'Frère'], ['sister', 'Sœur']]],
-                  ['Grands-parents', [['grandfather', 'Grand-père'], ['grandmother', 'Grand-mère']]],
-                  ['Oncles et tantes', [['uncle', 'Oncle'], ['aunt', 'Tante'], ['collateral-spouse', 'Leur conjoint']]],
-                  ['Cousins', [['cousin', 'Cousin'], ['cousine', 'Cousine']]],
-                  ['Une personne déjà présente', [['node-spouse', 'Ajouter un conjoint'], ['node-child', 'Ajouter un enfant']]],
-                ] as const).map(([title, items]) => (
-                  <div key={title}>
-                    <p className="mb-0.5 text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500">{title}</p>
-                    <div className="flex flex-wrap gap-1">
-                      {items.map(([kin, label]) => (
-                        <button key={kin} type="button" onClick={() => beginKin(kin)} className="rounded-full border border-zinc-200 bg-white px-2.5 py-0.5 text-xs text-zinc-800 hover:border-primary-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-                          {label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                <div className="flex w-full snap-x snap-mandatory gap-1.5 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-color:rgb(161_161_170)_transparent] [scrollbar-width:thin]">
+                  {([['brother', 'Frère'], ['sister', 'Sœur'], ['grandfather', 'Grand-père'], ['grandmother', 'Grand-mère'], ['uncle', 'Oncle'], ['aunt', 'Tante'], ['collateral-spouse', 'Conjoint'], ['cousin', 'Cousin'], ['cousine', 'Cousine'], ['node-spouse', 'Ajouter un conjoint'], ['node-child', 'Ajouter un enfant']] as const).map(([kin, label]) => (
+                    <button key={kin} type="button" onClick={() => beginKin(kin)} className="shrink-0 snap-start rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-800 shadow-sm hover:border-primary-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
+                      {label}
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
@@ -1068,10 +1192,10 @@ const AssistantPage: React.FC = () => {
       <div className="relative hidden min-w-0 flex-1 md:block">
         <div className="pointer-events-none absolute left-4 top-4 z-30 flex flex-col gap-2">
           <span className="pointer-events-auto rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs text-zinc-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-zinc-950/80 dark:text-zinc-200">
-            {family.persons.length} personne{family.persons.length > 1 ? 's' : ''}
+            {workingFamily.persons.length} personne{workingFamily.persons.length > 1 ? 's' : ''}
           </span>
           <span className="pointer-events-auto rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs text-zinc-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-zinc-950/80 dark:text-zinc-200">
-            {family.marriages.length} union{family.marriages.length > 1 ? 's' : ''}
+            {workingFamily.marriages.length} union{workingFamily.marriages.length > 1 ? 's' : ''}
           </span>
         </div>
         <div className="absolute right-4 top-4 z-30 flex gap-2">
@@ -1081,13 +1205,13 @@ const AssistantPage: React.FC = () => {
         <button type="button" onClick={resetDraft} className="absolute bottom-24 right-4 z-30 rounded-full border border-white/70 bg-white/85 px-3 py-1.5 text-xs text-zinc-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-zinc-950/80 dark:text-zinc-200">
           Recommencer
         </button>
-        {family.persons.length > 0 ? (
+        {workingFamily.persons.length > 0 ? (
           <TreeVisualization
             viewType="tree"
             generations={5}
             focusPerson={draft.anchor.id}
-            familyData={family.persons}
-            marriagesData={family.marriages}
+            familyData={workingFamily.persons}
+            marriagesData={workingFamily.marriages}
             onPersonSelect={() => undefined}
             onAddPersonClick={() => undefined}
             onDeletePerson={() => undefined}

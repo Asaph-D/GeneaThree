@@ -118,7 +118,7 @@ const HorizonsPage: React.FC = () => {
               <p className="font-serif text-3xl">Le prochain pas se prend avec l’assistant.</p>
               <p className="mt-2 max-w-xl text-sm text-white/70">Les images restent ici. Le prénom, le nom et les unions se posent dans la conversation.</p>
             </div>
-            <MovingBorder to="/assistant">Commencer un arbre</MovingBorder>
+            <MovingBorder to="/assistant?new=1">Commencer un arbre</MovingBorder>
           </div>
           <Link to="/demo" className="relative mt-4 inline-flex text-sm text-sky-200">Voir la démonstration</Link>
         </div>
