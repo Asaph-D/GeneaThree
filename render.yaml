@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: geneatree-api
+    runtime: docker
+    plan: free
+    rootDir: api/geneatree
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        fromDatabase:
+          name: geneatree-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: geneatree-db
+          property: password
+      - key: CORS_ALLOWED_ORIGIN
+        sync: false
+      - key: JPA_SHOW_SQL
+        value: "false"
+
+databases:
+  - name: geneatree-db
+    plan: free
+    databaseName: geneatree
+
