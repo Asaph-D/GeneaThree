@@ -77,6 +77,13 @@ class AuthenticationTests {
     }
 
     @Test
+    void exposesHealthWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/api/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
+    }
+
+    @Test
     void scopesFamilyDataToAuthorizedTreeMembers() throws Exception {
         String ownerTreeId = register("owner@example.com", "strong-passphrase", "Famille Owner");
         register("outsider@example.com", "another-passphrase", "Famille Outsider");

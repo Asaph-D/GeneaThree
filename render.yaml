@@ -3,26 +3,19 @@ services:
     name: geneatree-api
     runtime: docker
     plan: free
+    branch: main
+    autoDeploy: false
     rootDir: api/geneatree
     dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/health
     envVars:
       - key: DB_URL
         sync: false
       - key: DB_USERNAME
-        fromDatabase:
-          name: geneatree-db
-          property: user
+        sync: false
       - key: DB_PASSWORD
-        fromDatabase:
-          name: geneatree-db
-          property: password
+        sync: false
       - key: CORS_ALLOWED_ORIGIN
         sync: false
       - key: JPA_SHOW_SQL
         value: "false"
-
-databases:
-  - name: geneatree-db
-    plan: free
-    databaseName: geneatree
-

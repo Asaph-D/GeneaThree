@@ -73,7 +73,8 @@ Critère de sortie : cousins alignés, foyers polygames séparés et aucune fili
 
 Durée cible : 1 à 2 semaines.
 
-- [ ] Ajouter CI et migrations Flyway.
+- [ ] Ajouter les migrations Flyway.
+- [x] Ajouter la CI et le déploiement automatique du backend après push sur `main`.
 - [x] Ajouter le conteneur backend et documenter l'environnement Render.
 - [x] Découper les pages du bundle initial.
 - [x] Transformer `/quick-start` en page d'abonnements.

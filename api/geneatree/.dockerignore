@@ -3,4 +3,7 @@ target
 .idea
 *.iml
 *.log
-
+.git
+.github
+README*
+src/test

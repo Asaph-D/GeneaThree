@@ -96,3 +96,17 @@ P0-04 : concevoir et tester la sauvegarde atomique du snapshot familial.
 - [x] Transformer `/quick-start` en page d'abonnements responsive.
 - [x] Valider build et lint : 0 erreur, 7 avertissements préexistants ou non bloquants.
 - [x] Contrôler la page abonnements avec Edge headless en viewport mobile.
+
+## 2026-10-23 — Phase 4, conteneur et déploiement continu
+
+- [x] Durcir l'image Java 21 avec utilisateur non privilégié et limites mémoire JVM.
+- [x] Ajouter `/api/health` et le healthcheck Docker/Render indépendant de la base.
+- [x] Rendre le Blueprint compatible avec PostgreSQL externe, notamment Supabase.
+- [x] Ajouter la CI GitHub Actions sur pull request et push `main`.
+- [x] Déclencher Render par Deploy Hook uniquement après tests et build Docker réussis.
+- [x] Exécuter la suite backend : 13 tests, 0 échec.
+- [x] Construire localement l'image `geneatree-api:local` avec succès.
+- [x] Diagnostiquer l'échec Render : fallback involontaire vers `localhost:5432`.
+- [x] Accepter automatiquement les URL Supabase `postgres://` et extraire leurs identifiants.
+- [x] Refuser explicitement un démarrage Render sans configuration PostgreSQL.
+- [x] Valider la correction datasource : 15 tests, 0 échec.
