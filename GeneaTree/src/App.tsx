@@ -3,8 +3,8 @@ import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import HomePage from './pages/HomePage';
 
-const HomePage = lazy(() => import('./pages/HomePage'));
 const DemoPage = lazy(() => import('./pages/DemoPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));

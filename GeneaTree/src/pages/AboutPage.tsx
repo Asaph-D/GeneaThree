@@ -33,7 +33,7 @@ const AboutPage: React.FC = () => {
 
         <section className="mt-8 flex flex-col items-start justify-between gap-6 rounded-3xl bg-zinc-950 px-7 py-8 text-white dark:bg-white dark:text-zinc-950 sm:flex-row sm:items-center">
           <div><p className="font-serif text-2xl">Votre histoire peut commencer maintenant.</p><p className="mt-1 text-sm text-zinc-300 dark:text-zinc-600">L’assistant vous accompagne, la Démonstration vous laisse la main.</p></div>
-          <Link to="/assistant?new=1" className="shrink-0 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-zinc-950 hover:bg-zinc-100 dark:bg-zinc-950 dark:text-white dark:hover:bg-zinc-800">Commencer un arbre</Link>
+          <Link to="/assistant?new=1" className="shrink-0 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-4 py-3 text-sm font-semibold text-white hover:from-sky-400 hover:to-indigo-500">Créer mon arbre</Link>
         </section>
       </div>
     </main>

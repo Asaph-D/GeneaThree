@@ -3,7 +3,7 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const items = [
-  ['Comment commencer mon arbre ?', 'Le bouton Commencer ouvre un nouvel assistant guidé. Il recueille les personnes une à une, puis enregistre le résultat dans la Démonstration.'],
+  ['Comment créer mon arbre ?', 'Le bouton Créer ouvre un nouvel assistant guidé. Il recueille les personnes une à une, puis enregistre le résultat dans la Démonstration.'],
   ['Puis-je continuer directement dans la Démonstration ?', 'Oui. Activez le mode édition, choisissez une personne, puis ajoutez un parent, un conjoint ou un enfant. Un enfant est rattaché à l’union que vous sélectionnez.'],
   ['Que se passe-t-il si j’ouvre l’assistant par erreur ?', 'Votre arbre enregistré n’est pas effacé. Le bouton « Reprendre mon arbre » vous ramène immédiatement à la Démonstration, et le brouillon de l’assistant est conservé séparément.'],
   ['Comment attribuer des enfants existants à un nouveau conjoint ?', 'Lors de l’ajout du conjoint, activez « Parenter les enfants de X ». Seuls les enfants qui ne sont encore associés à aucune union reçoivent ce second parent.'],
@@ -35,7 +35,7 @@ const FaqPage: React.FC = () => {
             </section>
           ))}
         </div>
-        <div className="mt-8 text-center text-sm text-zinc-600 dark:text-zinc-300">Prêt à essayer ? <Link to="/assistant?new=1" className="font-semibold text-primary-700 hover:underline dark:text-primary-300">Commencer un arbre</Link></div>
+        <div className="mt-8 text-center text-sm text-zinc-600 dark:text-zinc-300">Prêt à essayer ? <Link to="/assistant?new=1" className="font-semibold text-primary-700 hover:underline dark:text-primary-300">Créer mon arbre</Link></div>
       </div>
     </main>
   );

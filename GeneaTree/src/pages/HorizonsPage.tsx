@@ -6,7 +6,7 @@ const sections = [
   {
     kicker: 'Opportunités',
     title: 'Ce que le lignage peut relier',
-    image: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=1200&q=80',
+    image: '/gallery/genealogy-generations.jpg',
     items: [
       { title: 'Registres et récits', text: 'Faire entrer un acte, une date orale ou un lieu sans forcer une forme unique de foyer.' },
       { title: 'Unions au rang', text: 'Garder l’ordre des conjoints et les enfants de chaque union, chacun dans sa colonne.' },
@@ -16,7 +16,7 @@ const sections = [
   {
     kicker: 'À venir',
     title: 'La suite du chantier',
-    image: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80',
+    image: '/gallery/genealogy-digital-memory.jpg',
     items: [
       { title: 'Import GEDCOM', text: 'Reprendre un fichier existant et le poser sur la vue en bandes, sans perdre les unions.' },
       { title: 'Récit attaché', text: 'Une note, une voix ou une photo à côté du portrait, sans quitter la fiche.' },
@@ -26,20 +26,13 @@ const sections = [
   {
     kicker: 'Partenaires',
     title: 'Avec qui avancer',
-    image: 'https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1200&q=80',
+    image: '/gallery/genealogy-archives.jpg',
     items: [
       { title: 'Familles', text: 'Celles qui tiennent le rang des unions et les prénoms tels qu’ils se disent.' },
       { title: 'Associations', text: 'Les cercles qui collectent les récits et veulent une lecture claire, pas un tableur.' },
       { title: 'Chercheurs', text: 'Ceux qui comparent des branches, des générations et des foyers recomposés.' },
     ],
   },
-];
-
-const online = [
-  'https://images.unsplash.com/photo-1609220136736-443140cffec6?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1475503572774-15a45e5d60b9?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=900&q=80',
-  'https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=900&q=80',
 ];
 
 const HorizonsPage: React.FC = () => {
@@ -52,7 +45,6 @@ const HorizonsPage: React.FC = () => {
   const strip = [
     { src: gallery.portrait, alt: 'Portrait' },
     ...gallery.scenes.map((src, index) => ({ src, alt: `Scène ${index + 1}` })),
-    ...online.map((src, index) => ({ src, alt: `Horizon ${index + 1}` })),
   ];
 
   return (
@@ -70,15 +62,10 @@ const HorizonsPage: React.FC = () => {
             <img src={gallery.portrait} alt="Portrait" className="h-full min-h-64 w-full object-cover" />
             <p className="absolute bottom-4 left-4 font-serif text-3xl text-white">Le portrait qui ouvre</p>
           </TiltCard>
-          {gallery.scenes.slice(0, 2).map((src, index) => (
+          {gallery.scenes.map((src, index) => (
             <div key={src} className="relative min-h-40 overflow-hidden rounded-3xl">
               <img src={src} alt="" className="h-full w-full object-cover" />
               <p className="absolute bottom-3 left-3 text-sm text-white">Scène {index + 1}</p>
-            </div>
-          ))}
-          {online.slice(0, 2).map((src) => (
-            <div key={src} className="relative min-h-40 overflow-hidden rounded-3xl">
-              <img src={src} alt="" className="h-full w-full object-cover" />
             </div>
           ))}
         </div>
@@ -118,7 +105,7 @@ const HorizonsPage: React.FC = () => {
               <p className="font-serif text-3xl">Le prochain pas se prend avec l’assistant.</p>
               <p className="mt-2 max-w-xl text-sm text-white/70">Les images restent ici. Le prénom, le nom et les unions se posent dans la conversation.</p>
             </div>
-            <MovingBorder to="/assistant?new=1">Commencer un arbre</MovingBorder>
+            <MovingBorder to="/assistant?new=1">Créer mon arbre</MovingBorder>
           </div>
           <Link to="/demo" className="relative mt-4 inline-flex text-sm text-sky-200">Voir la démonstration</Link>
         </div>

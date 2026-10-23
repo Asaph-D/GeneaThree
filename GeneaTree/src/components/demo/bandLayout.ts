@@ -46,6 +46,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
   const unions: BandUnion[] = [];
   const drops: BandDrop[] = [];
   const placed = new Set<string>();
+  const generationById = calculateGenerations(people, marriages);
 
   const householdsOf = (id: string) =>
     marriages
@@ -138,18 +139,19 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
 
   function place(id: string, left: number, depth: number): { x: number; y: number } | null {
     const person = byId.get(id);
-    if (!person || depth > maxDepth) return null;
+    const generation = generationById.get(id) ?? depth;
+    if (!person || generation > maxDepth) return null;
     if (placed.has(id)) {
       const node = nodes.find((item) => item.person.id === id);
       return node ? { x: node.x, y: node.y } : null;
     }
     const width = measure(id, depth);
-    const y = 56 + depth * ROW;
-    const households = depth === maxDepth ? [] : householdsOf(id);
+    const y = 56 + generation * ROW;
+    const households = generation === maxDepth ? [] : householdsOf(id);
 
     if (households.length === 0) {
       const x = left + width / 2;
-      nodes.push({ person, x, y, depth });
+      nodes.push({ person, x, y, depth: generation });
       placed.add(id);
       const centers = placeChildren(looseKids(id), left, width, depth + 1);
       if (centers.length) drops.push(childStem(x, y + 36, centers));
@@ -163,10 +165,10 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
       const pairLeft = left + (width - pair) / 2;
       const anchorX = pairLeft + CARD_W / 2;
       const spouseX = pairLeft + CARD_W + 20 + CARD_W / 2;
-      nodes.push({ person, x: anchorX, y, depth });
+      nodes.push({ person, x: anchorX, y, depth: generation });
       placed.add(id);
       if (!placed.has(spouse.id)) {
-        nodes.push({ person: spouse, x: spouseX, y, depth });
+        nodes.push({ person: spouse, x: spouseX, y, depth: generationById.get(spouse.id) ?? generation });
         placed.add(spouse.id);
       }
       unions.push({ x1: anchorX + 28, x2: spouseX - 28, y, rail: false, ticks: [] });
@@ -196,7 +198,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
       });
     }
 
-    nodes.push({ person, x: anchorX, y, depth });
+    nodes.push({ person, x: anchorX, y, depth: generation });
     placed.add(id);
 
     const wifeCenters: number[] = [];
@@ -206,7 +208,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
       const spouseX = slot.left + CARD_W / 2;
       wifeCenters.push(spouseX);
       if (!placed.has(spouse.id)) {
-        nodes.push({ person: spouse, x: spouseX, y, depth });
+        nodes.push({ person: spouse, x: spouseX, y, depth: generationById.get(spouse.id) ?? generation });
         placed.add(spouse.id);
       }
       const childCenters = placeChildren(kidsOf(slot.marriage), slot.left, slot.width, depth + 1);
@@ -249,8 +251,9 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
 
   people.forEach((person) => {
     if (!placed.has(person.id) && !childIds.has(person.id)) {
-      const y = 56;
-      nodes.push({ person, x: cursor + CARD_W / 2, y, depth: 0 });
+      const depth = generationById.get(person.id) ?? 0;
+      const y = 56 + depth * ROW;
+      nodes.push({ person, x: cursor + CARD_W / 2, y, depth });
       placed.add(person.id);
       cursor += CARD_W + GAP;
     }
@@ -272,6 +275,34 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
     width: maxX - minX,
     height: maxY - minY,
   };
+}
+
+function calculateGenerations(people: Person[], marriages: Marriage[]): Map<string, number> {
+  const generations = new Map(people.map((person) => [person.id, 0]));
+  const known = new Set(generations.keys());
+  const limit = Math.max(1, people.length * 2);
+
+  for (let pass = 0; pass < limit; pass += 1) {
+    let changed = false;
+    const raise = (id: string, level: number) => {
+      if (!known.has(id) || (generations.get(id) ?? 0) >= level) return;
+      generations.set(id, level);
+      changed = true;
+    };
+
+    people.forEach((person) => {
+      person.parentIds.forEach((parentId) => raise(person.id, (generations.get(parentId) ?? 0) + 1));
+    });
+    marriages.forEach((marriage) => {
+      const spouseLevel = Math.max(generations.get(marriage.spouse1Id) ?? 0, generations.get(marriage.spouse2Id) ?? 0);
+      raise(marriage.spouse1Id, spouseLevel);
+      raise(marriage.spouse2Id, spouseLevel);
+      (marriage.childrenIds ?? []).forEach((childId) => raise(childId, spouseLevel + 1));
+    });
+    if (!changed) break;
+  }
+
+  return generations;
 }
 
 function childStem(originX: number, originY: number, children: { x: number; y: number }[]) {

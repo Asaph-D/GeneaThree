@@ -173,6 +173,10 @@ function mergeFamilies(base: { persons: Person[]; marriages: Marriage[] }, chang
       ...previous,
       ...person,
       birthPlace: { ...previous.birthPlace, city: person.birthPlace.city },
+      parentIds: uniq([...(previous.parentIds ?? []), ...(person.parentIds ?? [])]),
+      childrenIds: uniq([...(previous.childrenIds ?? []), ...(person.childrenIds ?? [])]),
+      spouseIds: uniq([...(previous.spouseIds ?? []), ...(person.spouseIds ?? [])]),
+      siblingIds: uniq([...(previous.siblingIds ?? []), ...(person.siblingIds ?? [])]),
       photoUrl: person.photoUrl || previous.photoUrl,
       biography: person.biography || previous.biography,
       occupation: person.occupation || previous.occupation,
@@ -187,7 +191,11 @@ function mergeFamilies(base: { persons: Person[]; marriages: Marriage[] }, chang
       (current.spouse1Id === marriage.spouse1Id && current.spouse2Id === marriage.spouse2Id)
       || (current.spouse1Id === marriage.spouse2Id && current.spouse2Id === marriage.spouse1Id));
     if (index < 0) marriages.push(marriage);
-    else marriages[index] = { ...marriage, ...marriages[index], childrenIds: marriage.childrenIds };
+    else marriages[index] = {
+      ...marriage,
+      ...marriages[index],
+      childrenIds: uniq([...(marriages[index].childrenIds ?? []), ...(marriage.childrenIds ?? [])]),
+    };
   });
   return { persons: [...persons.values()], marriages };
 }
@@ -985,9 +993,8 @@ const AssistantPage: React.FC = () => {
           go(spouses.length ? 'kin-union' : 'kin-first', draft, nextPending);
           return;
         }
-        const spouses = hostSpouses(draft, clean);
         const next = { ...freshPending(), kin: pending.kin, gender: impliedGender(pending.kin ?? 'node-spouse'), hostId: clean, viaUncleId: findCollateral(draft, clean) ? clean : null };
-        go(pending.kin === 'node-child' && spouses.length ? 'kin-union' : 'kin-first', draft, next);
+        go(pending.kin === 'node-child' ? 'kin-union' : 'kin-first', draft, next);
         return;
       }
       case 'kin-union':
@@ -1318,7 +1325,7 @@ function promptFor(phase: Phase, draft: Draft, pending?: Pending) {
       if (pending?.kin === 'collateral-spouse') return 'Le conjoint de quel oncle ou quelle tante ?';
       if (pending?.kin === 'node-child') return 'L’enfant de quelle personne ?';
       return 'Le conjoint de quelle personne ?';
-    case 'kin-union': return 'Dans quelle union ?';
+    case 'kin-union': return 'Avec quel parent ou quelle union rattacher cet enfant ?';
     case 'kin-gender': return 'Quel genre enregistrer ?';
     case 'kin-last': return 'Quel est le nom ?';
     case 'kin-first':
@@ -1397,7 +1404,7 @@ function chipsFor(phase: Phase, draft: Draft, optional: boolean, pending?: Pendi
     const host = hostPerson(draft, hostId);
     const spouses = hostSpouses(draft, hostId);
     return [
-      { label: host?.firstName ? `${host.firstName} seul` : 'Seul', value: 'none' },
+      { label: host?.firstName ? `${host.firstName} seul · sans conjoint` : 'Un seul parent connu', value: 'none' },
       ...spouses.map((spouse) => ({ label: `${host?.firstName ?? ''} et ${spouse.firstName}`, value: spouse.id })),
     ];
   }

@@ -2,8 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export const gallery = {
-  portrait: '/gallery/portrait.jpg',
-  scenes: [1, 2, 3, 4, 5, 6, 7, 8].map((index) => `/gallery/scene-${index}.jpg`),
+  portrait: '/gallery/genealogy-generations.jpg',
+  scenes: [
+    '/gallery/genealogy-archives.jpg',
+    '/gallery/genealogy-oral-history.jpg',
+    '/gallery/genealogy-digital-memory.jpg',
+    '/gallery/genealogy-generations.jpg',
+  ],
 };
 
 export const Spotlight: React.FC<{ className?: string }> = ({ className = '' }) => {
@@ -82,7 +87,17 @@ export const InfiniteRow: React.FC<{ images: { src: string; alt: string }[]; fra
     <div className="overflow-hidden">
       <div className="genea-marquee flex w-max gap-3">
         {loop.map((image, index) => (
-          <img key={`${image.src}-${index}`} src={image.src} alt={image.alt} className={`shrink-0 rounded-2xl object-cover shadow-sm ${frameClass}`} />
+          <img
+            key={`${image.src}-${index}`}
+            src={image.src}
+            alt={image.alt}
+            width="1200"
+            height="675"
+            loading={index < images.length ? 'eager' : 'lazy'}
+            fetchPriority={index === 0 ? 'high' : 'auto'}
+            decoding="async"
+            className={`shrink-0 rounded-2xl object-cover shadow-sm ${frameClass}`}
+          />
         ))}
       </div>
     </div>

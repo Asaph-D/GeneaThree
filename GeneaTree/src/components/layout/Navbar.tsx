@@ -1,4 +1,4 @@
-import { Menu, Moon, Sun, Trees as Tree, X } from 'lucide-react';
+import { Menu, Moon, Sun, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 
@@ -53,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
         <div className="flex h-14 items-center justify-between">
           <Link to="/" className="rounded-lg px-1 py-1.5">
             <span className="flex items-center">
-              <Tree className="h-6 w-6 text-primary-600" />
+              <img src="/brand/geneatree-mark.svg" alt="" className="h-7 w-7" />
               <span className="ml-2 text-base font-semibold text-zinc-900 dark:text-white">
                 GeneaTree<span className="text-primary-600">Pro</span>
               </span>
@@ -73,8 +73,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
                 {item.label}
               </NavLink>
             ))}
-            <Link to="/assistant?new=1" className="ml-3 inline-flex items-center rounded-lg bg-primary-600 px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-primary-700">
-              Commencer
+            <Link to="/assistant?new=1" className="ml-3 inline-flex items-center rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 px-3.5 py-2 text-[13px] font-semibold text-white shadow-[0_8px_24px_-12px_rgba(79,70,229,0.9)] transition hover:from-sky-400 hover:to-indigo-500">
+              Créer
             </Link>
           </div>
           <div className="flex items-center gap-1 md:hidden">
@@ -108,9 +108,9 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
             <Link
               to="/assistant?new=1"
               onClick={() => setIsMenuOpen(false)}
-              className="mt-1 block rounded-xl bg-primary-600 px-3 py-3 text-center text-[15px] font-medium text-white hover:bg-primary-700"
+              className="mt-1 block rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-3 py-3 text-center text-[15px] font-semibold text-white hover:from-sky-400 hover:to-indigo-500"
             >
-              Commencer
+              Créer
             </Link>
           </div>
         </div>

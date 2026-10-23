@@ -20,8 +20,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        serif: ['Cormorant Garamond', 'serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        serif: ['Iowan Old Style', 'Baskerville', 'Times New Roman', 'serif'],
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out forwards',

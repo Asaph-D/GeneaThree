@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">GeneaTreePro</title>
+  <defs><linearGradient id="g" x1="8" y1="6" x2="55" y2="58" gradientUnits="userSpaceOnUse"><stop stop-color="#38bdf8"/><stop offset="1" stop-color="#4f46e5"/></linearGradient></defs>
+  <path d="M32 54V28m0 8L19 24m13 7 13-12M19 24l-8 8m8-8-2-10m28 5 8 8m-8-8 1-9" fill="none" stroke="url(#g)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="17" cy="13" r="7" fill="#0ea5e9"/><circle cx="47" cy="9" r="7" fill="#6366f1"/><circle cx="10" cy="33" r="7" fill="#0284c7"/><circle cx="54" cy="28" r="7" fill="#4f46e5"/><path d="M22 55h20" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/>
+</svg>
