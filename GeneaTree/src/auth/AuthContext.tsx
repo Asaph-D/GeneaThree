@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from '
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const anonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) as string | undefined;
+const configuredSiteUrl = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '');
 const supabase = url && anonKey ? createClient(url, anonKey) : null;
 
 interface AuthValue {
@@ -37,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!supabase) throw new Error('Supabase n’est pas configuré.');
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: `${window.location.origin}/demo` },
+        options: { redirectTo: `${configuredSiteUrl || window.location.origin}/demo` },
       });
       if (error) throw error;
     },

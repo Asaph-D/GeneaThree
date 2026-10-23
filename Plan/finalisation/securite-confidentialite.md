@@ -10,6 +10,7 @@
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` est également accepté pour l'intégration Supabase fournie par Vercel ; l'URL doit être copiée dans `VITE_SUPABASE_URL`.
 - Les clés `service_role`, secrètes, JWT et les identifiants PostgreSQL ne doivent jamais recevoir un préfixe public ni être intégrés au bundle Vite.
 - Les URL de retour locale et Vercel doivent être autorisées dans Supabase et dans les consoles OAuth Google/GitHub.
+- `VITE_SITE_URL` fixe l'origine de retour OAuth stable et évite qu'une ancienne URL locale Supabase soit réutilisée en production.
 
 ## Consentement et droits utilisateur
 
