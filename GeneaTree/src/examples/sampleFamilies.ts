@@ -150,7 +150,50 @@ function recomposee(): SampleFamily {
   return { id: 'recomposee', label: 'Cousins et unions successives', focusId: 're-simon', ...built };
 }
 
-export const SAMPLE_FAMILIES: SampleFamily[] = [monogame(), polygame(), recomposee()];
+function septGenerations(): SampleFamily {
+  const people: Person[] = [];
+  const marriages: Marriage[] = [];
+  const year = (generation: number, offset = 0) => `${1920 + generation * 24 + offset}-01-01`;
+
+  for (let generation = 0; generation < 7; generation += 1) {
+    people.push(
+      person(`g7-line-${generation}`, `Lignée ${generation + 1}`, 'Mballa', generation % 2 ? 'female' : 'male', year(generation), 'Bafoussam'),
+      person(`g7-spouse-${generation}`, `Alliance ${generation + 1}`, 'Mballa', generation % 2 ? 'male' : 'female', year(generation, 2), 'Foumban'),
+    );
+    if (generation === 6) continue;
+
+    const childGeneration = generation + 1;
+    people.push(
+      person(`g7-side-${childGeneration}`, `Branche ${childGeneration}`, 'Mballa', childGeneration % 2 ? 'male' : 'female', year(childGeneration, 1), 'Dschang'),
+    );
+    marriages.push({
+      id: `g7-main-union-${generation}`,
+      spouse1Id: `g7-line-${generation}`,
+      spouse2Id: `g7-spouse-${generation}`,
+      rank: 1,
+      childrenIds: [`g7-line-${childGeneration}`, `g7-side-${childGeneration}`],
+    });
+
+    if (childGeneration < 6) {
+      people.push(
+        person(`g7-side-spouse-${childGeneration}`, `Partenaire ${childGeneration}`, 'Njoya', childGeneration % 2 ? 'female' : 'male', year(childGeneration, 3), 'Foumban'),
+        person(`g7-cousin-${childGeneration + 1}`, `Cousin ${childGeneration + 1}`, 'Mballa', 'unknown', year(childGeneration + 1, 2), 'Douala'),
+      );
+      marriages.push({
+        id: `g7-side-union-${childGeneration}`,
+        spouse1Id: `g7-side-${childGeneration}`,
+        spouse2Id: `g7-side-spouse-${childGeneration}`,
+        rank: 1,
+        childrenIds: [`g7-cousin-${childGeneration + 1}`],
+      });
+    }
+  }
+
+  const built = assemble(people, marriages);
+  return { id: 'sept-generations', label: 'Sept générations et cousins', focusId: 'g7-line-3', ...built };
+}
+
+export const SAMPLE_FAMILIES: SampleFamily[] = [monogame(), polygame(), recomposee(), septGenerations()];
 
 export function getSampleFamily(id: string): SampleFamily {
   return SAMPLE_FAMILIES.find((family) => family.id === id) ?? SAMPLE_FAMILIES[0];

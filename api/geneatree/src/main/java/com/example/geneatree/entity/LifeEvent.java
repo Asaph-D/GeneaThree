@@ -30,6 +30,10 @@ public class LifeEvent {
     private String location;
     private String description;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tree_id")
+    private FamilyTree tree;
+
     @ManyToMany
     @JoinTable(
         name = "life_event_related_person_ids",

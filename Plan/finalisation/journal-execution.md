@@ -21,6 +21,8 @@
 - [x] Refaire FAQ et À propos dans le langage visuel du site.
 - [x] Valider dates, identifiants, réciprocité et cycles avant toute sauvegarde atomique.
 - [x] Retourner des erreurs RFC 9457 cohérentes sur les ressources CRUD absentes.
+- [x] Ajouter comptes authentifiés, mots de passe BCrypt, arbres propriétaires et rôles `OWNER`, `COLLABORATOR`, `READER`.
+- [x] Créer automatiquement le premier arbre et son adhésion propriétaire à l’inscription.
 - [x] Centraliser l'URL API.
 - [x] Aligner le corps de `createPerson` sur `PersonDTO`.
 - [x] Relancer build et lint.
@@ -65,3 +67,32 @@ P0-04 : concevoir et tester la sauvegarde atomique du snapshot familial.
 - `/quick-start` reste la page Horizons afin de ne pas casser les liens existants.
 - `/atelier` devient une vitrine partenaires ; la création se concentre sur `/assistant` et `/demo`.
 - Le mode local reste le défaut documenté tant que la sauvegarde backend n'est pas atomique.
+
+## 2026-10-23 — Phase 2, authentification et isolation
+
+- [x] Ajouter les comptes persistants avec mots de passe BCrypt.
+- [x] Créer les arbres et appartenances `OWNER`, `COLLABORATOR`, `READER`.
+- [x] Ajouter les snapshots isolés sous `/api/trees/{treeId}/family`.
+- [x] Refuser les lectures inter-arbres et les écritures des lecteurs.
+- [x] Retourner les refus d'accès au format `application/problem+json`.
+- [x] Rendre l'authentification HTTP sans état et durcir en-têtes, cookies et logs.
+- [x] Exécuter les tests d'autorisation ciblés : 4 tests, 0 échec.
+- [x] Exécuter la suite backend complète après durcissement : 11 tests, 0 échec.
+- [x] Limiter les anciennes routes globales aux profils `demo` et `test`.
+- [x] Ajouter consentement horodaté, export JSON et suppression transactionnelle.
+- [x] Documenter conservation, sauvegarde et restauration.
+- [x] Clore la phase 2 avec la suite backend complète : 12 tests, 0 échec.
+
+## 2026-10-23 — Ouverture de la phase 3
+
+- [x] Auditer `bandLayout.ts` face à la stratégie de positionnement.
+- [x] Confirmer que la vue lignage utilise le moteur pur par bandes.
+- [x] Confirmer que les vues D3 restent des modes secondaires.
+- [x] Ajouter une fixture sélectionnable sur sept générations avec branches cousines.
+- [x] Compiler le frontend de production avec la fixture : build réussi.
+- [x] Ajouter le repli de branche au double-clic et les détails progressifs selon le zoom.
+- [x] Transformer le menu mobile en tiroir superposé depuis la droite.
+- [x] Ajouter avatar, menu de compte, déconnexion et OAuth Google/GitHub via Supabase.
+- [x] Transformer `/quick-start` en page d'abonnements responsive.
+- [x] Valider build et lint : 0 erreur, 7 avertissements préexistants ou non bloquants.
+- [x] Contrôler la page abonnements avec Edge headless en viewport mobile.

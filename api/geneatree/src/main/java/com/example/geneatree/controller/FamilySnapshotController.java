@@ -4,9 +4,11 @@ import com.example.geneatree.dto.FamilySnapshotDTO;
 import com.example.geneatree.service.FamilySnapshotService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@Profile({"demo", "test"})
 @RequestMapping("/api/family")
 public class FamilySnapshotController {
     private final FamilySnapshotService familySnapshotService;
@@ -31,4 +33,3 @@ public class FamilySnapshotController {
         return ResponseEntity.noContent().build();
     }
 }
-

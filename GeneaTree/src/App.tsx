@@ -9,7 +9,8 @@ const DemoPage = lazy(() => import('./pages/DemoPage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const FaqPage = lazy(() => import('./pages/FaqPage'));
 const CreateAccountForm = lazy(() => import('./components/modals/CreateAccountForm'));
-const HorizonsPage = lazy(() => import('./pages/HorizonsPage'));
+const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
+const AccountPage = lazy(() => import('./pages/AccountPage'));
 const AssistantPage = lazy(() => import('./pages/AssistantPage'));
 const CreationPage = lazy(() => import('./creation/CreationPage'));
 
@@ -43,7 +44,8 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/demo" element={<DemoPage />} />
-            <Route path="/quick-start" element={<HorizonsPage />} />
+            <Route path="/quick-start" element={<SubscriptionPage />} />
+            <Route path="/account" element={<AccountPage />} />
             <Route path="/atelier" element={<CreationPage />} />
             <Route path="/assistant" element={<AssistantPage />} />
             <Route path="/signin" element={<CreateAccountForm onSubmit={() => undefined} />} />

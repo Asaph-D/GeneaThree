@@ -18,6 +18,8 @@
 
 html {
   font-size: clamp(12.5px, 0.18vw + 12px, 14.5px);
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -26,7 +28,11 @@ body {
   background-color: #f4f1ea;
   color: #1c1917;
   transition: background-color 0.3s ease, color 0.3s ease;
+  max-width: 100%;
+  overflow-x: hidden;
 }
+
+#root { max-width: 100%; overflow-x: hidden; }
 
 .tree-container {
   width: 100%;

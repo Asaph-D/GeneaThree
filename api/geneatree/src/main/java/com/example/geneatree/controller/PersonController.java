@@ -4,12 +4,14 @@ import com.example.geneatree.dto.LifeEventDTO;
 import com.example.geneatree.dto.PersonDTO;
 import com.example.geneatree.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@Profile({"demo", "test"})
 @RequestMapping("/api/people")
 public class PersonController {
 

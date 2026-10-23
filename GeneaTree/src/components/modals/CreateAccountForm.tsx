@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, CheckCircle, Github } from 'lucide-react';
+import { useAuth } from '../../auth/AuthContext';
 
 interface CreateAccountFormProps {
   onSubmit: (userData: UserData) => void;
@@ -15,6 +16,7 @@ export interface UserData {
 }
 
 const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
+  const { configured, signInWithProvider } = useAuth();
   const [formData, setFormData] = useState<UserData>({
     firstName: '',
     lastName: '',
@@ -92,6 +94,12 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
           Commencez à explorer votre histoire familiale
         </p>
       </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <button type="button" disabled={!configured} onClick={() => void signInWithProvider('google')} className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900">Google</button>
+        <button type="button" disabled={!configured} onClick={() => void signInWithProvider('github')} className="flex items-center justify-center gap-2 rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900"><Github size={16} /> GitHub</button>
+      </div>
+      <div className="my-5 flex items-center gap-3 text-xs text-zinc-400"><span className="h-px flex-1 bg-zinc-200 dark:bg-white/10" />ou par e-mail<span className="h-px flex-1 bg-zinc-200 dark:bg-white/10" /></div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -110,7 +118,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
                 value={formData.firstName}
                 onChange={handleChange}
                 className={`pl-10 w-full rounded-md border ${errors.firstName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white transition-colors duration-300`}
-                placeholder="Jean"
+                placeholder="Asaph"
               />
             </div>
             {errors.firstName && (
@@ -133,7 +141,7 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
                 value={formData.lastName}
                 onChange={handleChange}
                 className={`pl-10 w-full rounded-md border ${errors.lastName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'} focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-700 dark:text-white transition-colors duration-300`}
-                placeholder="Dupont"
+                placeholder="Kouokam"
               />
             </div>
             {errors.lastName && (

@@ -46,7 +46,7 @@ const Footer: React.FC = () => {
                   </li>
                   <li>
                     <Link to="/quick-start" className="text-base text-gray-400 hover:text-white">
-                      Horizons
+                      Abonnements
                     </Link>
                   </li>
                   <li>

@@ -41,6 +41,11 @@ public class Person {
     private String email;
     private String phone;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tree_id")
+    @JsonIgnore
+    private FamilyTree tree;
+
     @ManyToMany
     @JoinTable(
         name = "person_parent_ids",

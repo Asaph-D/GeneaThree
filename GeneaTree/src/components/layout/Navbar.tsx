@@ -1,6 +1,7 @@
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import AccountButton from '../auth/AccountButton';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -8,7 +9,7 @@ interface NavbarProps {
 }
 
 const links = [
-  { to: '/quick-start', label: 'Horizons' },
+  { to: '/quick-start', label: 'Abonnements' },
   { to: '/atelier', label: 'Découvrir' },
   { to: '/demo', label: 'Démonstration' },
   { to: '/about', label: 'À propos' },
@@ -76,6 +77,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
             <Link to="/assistant?new=1" className="ml-3 inline-flex items-center rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 px-3.5 py-2 text-[13px] font-semibold text-white shadow-[0_8px_24px_-12px_rgba(79,70,229,0.9)] transition hover:from-sky-400 hover:to-indigo-500">
               Créer
             </Link>
+            <AccountButton />
           </div>
           <div className="flex items-center gap-1 md:hidden">
             {themeButton}
@@ -93,8 +95,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
       </div>
 
       {isMenuOpen && (
-        <div className="px-3 pb-3 md:hidden">
-          <div className="rounded-2xl border border-zinc-200/80 bg-[#f4f1ea]/95 p-2 shadow-[0_24px_50px_-28px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/95">
+        <div className="fixed inset-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-[60] bg-black/35 md:hidden" onClick={() => setIsMenuOpen(false)}>
+          <div className="ml-auto flex h-full w-[min(86vw,22rem)] flex-col border-l border-zinc-200 bg-[#f4f1ea] p-3 shadow-2xl dark:border-white/10 dark:bg-zinc-950" onClick={(event) => event.stopPropagation()}>
             {links.map((item) => (
               <NavLink
                 key={item.to}
@@ -112,6 +114,9 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
             >
               Créer
             </Link>
+            <div className="mt-auto flex items-center justify-between border-t border-zinc-200 px-2 pt-4 dark:border-white/10">
+              <span className="text-sm text-zinc-500">Mon compte</span><AccountButton />
+            </div>
           </div>
         </div>
       )}

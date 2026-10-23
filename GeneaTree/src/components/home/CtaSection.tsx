@@ -13,7 +13,7 @@ const CtaSection: React.FC = () => {
         <div className="flex gap-3">
           <MovingBorder to="/assistant?new=1">Créer</MovingBorder>
           <Link to="/quick-start" className="rounded-lg border border-zinc-300 px-4 py-2.5 text-sm font-medium text-zinc-800 dark:border-white/15 dark:text-zinc-100">
-            Horizons
+            Voir les abonnements
           </Link>
         </div>
       </div>

@@ -49,6 +49,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
   const fitKeyRef = useRef('');
   const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number, y: number, personId: string } | null>(null);
   const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
+  const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => new Set());
   const hoverRef = useRef(onPersonHover);
   const hoverEndRef = useRef(onPersonHoverEnd);
   const selectRef = useRef(onPersonSelect);
@@ -117,7 +118,10 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
       })
       .on('zoom', (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         if (gRef.current) {
-          d3.select(gRef.current).attr('transform', event.transform.toString());
+          const content = d3.select(gRef.current).attr('transform', event.transform.toString());
+          content.selectAll<SVGElement, unknown>('.node-portrait').style('display', event.transform.k < 0.42 ? 'none' : null);
+          content.selectAll<SVGElement, unknown>('.node-secondary-detail').style('display', event.transform.k < 0.34 ? 'none' : null);
+          content.selectAll<SVGElement, unknown>('.node-tertiary-detail').style('display', event.transform.k < 0.58 ? 'none' : null);
         }
       });
 
@@ -146,19 +150,35 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
       return;
     }
 
-    const focusRecord = familyData.find((person) => person.id === validFocusPerson);
+    const hidden = new Set<string>();
+    const byId = new Map(familyData.map((person) => [person.id, person]));
+    collapsedIds.forEach((id) => {
+      const queue = [...(byId.get(id)?.childrenIds ?? [])];
+      while (queue.length) {
+        const childId = queue.shift()!;
+        if (hidden.has(childId)) continue;
+        hidden.add(childId);
+        queue.push(...(byId.get(childId)?.childrenIds ?? []));
+      }
+    });
+    const visibleFamily = familyData.filter((person) => !hidden.has(person.id));
+    const visibleIds = new Set(visibleFamily.map((person) => person.id));
+    const visibleMarriages = marriagesData
+      .filter((marriage) => visibleIds.has(marriage.spouse1Id) && visibleIds.has(marriage.spouse2Id))
+      .map((marriage) => ({ ...marriage, childrenIds: (marriage.childrenIds ?? []).filter((id) => visibleIds.has(id)) }));
+    const focusRecord = visibleFamily.find((person) => person.id === validFocusPerson);
     const annotated = focusRecord
-      ? familyData.map((person) => ({
+      ? visibleFamily.map((person) => ({
           ...person,
-          relationship: relationToFocus(person, focusRecord, familyData) as Person['relationship'],
+          relationship: relationToFocus(person, focusRecord, visibleFamily) as Person['relationship'],
         }))
-      : familyData;
+      : visibleFamily;
 
     if (viewType === 'tree' || viewType === 'vertical') {
       const layout = drawBandTree(
         g,
         annotated,
-        marriagesData,
+        visibleMarriages,
         generations,
         validFocusPerson,
         document.body.classList.contains('dark'),
@@ -169,7 +189,12 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
           }
         },
         (person, rect) => hoverRef.current?.(person, rect),
-        () => hoverEndRef.current?.()
+        () => hoverEndRef.current?.(),
+        (person) => setCollapsedIds((current) => {
+          const next = new Set(current);
+          if (next.has(person.id)) next.delete(person.id); else if (person.childrenIds.length) next.add(person.id);
+          return next;
+        })
       );
       const zoom = zoomRef.current;
       const host = svgRef.current;
@@ -180,7 +205,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
         const safeScale = Math.max(0.2, Math.min(0.8, fit));
         const tx = (svgW - layout.width * safeScale) / 2 - layout.minX * safeScale;
         const ty = (svgH - layout.height * safeScale) / 2 - layout.minY * safeScale;
-        const fitKey = `${viewType}|${generations}|${annotated.map((person) => person.id).join(',')}|${marriagesData.map((marriage) => marriage.id).join(',')}`;
+        const fitKey = `${viewType}|${generations}|${annotated.map((person) => person.id).join(',')}|${visibleMarriages.map((marriage) => marriage.id).join(',')}`;
         if (fitKeyRef.current !== fitKey) {
           fitKeyRef.current = fitKey;
           svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(safeScale));
@@ -675,7 +700,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
         .text("✏");
     }
 
-  }, [viewType, generations, focusPerson, familyData, marriagesData, isEditMode]);
+  }, [viewType, generations, focusPerson, familyData, marriagesData, isEditMode, collapsedIds]);
 
   useEffect(() => {
     initializeTree();

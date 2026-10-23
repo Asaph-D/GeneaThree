@@ -48,12 +48,12 @@ Critère de sortie : une sauvegarde est atomique; les fixtures monogame, polygam
 
 Durée cible : 1 à 2 semaines.
 
-- [ ] Ajouter authentification et modèle propriétaire/collaborateur/lecteur.
-- [ ] Protéger toutes les routes de données par arbre.
+- [x] Ajouter authentification et modèle propriétaire/collaborateur/lecteur.
+- [x] Protéger toutes les routes de données par arbre.
 - [x] Externaliser les secrets et rendre CORS configurable.
-- [ ] Durcir cookies et journaux avant exposition publique.
-- [ ] Ajouter consentement, export et suppression des données personnelles.
-- [ ] Documenter sauvegarde, restauration et durée de conservation.
+- [x] Durcir cookies et journaux avant exposition publique.
+- [x] Ajouter consentement, export et suppression des données personnelles.
+- [x] Documenter sauvegarde, restauration et durée de conservation.
 
 Critère de sortie : tests d'autorisation négatifs verts et aucune donnée personnelle exposée anonymement.
 
@@ -61,11 +61,11 @@ Critère de sortie : tests d'autorisation négatifs verts et aucune donnée pers
 
 Durée cible : 2 à 4 semaines.
 
-- [ ] Écrire le moteur pur de générations, foyers et couloirs décrit dans `../strategie-positionnement.md`.
-- [ ] Couvrir le moteur par des fixtures jusqu'à sept générations.
-- [ ] Remplacer progressivement le placement `d3.tree` dans la vue lignage.
-- [ ] Ajouter repli, centrage et niveaux de détail selon le zoom.
-- [ ] Conserver les vues alternatives comme modes secondaires.
+- [x] Écrire le moteur pur de générations, foyers et couloirs décrit dans `../strategie-positionnement.md`.
+- [x] Couvrir le moteur par des fixtures jusqu'à sept générations.
+- [x] Remplacer progressivement le placement `d3.tree` dans la vue lignage.
+- [x] Ajouter repli, centrage et niveaux de détail selon le zoom.
+- [x] Conserver les vues alternatives comme modes secondaires.
 
 Critère de sortie : cousins alignés, foyers polygames séparés et aucune filiation principale hors de son couloir.
 
@@ -76,6 +76,9 @@ Durée cible : 1 à 2 semaines.
 - [ ] Ajouter CI et migrations Flyway.
 - [x] Ajouter le conteneur backend et documenter l'environnement Render.
 - [x] Découper les pages du bundle initial.
+- [x] Transformer `/quick-start` en page d'abonnements.
+- [x] Ajouter le tiroir mobile superposé et le menu de profil.
+- [x] Intégrer les sessions et fournisseurs OAuth Google/GitHub via Supabase.
 - [ ] Charger les fonctions d'export à la demande.
 - [ ] Ajouter observabilité, suivi d'erreurs et métriques non personnelles.
 - [ ] Exécuter tests d'accessibilité, responsive et compatibilité navigateurs.

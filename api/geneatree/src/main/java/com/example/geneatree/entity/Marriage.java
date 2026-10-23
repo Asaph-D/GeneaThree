@@ -38,6 +38,11 @@ public class Marriage {
     private String divorceDate;
     private String location;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tree_id")
+    @JsonIgnore
+    private FamilyTree tree;
+
     @ManyToOne
     @JoinColumn(name = "event_id")
     private LifeEvent event;

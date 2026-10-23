@@ -27,7 +27,8 @@ export function drawBandTree(
   onSelect: (person: Person, rect: DOMRect) => void,
   onContextMenu?: (person: Person, event: MouseEvent) => void,
   onHover?: (person: Person, rect: DOMRect) => void,
-  onHoverEnd?: () => void
+  onHoverEnd?: () => void,
+  onToggleCollapse?: (person: Person) => void
 ): BandLayout {
   const layout = layoutBands(people, marriages, maxGenerations);
   const ink = dark ? '#e7e5e4' : '#1c1917';
@@ -199,6 +200,10 @@ export function drawBandTree(
       event.preventDefault();
       onContextMenu?.(node.person, event);
     })
+    .on('dblclick', (event, node) => {
+      event.stopPropagation();
+      onToggleCollapse?.(node.person);
+    })
     .on('mouseenter', function onNodeEnter(_event, node) {
       if (d3.select(this).classed('is-muted')) return;
       onHover?.(node.person, this.getBoundingClientRect());
@@ -223,6 +228,7 @@ export function drawBandTree(
         .append('circle')
         .attr('r', 26);
       card.append('image')
+        .attr('class', 'node-portrait')
         .attr('href', person.photoUrl!)
         .attr('x', -26)
         .attr('y', -26)
@@ -252,6 +258,7 @@ export function drawBandTree(
   });
 
   cards.append('text')
+    .attr('class', 'node-first-name')
     .attr('text-anchor', 'middle')
     .attr('y', 46)
     .attr('fill', ink)
@@ -261,6 +268,7 @@ export function drawBandTree(
     .text((node) => displayFirst(node.person));
 
   cards.append('text')
+    .attr('class', 'node-secondary-detail')
     .attr('text-anchor', 'middle')
     .attr('y', 62)
     .attr('fill', ink)
@@ -270,6 +278,7 @@ export function drawBandTree(
 
   cards.filter((node) => Boolean(node.person.birthDate))
     .append('text')
+    .attr('class', 'node-tertiary-detail')
     .attr('text-anchor', 'middle')
     .attr('y', 76)
     .attr('fill', muted)
