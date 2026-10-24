@@ -11,7 +11,7 @@ type Phase =
   | 'child-ask' | 'child-union' | 'child-first' | 'child-last' | 'child-gender' | 'child-more'
   | 'parent-ask' | 'parent-first' | 'parent-last' | 'parent-gender' | 'parent-second'
   | 'parent2-first' | 'parent2-last' | 'parent2-gender'
-  | 'grow' | 'kin-side' | 'kin-link-role' | 'kin-link' | 'kin-link-last' | 'kin-pick' | 'kin-union' | 'kin-first' | 'kin-last' | 'kin-gender';
+  | 'grow' | 'kin-side' | 'kin-link-role' | 'kin-link' | 'kin-link-last' | 'kin-pick' | 'kin-union' | 'kin-parent-union' | 'kin-first' | 'kin-last' | 'kin-gender';
 
 type KinKind =
   | 'brother' | 'sister'
@@ -35,6 +35,7 @@ interface Bits {
 interface Collateral {
   person: Bits;
   spouses: (Bits & { rank: number })[];
+  parentIds: string[];
 }
 
 interface Branch {
@@ -153,14 +154,72 @@ function draftFromFamily(persons: Person[], marriages: Marriage[], focusId: stri
     const unionSpouseId = union ? (union.spouse1Id === anchor.id ? union.spouse2Id : union.spouse1Id) : null;
     return [{ ...bitsFromPerson(child), unionSpouseId }];
   });
+  const parents = anchor.parentIds.flatMap((id) => personById.has(id) ? [bitsFromPerson(personById.get(id)!)] : []);
+  const branches = parents.map((parentBits): Branch => {
+    const parent = personById.get(parentBits.id)!;
+    const grandparents = (parent.parentIds ?? []).flatMap((id) => personById.has(id) ? [personById.get(id)!] : []);
+    const grandfatherPerson = grandparents.find((person) => person.gender === 'male')
+      ?? grandparents.find((person) => person.gender === 'unknown');
+    const grandmotherPerson = grandparents.find((person) => person.gender === 'female')
+      ?? grandparents.find((person) => person.id !== grandfatherPerson?.id);
+    const grandparentIds = new Set(grandparents.map((person) => person.id));
+    const collateralIds = new Set([
+      ...(parent.siblingIds ?? []),
+      ...persons
+        .filter((person) => person.id !== parent.id && person.parentIds?.some((id) => grandparentIds.has(id)))
+        .map((person) => person.id),
+    ]);
+    const collateralPeople = [...collateralIds].flatMap((id) => personById.has(id) ? [personById.get(id)!] : []);
+    const collaterals = collateralPeople.map((collateral): Collateral => {
+      const unions = marriages
+        .filter((marriage) => marriage.spouse1Id === collateral.id || marriage.spouse2Id === collateral.id)
+        .sort((left, right) => (left.rank ?? 0) - (right.rank ?? 0));
+      const collateralSpouses = unions.flatMap((marriage, index) => {
+        const spouseId = marriage.spouse1Id === collateral.id ? marriage.spouse2Id : marriage.spouse1Id;
+        const spouse = personById.get(spouseId);
+        return spouse ? [{ ...bitsFromPerson(spouse), rank: marriage.rank ?? index + 1 }] : [];
+      });
+      return { person: bitsFromPerson(collateral), spouses: collateralSpouses, parentIds: [...(collateral.parentIds ?? [])] };
+    });
+    const cousins = collateralPeople.flatMap((collateral) => (collateral.childrenIds ?? []).flatMap((childId) => {
+      const child = personById.get(childId);
+      if (!child) return [];
+      const union = marriages.find((marriage) =>
+        marriage.childrenIds?.includes(childId)
+        && (marriage.spouse1Id === collateral.id || marriage.spouse2Id === collateral.id));
+      const unionSpouseId = union
+        ? (union.spouse1Id === collateral.id ? union.spouse2Id : union.spouse1Id)
+        : null;
+      return [{ ...bitsFromPerson(child), collateralId: collateral.id, unionSpouseId }];
+    }));
+    return {
+      parentId: parentBits.id,
+      grandfather: grandfatherPerson ? bitsFromPerson(grandfatherPerson) : undefined,
+      grandmother: grandmotherPerson ? bitsFromPerson(grandmotherPerson) : undefined,
+      collaterals,
+      cousins,
+    };
+  });
+  const branchGrandparents = new Set(branches.flatMap((branch) => [branch.grandfather?.id, branch.grandmother?.id].filter((id): id is string => Boolean(id))));
+  const pairedGrandparents = new Set(branches.flatMap((branch) => branch.grandfather && branch.grandmother
+    ? [`${branch.grandfather.id}:${branch.grandmother.id}`, `${branch.grandmother.id}:${branch.grandfather.id}`]
+    : []));
+  const extraSpouses = marriages.flatMap((marriage, index) => {
+    const pairs = [[marriage.spouse1Id, marriage.spouse2Id], [marriage.spouse2Id, marriage.spouse1Id]] as const;
+    return pairs.flatMap(([hostId, spouseId]) => {
+      if (!branchGrandparents.has(hostId) || pairedGrandparents.has(`${hostId}:${spouseId}`)) return [];
+      const spouse = personById.get(spouseId);
+      return spouse ? [{ hostId, spouse: { ...bitsFromPerson(spouse), rank: marriage.rank ?? index + 1 } }] : [];
+    });
+  });
   return {
     anchor: bitsFromPerson(anchor),
     spouses,
     children,
-    parents: anchor.parentIds.flatMap((id) => personById.has(id) ? [bitsFromPerson(personById.get(id)!)] : []),
+    parents,
     siblings: (anchor.siblingIds ?? []).flatMap((id) => personById.has(id) ? [bitsFromPerson(personById.get(id)!)] : []),
-    branches: [],
-    extraSpouses: [],
+    branches,
+    extraSpouses,
     extraChildren: [],
   };
 }
@@ -357,7 +416,6 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
     const grandparents = [branch.grandfather, branch.grandmother].filter((item): item is Bits => Boolean(item));
     const grandIds = grandparents.map((item) => item.id);
     const collateralIds = branch.collaterals.map((item) => item.person.id);
-    const lineKids = [parent.id, ...collateralIds];
     const other = anchorParents.find((item) => item.id !== parent.id);
     const extra = draft.extraSpouses.filter((item) => item.hostId === parent.id).map((item) => item.spouse);
 
@@ -369,7 +427,10 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
     });
 
     if (branch.grandfather && branch.grandmother) {
-      addMarriage(branch.grandfather.id, branch.grandmother.id, 1, lineKids);
+      const sharedChildren = [parent.id, ...branch.collaterals
+        .filter((item) => item.parentIds.includes(branch.grandfather!.id) && item.parentIds.includes(branch.grandmother!.id))
+        .map((item) => item.person.id)];
+      addMarriage(branch.grandfather.id, branch.grandmother.id, 1, sharedChildren);
     }
     grandparents.forEach((grand) => {
       const partners = grand.id === branch.grandfather?.id
@@ -377,7 +438,7 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
         : [branch.grandfather, ...draft.extraSpouses.filter((item) => item.hostId === grand.id).map((item) => item.spouse)].filter((item): item is Bits => Boolean(item));
       ensure(grand, {
         parentIds: [],
-        childrenIds: lineKids,
+        childrenIds: [parent.id, ...branch.collaterals.filter((item) => item.parentIds.includes(grand.id)).map((item) => item.person.id)],
         spouseIds: partners.map((item) => item.id),
         siblingIds: [],
       });
@@ -386,8 +447,11 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
     let extraRank = branch.grandfather && branch.grandmother ? 2 : 1;
     draft.extraSpouses.filter((item) => item.hostId === branch.grandfather?.id || item.hostId === branch.grandmother?.id).forEach((item) => {
       if (!people.has(item.spouse.id)) {
-        ensure(item.spouse, { parentIds: [], childrenIds: [], spouseIds: [item.hostId], siblingIds: [] });
-        addMarriage(item.hostId, item.spouse.id, extraRank, []);
+        const unionChildren = branch.collaterals
+          .filter((collateral) => collateral.parentIds.includes(item.hostId) && collateral.parentIds.includes(item.spouse.id))
+          .map((collateral) => collateral.person.id);
+        ensure(item.spouse, { parentIds: [], childrenIds: unionChildren, spouseIds: [item.hostId], siblingIds: [] });
+        addMarriage(item.hostId, item.spouse.id, extraRank, unionChildren);
         extraRank += 1;
       }
     });
@@ -395,7 +459,7 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
     branch.collaterals.forEach((collateral) => {
       const cousins = branch.cousins.filter((cousin) => cousin.collateralId === collateral.person.id);
       ensure(collateral.person, {
-        parentIds: grandIds,
+        parentIds: collateral.parentIds.length ? collateral.parentIds : grandIds,
         childrenIds: cousins.map((cousin) => cousin.id),
         spouseIds: collateral.spouses.map((spouse) => spouse.id),
         siblingIds: [parent.id, ...collateralIds.filter((id) => id !== collateral.person.id)],
@@ -463,13 +527,46 @@ function withBranch(draft: Draft, parentId: string, update: (branch: Branch) => 
   return { ...draft, branches };
 }
 
+function siblingParentOptions(draft: Draft, parentId: string) {
+  const branch = branchOf(draft, parentId);
+  if (!branch) return [];
+  const known = [branch.grandfather, branch.grandmother].filter((item): item is Bits => Boolean(item));
+  const options: { value: string; label: string; parentIds: string[] }[] = [];
+  if (known.length === 2) {
+    options.push({
+      value: `${known[0].id}|${known[1].id}`,
+      label: `${known[0].firstName} et ${known[1].firstName}`,
+      parentIds: [known[0].id, known[1].id],
+    });
+  } else if (known.length === 1) {
+    options.push({ value: `${known[0].id}|none`, label: `${known[0].firstName} seul · autre parent inconnu`, parentIds: [known[0].id] });
+  }
+  known.forEach((grandparent) => {
+    draft.extraSpouses.filter((item) => item.hostId === grandparent.id).forEach((item) => {
+      options.push({
+        value: `${grandparent.id}|${item.spouse.id}`,
+        label: `${grandparent.firstName} et ${item.spouse.firstName}`,
+        parentIds: [grandparent.id, item.spouse.id],
+      });
+    });
+  });
+  return options.filter((option, index) => options.findIndex((item) => item.value === option.value) === index);
+}
+
 function routeKin(kin: KinKind, draft: Draft, parentId: string): { phase: Phase; pendingPatch: Partial<Pending> } {
   const branch = branchOf(draft, parentId);
   if (kin === 'brother' || kin === 'sister' || kin === 'grandfather' || kin === 'grandmother') {
     return { phase: 'kin-first', pendingPatch: {} };
   }
   if (kin === 'uncle' || kin === 'aunt') {
-    return { phase: branch?.grandfather || branch?.grandmother ? 'kin-first' : 'kin-link-role', pendingPatch: {} };
+    if (!branch?.grandfather && !branch?.grandmother) return { phase: 'kin-link-role', pendingPatch: {} };
+    const options = siblingParentOptions(draft, parentId);
+    if (options.length > 1) return { phase: 'kin-parent-union', pendingPatch: {} };
+    const parentIds = options[0]?.parentIds ?? [];
+    return {
+      phase: 'kin-first',
+      pendingPatch: { hostId: parentIds[0] ?? null, unionSpouseId: parentIds[1] ?? null },
+    };
   }
   if (kin === 'cousin' || kin === 'cousine') return { phase: 'kin-pick', pendingPatch: {} };
   return { phase: 'grow', pendingPatch: {} };
@@ -605,9 +702,10 @@ function finishKin(draft: Draft, source: Pending): { draft: Draft; phase: Phase;
 
   if ((source.kin === 'uncle' || source.kin === 'aunt') && source.viaParentId) {
     const person = { ...emptyBits(uid(source.kin === 'aunt' ? 'au' : 'un')), ...bits };
+    const parentIds = [source.hostId, source.unionSpouseId].filter((id): id is string => Boolean(id && id !== 'none'));
     const next = withBranch(draft, source.viaParentId, (branch) => ({
       ...branch,
-      collaterals: [...branch.collaterals, { person, spouses: [] }],
+      collaterals: [...branch.collaterals, { person, spouses: [], parentIds }],
     }));
     if (source.queue === 'cousin' || source.queue === 'cousine') {
       return {
@@ -955,7 +1053,7 @@ const AssistantPage: React.FC = () => {
         const branch = pending.viaParentId ? branchOf(draft, pending.viaParentId) : undefined;
         const existing = linkAs === 'female' ? branch?.grandmother : branch?.grandfather;
         if (existing) {
-          go('kin-first', draft, { ...pending, linkAs, firstName: '', lastName: '' });
+          go('kin-first', draft, { ...pending, linkAs, hostId: existing.id, unionSpouseId: null, firstName: '', lastName: '' });
           return;
         }
         go('kin-link', draft, { ...pending, linkAs, firstName: '', lastName: '' });
@@ -971,7 +1069,12 @@ const AssistantPage: React.FC = () => {
         }
         const key = pending.linkAs === 'female' ? 'grandmother' : 'grandfather';
         const person = { ...emptyBits(uid(pending.linkAs === 'female' ? 'gm' : 'gf')), firstName: pending.firstName, lastName: clean, gender: pending.linkAs };
-        go('kin-first', withBranch(draft, pending.viaParentId, (branch) => ({ ...branch, [key]: person })), { ...pending, firstName: '', lastName: '' });
+        go('kin-first', withBranch(draft, pending.viaParentId, (branch) => ({ ...branch, [key]: person })), { ...pending, hostId: person.id, unionSpouseId: null, firstName: '', lastName: '' });
+        return;
+      }
+      case 'kin-parent-union': {
+        const [firstParentId, secondParentId] = clean.split('|');
+        go('kin-first', draft, { ...pending, hostId: firstParentId, unionSpouseId: secondParentId === 'none' ? null : secondParentId });
         return;
       }
       case 'kin-pick': {
@@ -1261,7 +1364,7 @@ function kinLabel(kin: KinKind) {
 
 function kindOf(phase: Phase): 'text' | 'date' | 'choice' | 'yesno' | 'grow' {
   if (phase === 'grow') return 'grow';
-  if (phase === 'kin-side' || phase === 'kin-link-role' || phase === 'kin-pick' || phase === 'kin-union' || phase.endsWith('gender') || phase === 'child-union') return 'choice';
+  if (phase === 'kin-side' || phase === 'kin-link-role' || phase === 'kin-pick' || phase === 'kin-union' || phase === 'kin-parent-union' || phase.endsWith('gender') || phase === 'child-union') return 'choice';
   if (phase.endsWith('ask') || phase.endsWith('more') || phase === 'parent-second') return 'yesno';
   if (phase === 'anchor-birth') return 'date';
   return 'text';
@@ -1326,6 +1429,7 @@ function promptFor(phase: Phase, draft: Draft, pending?: Pending) {
       if (pending?.kin === 'node-child') return 'L’enfant de quelle personne ?';
       return 'Le conjoint de quelle personne ?';
     case 'kin-union': return 'Avec quel parent ou quelle union rattacher cet enfant ?';
+    case 'kin-parent-union': return `De quelle union des parents de ${parent} cette personne est-elle issue ?`;
     case 'kin-gender': return 'Quel genre enregistrer ?';
     case 'kin-last': return 'Quel est le nom ?';
     case 'kin-first':
@@ -1373,7 +1477,7 @@ function interpret(phase: Phase, raw: string, optional: boolean, draft: Draft, p
     if (clean === 'mother' || /m[eè]re/i.test(clean)) return { ok: true, value: 'mother', label: 'Sa mère' };
     return { ok: false, error: 'Choisissez le père ou la mère.' };
   }
-  if (phase === 'kin-pick' || phase === 'kin-union') {
+  if (phase === 'kin-pick' || phase === 'kin-union' || phase === 'kin-parent-union') {
     const choice = (pending ? chipsFor(phase, draft, false, pending) : []).find((item) => item.value === clean);
     if (!choice) return { ok: false, error: 'Choisissez une pastille.' };
     return { ok: true, value: choice.value, label: choice.label };
@@ -1408,6 +1512,7 @@ function chipsFor(phase: Phase, draft: Draft, optional: boolean, pending?: Pendi
       ...spouses.map((spouse) => ({ label: `${host?.firstName ?? ''} et ${spouse.firstName}`, value: spouse.id })),
     ];
   }
+  if (phase === 'kin-parent-union' && pending?.viaParentId) return siblingParentOptions(draft, pending.viaParentId);
   if (phase === 'anchor-city') return ['Yaoundé', 'Douala', 'Bafoussam', 'Garoua'].map((city) => ({ label: city, value: city }));
   if (phase === 'child-last') {
     const spouse = draft.spouses.find((item) => item.id === pending?.unionSpouseId);

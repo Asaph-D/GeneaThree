@@ -66,6 +66,11 @@ Durée cible : 2 à 4 semaines.
 - [x] Remplacer progressivement le placement `d3.tree` dans la vue lignage.
 - [x] Ajouter repli, centrage et niveaux de détail selon le zoom.
 - [x] Conserver les vues alternatives comme modes secondaires.
+- [x] Reconstruire les branches ascendantes dans l'assistant lors du chargement depuis `/demo`.
+- [x] Déduire le parent commun d'un nouvel oncle ou d'une nouvelle tante lorsqu'il est déjà connu.
+- [x] Distinguer l'union parentale des oncles et tantes lorsque les grands-parents ont plusieurs conjoints.
+- [x] Tester les parcours cousin avec branche parentale connue et inconnue.
+- [x] Documenter visuellement les combinaisons de parenté dans la FAQ.
 
 Critère de sortie : cousins alignés, foyers polygames séparés et aucune filiation principale hors de son couloir.
 
