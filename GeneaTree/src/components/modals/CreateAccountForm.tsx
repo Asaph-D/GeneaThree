@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { User, Mail, Lock, Eye, EyeOff, CheckCircle, Github } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
-
-interface CreateAccountFormProps {
-  onSubmit: (userData: UserData) => void;
-}
 
 export interface UserData {
   firstName: string;
@@ -15,8 +12,9 @@ export interface UserData {
   acceptTerms: boolean;
 }
 
-const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
-  const { configured, signInWithProvider } = useAuth();
+const CreateAccountForm: React.FC = () => {
+  const navigate = useNavigate();
+  const { configured, signInWithProvider, signUpWithEmail } = useAuth();
   const [formData, setFormData] = useState<UserData>({
     firstName: '',
     lastName: '',
@@ -29,6 +27,9 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const [errors, setErrors] = useState<Partial<UserData>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -76,11 +77,33 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleProvider = async (provider: 'google' | 'github') => {
+    setSubmitError(null);
+    try {
+      await signInWithProvider(provider);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Connexion impossible.');
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (validateForm()) {
-      onSubmit(formData);
+    if (!validateForm()) return;
+
+    setSubmitting(true);
+    setSubmitError(null);
+    setSuccessMessage(null);
+    try {
+      const result = await signUpWithEmail(formData);
+      if (result.requiresEmailConfirmation) {
+        setSuccessMessage('Compte créé. Consultez votre e-mail pour confirmer votre inscription.');
+      } else {
+        navigate('/demo', { replace: true });
+      }
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Création du compte impossible.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -96,9 +119,12 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <button type="button" disabled={!configured} onClick={() => void signInWithProvider('google')} className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900">Google</button>
-        <button type="button" disabled={!configured} onClick={() => void signInWithProvider('github')} className="flex items-center justify-center gap-2 rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900"><Github size={16} /> GitHub</button>
+        <button type="button" disabled={!configured || submitting} onClick={() => void handleProvider('google')} className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900">Google</button>
+        <button type="button" disabled={!configured || submitting} onClick={() => void handleProvider('github')} className="flex items-center justify-center gap-2 rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900"><Github size={16} /> GitHub</button>
       </div>
+      {!configured && <p className="mt-3 text-sm text-amber-600">L'authentification Supabase n'est pas configurée sur ce déploiement.</p>}
+      {submitError && <p role="alert" className="mt-3 text-sm text-red-600">{submitError}</p>}
+      {successMessage && <p role="status" className="mt-3 text-sm text-emerald-600">{successMessage}</p>}
       <div className="my-5 flex items-center gap-3 text-xs text-zinc-400"><span className="h-px flex-1 bg-zinc-200 dark:bg-white/10" />ou par e-mail<span className="h-px flex-1 bg-zinc-200 dark:bg-white/10" /></div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -265,10 +291,11 @@ const CreateAccountForm: React.FC<CreateAccountFormProps> = ({ onSubmit }) => {
         <div>
           <button
             type="submit"
+            disabled={!configured || submitting}
             className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-300"
           >
             <CheckCircle className="h-5 w-5 mr-2" />
-            Créer mon compte
+            {submitting ? 'Création…' : 'Créer mon compte'}
           </button>
         </div>
       </form>

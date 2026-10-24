@@ -10,7 +10,15 @@ interface AuthValue {
   user: User | null;
   loading: boolean;
   configured: boolean;
+  authError: string | null;
+  clearAuthError: () => void;
   signInWithProvider: (provider: 'google' | 'github') => Promise<void>;
+  signUpWithEmail: (input: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) => Promise<{ requiresEmailConfirmation: boolean }>;
   signOut: () => Promise<void>;
 }
 
@@ -19,8 +27,16 @@ const AuthContext = createContext<AuthValue | null>(null);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(Boolean(supabase));
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
+    const query = new URLSearchParams(window.location.search);
+    const fragment = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    const error = query.get('error_description') || fragment.get('error_description');
+    if (error) {
+      setAuthError(decodeURIComponent(error.replace(/\+/g, ' ')));
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
     if (!supabase) return;
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
@@ -34,6 +50,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user: session?.user ?? null,
     loading,
     configured: Boolean(supabase),
+    authError,
+    clearAuthError: () => setAuthError(null),
     signInWithProvider: async (provider) => {
       if (!supabase) throw new Error('Supabase n’est pas configuré.');
       const { error } = await supabase.auth.signInWithOAuth({
@@ -42,12 +60,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       if (error) throw error;
     },
+    signUpWithEmail: async ({ firstName, lastName, email, password }) => {
+      if (!supabase) throw new Error("Supabase n'est pas configuré.");
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: `${configuredSiteUrl || window.location.origin}/demo`,
+          data: {
+            first_name: firstName.trim(),
+            last_name: lastName.trim(),
+            full_name: `${firstName.trim()} ${lastName.trim()}`.trim(),
+            privacy_consent_at: new Date().toISOString(),
+          },
+        },
+      });
+      if (error) throw error;
+      return { requiresEmailConfirmation: !data.session };
+    },
     signOut: async () => {
       if (!supabase) return;
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
     },
-  }), [session, loading]);
+  }), [session, loading, authError]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
