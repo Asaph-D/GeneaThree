@@ -4,7 +4,7 @@ services:
     runtime: docker
     plan: free
     branch: main
-    autoDeploy: false
+    autoDeploy: true
     rootDir: api/geneatree
     dockerfilePath: ./Dockerfile
     healthCheckPath: /api/health

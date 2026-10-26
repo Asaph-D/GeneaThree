@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.SpringApplication;
 import org.springframework.mock.env.MockEnvironment;
 
+import java.io.IOException;
+import java.util.Properties;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -31,5 +34,17 @@ class DatabaseUrlEnvironmentPostProcessorTests {
         assertThatThrownBy(() -> processor.postProcessEnvironment(environment, new SpringApplication()))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("PostgreSQL is not configured on Render");
+    }
+
+    @Test
+    void isRegisteredForAutomaticSpringBootDiscovery() throws IOException {
+        Properties factories = new Properties();
+        try (var stream = getClass().getClassLoader().getResourceAsStream("META-INF/spring.factories")) {
+            assertThat(stream).as("META-INF/spring.factories must be packaged").isNotNull();
+            factories.load(stream);
+        }
+
+        assertThat(factories.getProperty("org.springframework.boot.env.EnvironmentPostProcessor"))
+                .contains(DatabaseUrlEnvironmentPostProcessor.class.getName());
     }
 }
