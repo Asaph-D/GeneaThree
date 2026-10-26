@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Edit, FileDown, Printer, RefreshCw, Search, Share } from 'lucide-react';
+import { ChevronDown, Download, Edit, FileDown, RefreshCw, Search, Share, Upload } from 'lucide-react';
 import { SAMPLE_FAMILIES } from '../../examples/sampleFamilies';
 import { Person } from '../../types/family';
 
@@ -13,7 +13,8 @@ interface DemoControlsProps {
   onGenerationsChange: (generations: number) => void;
   onFocusPersonChange: (focusPerson: string) => void;
   onExportPDF: () => void;
-  onPrint: () => void;
+  onExportTree: () => void;
+  onImportTree: (file: File) => void;
   onShare: () => void;
   onToggleEditMode: () => void;
   onResetTree: () => void;
@@ -99,7 +100,8 @@ const DemoControls: React.FC<DemoControlsProps> = ({
   onGenerationsChange,
   onFocusPersonChange,
   onExportPDF,
-  onPrint,
+  onExportTree,
+  onImportTree,
   onShare,
   onToggleEditMode,
   onResetTree,
@@ -111,6 +113,7 @@ const DemoControls: React.FC<DemoControlsProps> = ({
   const [searchResults, setSearchResults] = useState<Person[]>([]);
   const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const importRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!showSearchResults) return;
@@ -137,9 +140,11 @@ const DemoControls: React.FC<DemoControlsProps> = ({
   };
 
   const actions = (
-    <div className={`flex ${compact ? 'flex-col items-center gap-1.5' : 'gap-1.5'}`}>
-      <button type="button" title="Imprimer" onClick={onPrint} className={iconBtn}><Printer size={16} /></button>
-      <button type="button" title="Exporter PDF" onClick={onExportPDF} className={iconBtn}><FileDown size={16} /></button>
+    <div data-print-control className={`flex ${compact ? 'flex-col items-center gap-1.5' : 'gap-1.5'}`}>
+      <button type="button" title="Exporter l’arbre" aria-label="Exporter l’arbre" onClick={onExportTree} className={iconBtn}><Download size={16} /></button>
+      <button type="button" title="Importer un arbre" aria-label="Importer un arbre" onClick={() => importRef.current?.click()} className={iconBtn}><Upload size={16} /></button>
+      <input ref={importRef} type="file" accept=".json,.geneatree.json,application/json" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) onImportTree(file); event.target.value = ''; }} />
+      <button type="button" title="Exporter un PDF haute définition" aria-label="Exporter un PDF haute définition" onClick={onExportPDF} className={iconBtn}><FileDown size={16} /></button>
       <button type="button" title="Partager" onClick={onShare} className={`${iconBtn} !border-primary-600 !bg-primary-600 !text-white`}><Share size={16} /></button>
       <button type="button" title={isEditMode ? 'Terminer l\'édition' : 'Modifier l\'arbre'} onClick={onToggleEditMode} className={`${iconBtn} ${isEditMode ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-200' : ''}`}><Edit size={16} /></button>
       <button type="button" title="Réinitialiser" onClick={onResetTree} className={iconBtn}><RefreshCw size={16} /></button>
@@ -157,7 +162,10 @@ const DemoControls: React.FC<DemoControlsProps> = ({
         label="Exemple"
         value={exampleId}
         onChange={onExampleChange}
-        options={SAMPLE_FAMILIES.map((family) => ({ value: family.id, label: family.label }))}
+        options={[
+          ...(exampleId === 'imported' ? [{ value: 'imported', label: 'Arbre importé' }] : []),
+          ...SAMPLE_FAMILIES.map((family) => ({ value: family.id, label: family.label })),
+        ]}
       />
       <MenuField
         id="view-type"

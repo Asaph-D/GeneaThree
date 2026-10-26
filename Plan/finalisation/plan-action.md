@@ -66,6 +66,11 @@ Durée cible : 2 à 4 semaines.
 - [x] Remplacer progressivement le placement `d3.tree` dans la vue lignage.
 - [x] Ajouter repli, centrage et niveaux de détail selon le zoom.
 - [x] Conserver les vues alternatives comme modes secondaires.
+- [x] Centrer chaque foyer ascendant au-dessus de son enfant déjà placé avant tout raccord latéral.
+- [x] Séparer les grandes lignées des conjoints et maintenir chaque fratrie dans son propre couloir familial.
+- [x] Stabiliser portraits et arêtes aux faibles niveaux de zoom.
+- [x] Animer création, rééquilibrage et suppression des nœuds.
+- [x] Conserver descendants, fratries et nœuds isolés par défaut, avec cascade uniquement sur choix explicite.
 - [x] Reconstruire les branches ascendantes dans l'assistant lors du chargement depuis `/demo`.
 - [x] Déduire le parent commun d'un nouvel oncle ou d'une nouvelle tante lorsqu'il est déjà connu.
 - [x] Distinguer l'union parentale des oncles et tantes lorsque les grands-parents ont plusieurs conjoints.
@@ -85,7 +90,12 @@ Durée cible : 1 à 2 semaines.
 - [x] Transformer `/quick-start` en page d'abonnements.
 - [x] Ajouter le tiroir mobile superposé et le menu de profil.
 - [x] Intégrer les sessions et fournisseurs OAuth Google/GitHub via Supabase.
-- [ ] Charger les fonctions d'export à la demande.
+- [x] Charger les fonctions d'export à la demande.
+- [x] Générer un PDF vectoriel haute définition et prendre en charge l'import/export d'archives GeneaTreePro validées.
+- [x] Ajouter un studio de validation PDF avec aperçu, modèles, fonds, portraits, contours et messages personnalisables.
+- [x] Synchroniser le studio PDF avec le thème de `/demo`, ses losanges d'union et dix cadres décoratifs en carrousel.
+- [x] Ouvrir le studio sur un miroir SVG strict de `/demo`, sans décoration active avant le choix de l'utilisateur.
+- [x] Valider visuellement le studio neutre, la composition avancée et le formulaire d'import dans Edge headless.
 - [ ] Ajouter observabilité, suivi d'erreurs et métriques non personnelles.
 - [ ] Exécuter tests d'accessibilité, responsive et compatibilité navigateurs.
 - [ ] Organiser une bêta fermée avec scénarios et formulaire de retour.

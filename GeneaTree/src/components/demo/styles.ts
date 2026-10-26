@@ -7,7 +7,7 @@ export const printStyles = `
       page-break-inside: avoid;
     }
 
-    .controls, .context-menu, .edit-indicator, .edit-icon {
+    [data-print-control], button, .controls, .tree-zoom-controls, .context-menu, .edit-indicator, .edit-icon {
       display: none !important;
     }
 

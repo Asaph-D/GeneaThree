@@ -50,7 +50,7 @@ const TreeControls: React.FC<TreeControlsProps> = ({
   };
 
   return (
-    <div className="tree-zoom-controls pointer-events-auto absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] z-50 flex max-w-[calc(100%-2rem)] flex-wrap items-end gap-2">
+    <div data-print-control className="tree-zoom-controls pointer-events-auto absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-[max(1rem,env(safe-area-inset-left))] z-50 flex max-w-[calc(100%-2rem)] flex-wrap items-end gap-2">
       <div className="flex items-center gap-0.5 rounded-xl border border-zinc-200 bg-white p-0.5 shadow-md dark:border-zinc-700 dark:bg-zinc-900">
         <button type="button" className={iconButton} title="Zoomer" onClick={() => scaleBy(1.2)}>
           <ZoomIn size={16} strokeWidth={2} className="h-4 w-4 shrink-0" />

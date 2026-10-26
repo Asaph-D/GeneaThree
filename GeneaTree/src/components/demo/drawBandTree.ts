@@ -28,7 +28,8 @@ export function drawBandTree(
   onContextMenu?: (person: Person, event: MouseEvent) => void,
   onHover?: (person: Person, rect: DOMRect) => void,
   onHoverEnd?: () => void,
-  onToggleCollapse?: (person: Person) => void
+  onToggleCollapse?: (person: Person) => void,
+  previousPositions: Map<string, { x: number; y: number }> = new Map()
 ): BandLayout {
   const layout = layoutBands(people, marriages, maxGenerations);
   const ink = dark ? '#e7e5e4' : '#1c1917';
@@ -159,6 +160,10 @@ export function drawBandTree(
     });
   });
 
+  linkGroup.selectAll<SVGElement, unknown>('.link')
+    .attr('vector-effect', 'non-scaling-stroke')
+    .attr('stroke-linecap', 'round');
+
   joints.forEach(({ x, y }) => {
     const diamond = linkGroup.append('g')
       .attr('class', 'fusion-diamond')
@@ -190,7 +195,21 @@ export function drawBandTree(
     .enter()
     .append('g')
     .attr('class', (node) => `tree-node node-${node.person.id}${node.person.relationship ? ` relationship-${node.person.relationship}` : ''}`)
-    .attr('transform', (node) => `translate(${node.x},${node.y})`)
+    .attr('transform', (node) => {
+      const previous = previousPositions.get(node.person.id);
+      if (previous) return `translate(${previous.x},${previous.y})`;
+      const related = [...node.person.parentIds, ...node.person.spouseIds, ...node.person.childrenIds]
+        .map((id) => previousPositions.get(id))
+        .filter((point): point is { x: number; y: number } => Boolean(point));
+      const origin = related.length
+        ? {
+            x: related.reduce((sum, point) => sum + point.x, 0) / related.length,
+            y: related.reduce((sum, point) => sum + point.y, 0) / related.length,
+          }
+        : { x: node.x, y: node.y };
+      return `translate(${origin.x},${origin.y}) scale(0.2)`;
+    })
+    .style('opacity', (node) => previousPositions.has(node.person.id) ? 1 : 0)
     .style('cursor', 'pointer')
     .on('mousedown', function onNodePress(event, node) {
       event.stopPropagation();
@@ -212,6 +231,12 @@ export function drawBandTree(
       if (d3.select(this).classed('is-muted')) return;
       onHoverEnd?.();
     });
+
+  cards.transition('layout')
+    .duration(620)
+    .ease(d3.easeCubicInOut)
+    .attr('transform', (node) => `translate(${node.x},${node.y}) scale(1)`)
+    .style('opacity', 1);
 
   cards.append('circle')
     .attr('r', 28)
@@ -288,6 +313,22 @@ export function drawBandTree(
       const year = new Date(node.person.birthDate).getFullYear();
       return Number.isNaN(year) ? '' : String(year);
     });
+
+  if (layout.nodes.some((node) => !previousPositions.has(node.person.id))) {
+    linkGroup.selectAll<SVGGeometryElement, unknown>('.link').each(function animateLink() {
+      const length = this.getTotalLength?.() ?? 0;
+      if (!length) return;
+      d3.select(this)
+        .attr('stroke-dasharray', `${length} ${length}`)
+        .attr('stroke-dashoffset', length)
+        .style('opacity', 0.25)
+        .transition('link-draw')
+        .duration(700)
+        .ease(d3.easeCubicInOut)
+        .attr('stroke-dashoffset', 0)
+        .style('opacity', 1);
+    });
+  }
 
   return layout;
 }

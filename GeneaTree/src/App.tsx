@@ -17,13 +17,13 @@ const AssistantPage = lazy(() => import('./pages/AssistantPage'));
 const CreationPage = lazy(() => import('./creation/CreationPage'));
 
 const App: React.FC = () => {
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') !== 'light');
   const location = useLocation();
   const { authError, clearAuthError } = useAuth();
   const hideFooter = location.pathname === '/demo' || location.pathname === '/assistant';
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') === 'dark';
+    const savedTheme = localStorage.getItem('theme') !== 'light';
     setDarkMode(savedTheme);
     document.body.classList.toggle('dark', savedTheme);
   }, [location.pathname]);

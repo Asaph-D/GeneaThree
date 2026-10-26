@@ -25,6 +25,7 @@ interface TreeVisualizationProps {
   onPersonSelect: (person: Person, rect?: DOMRect) => void;
   onAddPersonClick: (relatedPersonId: string, relationshipType: 'child' | 'parent' | 'spouse') => void;
   onDeletePerson: (personId: string) => void;
+  deletingPersonIds?: string[];
   onPersonHover?: (person: Person, rect: DOMRect) => void;
   onPersonHoverEnd?: () => void;
 }
@@ -39,6 +40,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
   onPersonSelect,
   onAddPersonClick,
   onDeletePerson,
+  deletingPersonIds = [],
   onPersonHover,
   onPersonHoverEnd
 }, ref) => {
@@ -47,6 +49,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
   const gRef = useRef<SVGGElement | null>(null);
   const zoomRef = useRef<d3.ZoomBehavior<SVGSVGElement, unknown> | null>(null);
   const fitKeyRef = useRef('');
+  const previousBandPositionsRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const [contextMenuPosition, setContextMenuPosition] = useState<{ x: number, y: number, personId: string } | null>(null);
   const [selectedRelationship, setSelectedRelationship] = useState<string | null>(null);
   const [collapsedIds, setCollapsedIds] = useState<Set<string>>(() => new Set());
@@ -81,7 +84,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
       .attr('height', svgH)
       .attr('viewBox', [0, 0, svgW, svgH]);
     const fit = Math.min((svgW - 48) / box.width, (svgH - 48) / box.height);
-    const safeScale = Math.max(0.2, Math.min(0.8, fit));
+    const safeScale = Math.max(0.32, Math.min(0.8, fit));
     const tx = (svgW - box.width * safeScale) / 2 - box.x * safeScale;
     const ty = (svgH - box.height * safeScale) / 2 - box.y * safeScale;
     d3.select(host)
@@ -119,7 +122,6 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
       .on('zoom', (event: d3.D3ZoomEvent<SVGSVGElement, unknown>) => {
         if (gRef.current) {
           const content = d3.select(gRef.current).attr('transform', event.transform.toString());
-          content.selectAll<SVGElement, unknown>('.node-portrait').style('display', event.transform.k < 0.42 ? 'none' : null);
           content.selectAll<SVGElement, unknown>('.node-secondary-detail').style('display', event.transform.k < 0.34 ? 'none' : null);
           content.selectAll<SVGElement, unknown>('.node-tertiary-detail').style('display', event.transform.k < 0.58 ? 'none' : null);
         }
@@ -194,15 +196,17 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
           const next = new Set(current);
           if (next.has(person.id)) next.delete(person.id); else if (person.childrenIds.length) next.add(person.id);
           return next;
-        })
+        }),
+        previousBandPositionsRef.current
       );
+      previousBandPositionsRef.current = new Map(layout.nodes.map((node) => [node.person.id, { x: node.x, y: node.y }]));
       const zoom = zoomRef.current;
       const host = svgRef.current;
       if (zoom && host && layout.nodes.length) {
         const svgW = host.clientWidth || 800;
         const svgH = host.clientHeight || 640;
         const fit = Math.min((svgW - 48) / Math.max(layout.width, 1), (svgH - 48) / Math.max(layout.height, 1));
-        const safeScale = Math.max(0.2, Math.min(0.8, fit));
+        const safeScale = Math.max(0.32, Math.min(0.8, fit));
         const tx = (svgW - layout.width * safeScale) / 2 - layout.minX * safeScale;
         const ty = (svgH - layout.height * safeScale) / 2 - layout.minY * safeScale;
         const fitKey = `${viewType}|${generations}|${annotated.map((person) => person.id).join(',')}|${visibleMarriages.map((marriage) => marriage.id).join(',')}`;
@@ -738,6 +742,23 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
     playRelationFlow(selectedRelationship);
   }, [selectedRelationship, focusPerson, familyData, viewType, generations]);
 
+  useEffect(() => {
+    if (!gRef.current || deletingPersonIds.length === 0) return;
+    const root = d3.select(gRef.current);
+    deletingPersonIds.forEach((id) => {
+      const node = root.select<SVGGElement>(`.node-${id}`);
+      const point = node.node() ? readTranslate(node.node()!) : { x: 0, y: 0 };
+      node.interrupt('delete')
+        .attr('transform-origin', `${point.x}px ${point.y}px`)
+        .transition('delete')
+        .duration(380)
+        .ease(d3.easeCubicIn)
+        .style('opacity', 0)
+        .attr('transform', `translate(${point.x},${point.y}) scale(0.15)`);
+    });
+    root.selectAll<SVGElement, unknown>('.link').interrupt('delete').transition('delete').duration(380).style('opacity', 0.18);
+  }, [deletingPersonIds]);
+
   function playRelationFlow(relationship: string | null) {
     if (!gRef.current) return;
     const root = d3.select(gRef.current);
@@ -755,7 +776,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
       });
     }
 
-    nodes.interrupt().each(function markNode() {
+    nodes.interrupt('relation').each(function markNode() {
       const id = personIdFromNode(this);
       const enabled = !relationship || active.has(id);
       d3.select(this)
@@ -765,17 +786,17 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
     });
 
     if (!relationship) {
-      nodes.transition().duration(420).style('opacity', 1);
-      links.transition().duration(420).style('opacity', 1);
+      nodes.transition('relation').duration(420).style('opacity', 1);
+      links.transition('relation').duration(420).style('opacity', 1);
       return;
     }
 
     nodes.each(function dimRest() {
       const id = personIdFromNode(this);
       const enabled = active.has(id);
-      d3.select(this).transition().duration(280).style('opacity', id === focusPerson ? 1 : enabled ? 0.22 : 0.16);
+      d3.select(this).transition('relation').duration(280).style('opacity', id === focusPerson ? 1 : enabled ? 0.22 : 0.16);
     });
-    links.transition().duration(280).style('opacity', 0.08);
+    links.transition('relation').duration(280).style('opacity', 0.08);
 
     const focusEl = root.select<SVGGElement>(`.node-${focusPerson}`).node();
     if (!focusEl) return;
@@ -828,7 +849,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
         })
         .on('end', () => {
           head.transition().duration(180).style('opacity', 0).remove();
-          d3.select(targetEl).transition().duration(280).style('opacity', 1);
+          d3.select(targetEl).transition('relation').duration(280).style('opacity', 1);
         });
     });
   }
@@ -854,6 +875,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
   return (
     <div
       ref={containerRef}
+      data-tree-canvas
       className="relative h-full min-h-0 w-full bg-[#f4f1ea] dark:bg-[#09090b]"
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,102,241,0.16),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.12),transparent_30%)]" />

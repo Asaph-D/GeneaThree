@@ -46,6 +46,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
   const unions: BandUnion[] = [];
   const drops: BandDrop[] = [];
   const placed = new Set<string>();
+  const rootHints = new Map<string, { childId: string; side: -1 | 1 }>();
   const generationById = calculateGenerations(people, marriages);
 
   const householdsOf = (id: string) =>
@@ -69,6 +70,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
 
   function measure(id: string, depth: number): number {
     if (!byId.has(id) || depth > maxDepth || measuring.has(id)) return CARD_W;
+    if (placed.has(id)) return CARD_W;
     const households = householdsOf(id);
     if (depth === maxDepth) return CARD_W;
     if (households.length === 0) {
@@ -137,6 +139,20 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
     return centers;
   }
 
+  function familyOrderedChildren(ownerId: string, marriage: Marriage) {
+    const children = kidsOf(marriage);
+    const hint = rootHints.get(ownerId);
+    if (hint && children.includes(hint.childId)) {
+      const others = children.filter((id) => id !== hint.childId);
+      return hint.side === 1 ? [hint.childId, ...others] : [...others, hint.childId];
+    }
+    const bridge = children.find((childId) => marriages.some((union) => union.spouse1Id === childId || union.spouse2Id === childId));
+    if (!bridge) return children;
+    const ownUnion = marriages.find((union) => union.spouse1Id === bridge || union.spouse2Id === bridge);
+    const others = children.filter((id) => id !== bridge);
+    return ownUnion?.spouse1Id === bridge ? [...others, bridge] : [bridge, ...others];
+  }
+
   function place(id: string, left: number, depth: number): { x: number; y: number } | null {
     const person = byId.get(id);
     const generation = generationById.get(id) ?? depth;
@@ -172,7 +188,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
         placed.add(spouse.id);
       }
       unions.push({ x1: anchorX + 28, x2: spouseX - 28, y, rail: false, ticks: [] });
-      const childCenters = placeChildren(kidsOf(marriage), left, width, depth + 1);
+      const childCenters = placeChildren(familyOrderedChildren(id, marriage), left, width, depth + 1);
       if (childCenters.length) {
         drops.push(childStem((anchorX + spouseX) / 2, y, childCenters));
       }
@@ -211,7 +227,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
         nodes.push({ person: spouse, x: spouseX, y, depth: generationById.get(spouse.id) ?? generation });
         placed.add(spouse.id);
       }
-      const childCenters = placeChildren(kidsOf(slot.marriage), slot.left, slot.width, depth + 1);
+      const childCenters = placeChildren(familyOrderedChildren(id, slot.marriage), slot.left, slot.width, depth + 1);
       if (childCenters.length) {
         drops.push(childStem(spouseX, y + 100, childCenters));
       }
@@ -244,9 +260,25 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
 
   let cursor = 48;
   rootList.forEach((root) => {
+    const positionedChild = (root.childrenIds ?? [])
+      .map((childId) => nodes.find((node) => node.person.id === childId))
+      .find((node): node is BandNode => Boolean(node));
+    if (positionedChild) {
+      const union = marriages.find((marriage) => marriage.spouse1Id === positionedChild.person.id || marriage.spouse2Id === positionedChild.person.id);
+      const partnerId = union?.spouse1Id === positionedChild.person.id ? union.spouse2Id : union?.spouse1Id;
+      const partner = nodes.find((node) => node.person.id === partnerId);
+      rootHints.set(root.id, { childId: positionedChild.person.id, side: partner && positionedChild.x < partner.x ? -1 : 1 });
+    }
     const width = measure(root.id, 0);
-    place(root.id, cursor, 0);
-    cursor += width + GAP * 2;
+    const hint = rootHints.get(root.id);
+    const child = hint ? nodes.find((node) => node.person.id === hint.childId) : null;
+    const left = !hint || !child
+      ? cursor
+      : hint.side === 1
+        ? child.x - CARD_W / 2
+        : child.x - width + CARD_W / 2;
+    place(root.id, left, 0);
+    cursor = Math.max(cursor, left + width + GAP * 2);
   });
 
   people.forEach((person) => {

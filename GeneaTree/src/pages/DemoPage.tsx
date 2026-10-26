@@ -1,6 +1,4 @@
 // src/pages/DemoPage.tsx
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { Bot, ChevronLeft, ChevronRight, PanelLeft, X } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -10,10 +8,16 @@ import FamilyStats from '../components/demo/FamilyStats';
 import PersonProfileCard, { ProfileAnchor } from '../components/demo/PersonProfileCard';
 import { printStyles } from '../components/demo/styles';
 import TreeVisualization from '../components/demo/TreeVisualization';
+import { descendantIds, isolatedAfterDeletion } from '../components/demo/deletionPolicy';
 import PersonFormModal from '../components/modals/PersonFormModal';
+import DeletePersonModal from '../components/modals/DeletePersonModal';
 import ShareModal from '../components/modals/ShareModal';
+import PdfExportStudio from '../components/modals/PdfExportStudio';
+import ImportFamilyModal from '../components/modals/ImportFamilyModal';
 import { Marriage, PartialPerson, Person, TreeViewOptions } from '../types/family';
 import { getSampleFamily, SAMPLE_FAMILIES } from '../examples/sampleFamilies';
+import { FamilyArchive, parseFamilyArchive, serializeFamilyArchive } from '../services/familyTransfer';
+import { PdfDesignOptions } from '../services/pdfDesign';
 
 const DemoPage: React.FC = () => {
   const [familyData, setFamilyData] = useState<Person[]>([]);
@@ -25,6 +29,10 @@ const DemoPage: React.FC = () => {
   });
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const [pdfStudioOpen, setPdfStudioOpen] = useState(false);
+  const [pdfInitialSvg, setPdfInitialSvg] = useState('');
+  const [pendingImport, setPendingImport] = useState<{ fileName: string; archive?: FamilyArchive; error?: string } | null>(null);
+  const [importBusy, setImportBusy] = useState(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +40,10 @@ const DemoPage: React.FC = () => {
   const [selectedPersonForEdit, setSelectedPersonForEdit] = useState<Person | null>(null);
   const [relatedPersonForAdd, setRelatedPersonForAdd] = useState<string | null>(null);
   const [addRelationshipType, setAddRelationshipType] = useState<'child' | 'parent' | 'spouse' | null>(null);
+  const [deletePersonId, setDeletePersonId] = useState<string | null>(null);
+  const [deleteCascade, setDeleteCascade] = useState(false);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deletingPersonIds, setDeletingPersonIds] = useState<string[]>([]);
   const [exampleId, setExampleId] = useState(() => localStorage.getItem('geneatree.example') || 'monogame');
   const [narrow, setNarrow] = useState(() => window.matchMedia('(max-width: 767px)').matches);
   const [sidebarOpen, setSidebarOpen] = useState(() => !window.matchMedia('(max-width: 767px)').matches);
@@ -181,6 +193,24 @@ const DemoPage: React.FC = () => {
     media.addEventListener('change', apply);
     return () => media.removeEventListener('change', apply);
   }, []);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || loading || !familyData.length || pdfStudioOpen) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('studio') !== 'pdf') return;
+    const timer = window.setTimeout(() => {
+      setPdfInitialSvg(treeContainerRef.current?.querySelector('[data-tree-canvas] > svg')?.outerHTML ?? '');
+      setPdfStudioOpen(true);
+    }, 900);
+    return () => window.clearTimeout(timer);
+  }, [familyData.length, loading, pdfStudioOpen]);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV || loading || !familyData.length || pendingImport) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('importTest') !== '1') return;
+    setPendingImport({ fileName: 'famille-asaph.geneatree.json', archive: { format: 'geneatree-family', version: 1, exportedAt: new Date().toISOString(), persons: familyData, marriages: marriagesData, view: treeOptions } });
+  }, [familyData, loading, marriagesData, pendingImport, treeOptions]);
 
   useEffect(() => {
     const previous = document.body.style.overflow;
@@ -438,45 +468,44 @@ const DemoPage: React.FC = () => {
     }
   };
 
-  const handleDeletePerson = async (personId: string) => {
-    if (window.confirm("Êtes-vous sûr de vouloir supprimer cette personne ? Cette action est irréversible et peut affecter les relations dans l'arbre.")) {
-      try {
-        // Supprimer les références dans les autres personnes
-        const nextPeople = familyData
-          .filter(p => p.id !== personId)
-          .map(person => ({
-            ...person,
-            parentIds: person.parentIds.filter(id => id !== personId),
-            childrenIds: person.childrenIds.filter(id => id !== personId),
-            spouseIds: person.spouseIds.filter(id => id !== personId),
-            siblingIds: person.siblingIds?.filter(id => id !== personId) || []
-          }));
-        const nextMarriages = marriagesData
-          .filter(m => m.spouse1Id !== personId && m.spouse2Id !== personId)
-          .map(marriage => ({
-            ...marriage,
-            childrenIds: (marriage.childrenIds ?? []).filter(id => id !== personId),
-          }));
-        setFamilyData(nextPeople);
-        setMarriagesData(nextMarriages);
-        await saveFamily(nextPeople, nextMarriages);
+  const handleDeletePerson = (personId: string) => {
+    setDeletePersonId(personId);
+    setDeleteCascade(false);
+  };
 
-        if (treeOptions.focusPersonId === personId && familyData.length > 1) {
-          const newFocusPerson = familyData.filter(p => p.id !== personId)[0]?.id;
-          if (newFocusPerson) {
-            handleFocusPersonChange(newFocusPerson);
-          }
-        }
-
-        setSelectedPerson(null);
-        alert("Personne supprimée avec succès.");
-      } catch (err) {
-        if (err instanceof Error) {
-          alert(`Erreur lors de la suppression de la personne: ${err.message}`);
-        } else {
-          setError("Une erreur inconnue est survenue lors de la suppression de la personne.");
-        }
+  const confirmDeletePerson = async () => {
+    if (!deletePersonId) return;
+    const ids = new Set([deletePersonId, ...(deleteCascade ? descendantIds(deletePersonId, familyData) : [])]);
+    setDeleteBusy(true);
+    setDeletingPersonIds([...ids]);
+    await new Promise((resolve) => window.setTimeout(resolve, 420));
+    try {
+      const nextPeople = familyData
+        .filter((person) => !ids.has(person.id))
+        .map((person) => ({
+          ...person,
+          parentIds: person.parentIds.filter((id) => !ids.has(id)),
+          childrenIds: person.childrenIds.filter((id) => !ids.has(id)),
+          spouseIds: person.spouseIds.filter((id) => !ids.has(id)),
+          siblingIds: person.siblingIds?.filter((id) => !ids.has(id)) || [],
+        }));
+      const nextMarriages = marriagesData
+        .filter((marriage) => !ids.has(marriage.spouse1Id) && !ids.has(marriage.spouse2Id))
+        .map((marriage) => ({ ...marriage, childrenIds: (marriage.childrenIds ?? []).filter((id) => !ids.has(id)) }));
+      await saveFamily(nextPeople, nextMarriages);
+      setFamilyData(nextPeople);
+      setMarriagesData(nextMarriages);
+      if (ids.has(treeOptions.focusPersonId)) {
+        const newFocusPerson = nextPeople[0]?.id;
+        if (newFocusPerson) handleFocusPersonChange(newFocusPerson);
       }
+      setSelectedPerson(null);
+      setDeletePersonId(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur inconnue est survenue lors de la suppression.');
+    } finally {
+      setDeletingPersonIds([]);
+      setDeleteBusy(false);
     }
   };
 
@@ -509,56 +538,51 @@ const DemoPage: React.FC = () => {
   };
 
   const handleExportPDF = () => {
-    if (treeContainerRef.current) {
-      html2canvas(treeContainerRef.current, {
-        useCORS: true,
-        scale: 2,
-        scrollY: -window.scrollY,
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('landscape', 'pt', 'a4');
-        const imgWidth = 842;
-        const pageHeight = 595;
-        const imgHeight = canvas.height * imgWidth / canvas.width;
-        let heightLeft = imgHeight;
-        let position = 0;
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-        while (heightLeft >= 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-          heightLeft -= pageHeight;
-        }
-        pdf.save("family_tree.pdf");
-      });
-    } else {
-      alert("La visualisation de l'arbre n'est pas prête pour l'exportation.");
+    if (!displayFamilyData.length) return;
+    setPdfInitialSvg(treeContainerRef.current?.querySelector('[data-tree-canvas] > svg')?.outerHTML ?? '');
+    setPdfStudioOpen(true);
+  };
+
+  const downloadCustomizedPdf = async (design: PdfDesignOptions) => {
+    try {
+      const { exportFamilyPdf } = await import('../services/familyPdf');
+      await exportFamilyPdf(displayFamilyData, marriagesData, treeOptions.generations, design);
+    } catch (exportError) {
+      window.alert(exportError instanceof Error ? exportError.message : 'Impossible de générer le PDF.');
     }
   };
 
-  const handlePrint = () => {
-    if (treeContainerRef.current) {
-      const printContents = treeContainerRef.current.innerHTML;
-      const printWindow = window.open('', '', 'height=600,width=800');
-      if (printWindow) {
-        printWindow.document.write('<html><head><title>Imprimer l\'arbre généalogique</title>');
-        Array.from(document.querySelectorAll('link[rel="stylesheet"], style')).forEach(node => {
-          printWindow.document.head.appendChild(node.cloneNode(true));
-        });
-        printWindow.document.write('</head><body>');
-        printWindow.document.write(printContents);
-        printWindow.document.write('</body></html>');
-        printWindow.document.close();
-        printWindow.focus();
-        printWindow.print();
-        printWindow.close();
-      } else {
-        alert("Impossible d'ouvrir la fenêtre d'impression. Veuillez vérifier les bloqueurs de pop-up.");
-      }
-    } else {
-      alert("La visualisation de l'arbre n'est pas prête pour l'impression.");
+  const handleExportTree = () => {
+    const blob = new Blob([serializeFamilyArchive(familyData, marriagesData, treeOptions)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `arbre-geneatree-${new Date().toISOString().slice(0, 10)}.geneatree.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportTree = async (file: File) => {
+    try {
+      const archive = parseFamilyArchive(await file.text());
+      setPendingImport({ fileName: file.name, archive });
+    } catch (importError) {
+      setPendingImport({ fileName: file.name, error: importError instanceof Error ? importError.message : 'Impossible d’importer cette archive.' });
     }
+  };
+
+  const confirmImportTree = async () => {
+    if (!pendingImport?.archive) return;
+    setImportBusy(true);
+    try {
+      const archive = pendingImport.archive;
+      await saveFamily(archive.persons, archive.marriages);
+      applySnapshot(archive.persons, archive.marriages, archive.view.focusPersonId);
+      setTreeOptions(archive.view);
+      setExampleId('imported');
+      localStorage.setItem('geneatree.example', 'imported');
+      setPendingImport(null);
+    } finally { setImportBusy(false); }
   };
 
   if (loading) {
@@ -630,7 +654,8 @@ const DemoPage: React.FC = () => {
                 onGenerationsChange={handleGenerationsChange}
                 onFocusPersonChange={handleFocusPersonChange}
                 onExportPDF={handleExportPDF}
-                onPrint={handlePrint}
+                onExportTree={handleExportTree}
+                onImportTree={(file) => { void handleImportTree(file); }}
                 onShare={toggleShareModal}
                 onToggleEditMode={toggleEditMode}
                 onResetTree={handleResetTree}
@@ -658,6 +683,7 @@ const DemoPage: React.FC = () => {
       <div className="relative min-h-0 min-w-0 flex-1" ref={treeContainerRef}>
         <Link
           to="/assistant?from=demo"
+          data-print-control
           className="absolute right-3 top-3 z-30 inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white/90 px-3 py-2 text-[13px] font-medium text-primary-800 shadow-md backdrop-blur hover:bg-primary-50 dark:border-primary-400/30 dark:bg-zinc-950/90 dark:text-primary-200 dark:hover:bg-zinc-900"
           title="Ouvrir l’assistant sans perdre cet arbre"
         >
@@ -667,6 +693,7 @@ const DemoPage: React.FC = () => {
         {narrow && !sidebarOpen && (
           <button
             type="button"
+            data-print-control
             onClick={() => setSidebarOpen(true)}
             className="absolute left-[max(0.75rem,env(safe-area-inset-left))] top-3 z-30 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white/90 px-3 py-2 text-[13px] font-medium text-zinc-800 shadow-md backdrop-blur dark:border-zinc-700 dark:bg-zinc-950/90 dark:text-zinc-100"
           >
@@ -685,6 +712,7 @@ const DemoPage: React.FC = () => {
             onPersonSelect={handlePersonSelect}
             onAddPersonClick={handleAddPersonClick}
             onDeletePerson={handleDeletePerson}
+            deletingPersonIds={deletingPersonIds}
             onPersonHover={(person, rect) => openProfile(person, rect)}
             onPersonHoverEnd={releaseProfile}
           />
@@ -712,6 +740,30 @@ const DemoPage: React.FC = () => {
       )}
       {isShareModalOpen && (
         <ShareModal onClose={toggleShareModal} familyData={displayFamilyData} />
+      )}
+      {pdfStudioOpen && (
+        <PdfExportStudio
+          persons={displayFamilyData}
+          marriages={marriagesData}
+          generations={treeOptions.generations}
+          initialSvg={pdfInitialSvg}
+          testPreset={import.meta.env.DEV && new URLSearchParams(window.location.search).get('pdfTest') === 'showcase'}
+          onClose={() => setPdfStudioOpen(false)}
+          onDownload={downloadCustomizedPdf}
+        />
+      )}
+      {pendingImport && <ImportFamilyModal fileName={pendingImport.fileName} archive={pendingImport.archive} error={pendingImport.error} busy={importBusy} onCancel={() => !importBusy && setPendingImport(null)} onConfirm={() => void confirmImportTree()} />}
+      {deletePersonId && familyData.find((person) => person.id === deletePersonId) && (
+        <DeletePersonModal
+          person={familyData.find((person) => person.id === deletePersonId)!}
+          descendantCount={descendantIds(deletePersonId, familyData).length}
+          isolatedCount={isolatedAfterDeletion(deletePersonId, familyData).length}
+          cascade={deleteCascade}
+          busy={deleteBusy}
+          onCascadeChange={setDeleteCascade}
+          onCancel={() => !deleteBusy && setDeletePersonId(null)}
+          onConfirm={() => void confirmDeletePerson()}
+        />
       )}
       <PersonFormModal
         isOpen={isPersonFormModalOpen}

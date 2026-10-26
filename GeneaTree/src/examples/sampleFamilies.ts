@@ -156,11 +156,10 @@ function septGenerations(): SampleFamily {
   const year = (generation: number, offset = 0) => `${1920 + generation * 24 + offset}-01-01`;
 
   for (let generation = 0; generation < 7; generation += 1) {
-    people.push(
-      person(`g7-line-${generation}`, `Lignée ${generation + 1}`, 'Mballa', generation % 2 ? 'female' : 'male', year(generation), 'Bafoussam'),
-      person(`g7-spouse-${generation}`, `Alliance ${generation + 1}`, 'Mballa', generation % 2 ? 'male' : 'female', year(generation, 2), 'Foumban'),
-    );
+    people.push(person(`g7-line-${generation}`, `Lignée ${generation + 1}`, 'Mballa', generation % 2 ? 'female' : 'male', year(generation), 'Bafoussam'));
     if (generation === 6) continue;
+
+    people.push(person(`g7-spouse-${generation}`, `Alliance ${generation + 1}`, 'Mballa', generation % 2 ? 'male' : 'female', year(generation, 2), 'Foumban'));
 
     const childGeneration = generation + 1;
     people.push(
