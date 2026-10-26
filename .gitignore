@@ -1,0 +1,16 @@
+# Secrets and local environment overrides
+**/.env
+**/.env.*
+!**/.env.example
+
+# Generated visual and PDF test artifacts
+**/test-artifacts/
+tmp-shots/
+
+# JVM crash and replay logs
+hs_err_pid*.log
+replay_pid*.log
+
+# Operating-system clutter
+.DS_Store
+Thumbs.db
