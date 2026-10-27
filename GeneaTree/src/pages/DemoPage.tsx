@@ -3,6 +3,7 @@ import { Bot, ChevronLeft, ChevronRight, PanelLeft, X } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loadFamily, saveFamily } from '../services/familyGateway';
+import { loadLocalFamily } from '../services/localFamilyService';
 import DemoControls from '../components/demo/DemoControls';
 import FamilyStats from '../components/demo/FamilyStats';
 import PersonProfileCard, { ProfileAnchor } from '../components/demo/PersonProfileCard';
@@ -20,12 +21,16 @@ import { FamilyArchive, parseFamilyArchive, serializeFamilyArchive } from '../se
 import { PdfDesignOptions } from '../services/pdfDesign';
 
 const DemoPage: React.FC = () => {
-  const [familyData, setFamilyData] = useState<Person[]>([]);
-  const [marriagesData, setMarriagesData] = useState<Marriage[]>([]);
-  const [treeOptions, setTreeOptions] = useState<TreeViewOptions>({
-    viewType: 'tree',
-    generations: 4,
-    focusPersonId: '1'
+  const initialSnapshot = useRef(loadLocalFamily());
+  const [familyData, setFamilyData] = useState<Person[]>(initialSnapshot.current.persons);
+  const [marriagesData, setMarriagesData] = useState<Marriage[]>(initialSnapshot.current.marriages);
+  const [treeOptions, setTreeOptions] = useState<TreeViewOptions>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('geneatree.demo.view') || 'null') as Partial<TreeViewOptions> | null;
+      return { viewType: saved?.viewType ?? 'tree', generations: saved?.generations ?? 4, focusPersonId: saved?.focusPersonId ?? '1' };
+    } catch {
+      return { viewType: 'tree', generations: 4, focusPersonId: '1' };
+    }
   });
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
@@ -34,7 +39,7 @@ const DemoPage: React.FC = () => {
   const [pendingImport, setPendingImport] = useState<{ fileName: string; archive?: FamilyArchive; error?: string } | null>(null);
   const [importBusy, setImportBusy] = useState(false);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(initialSnapshot.current.persons.length === 0);
   const [error, setError] = useState<string | null>(null);
   const [isPersonFormModalOpen, setIsPersonFormModalOpen] = useState(false);
   const [selectedPersonForEdit, setSelectedPersonForEdit] = useState<Person | null>(null);
@@ -79,7 +84,7 @@ const DemoPage: React.FC = () => {
   }, [applySnapshot]);
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    if (initialSnapshot.current.persons.length === 0) setLoading(true);
     setError(null);
 
     try {
@@ -121,6 +126,10 @@ const DemoPage: React.FC = () => {
     document.title = 'Démonstration - GeneaTreePro';
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    localStorage.setItem('geneatree.demo.view', JSON.stringify(treeOptions));
+  }, [treeOptions]);
 
   // Effet pour mettre à jour les relations après le chargement initial
   useEffect(() => {
@@ -587,9 +596,11 @@ const DemoPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6 text-center text-lg text-zinc-700 dark:text-zinc-300">
-        <div className="w-8 h-8 mb-4 border-4 border-blue-200 rounded-full border-t-blue-600 animate-spin"></div>
-        Chargement de l'arbre généalogique...
+      <div className="relative flex h-full flex-col items-center justify-center overflow-hidden bg-white/30 px-6 text-center backdrop-blur-[2px] dark:bg-zinc-950/30">
+        <div className="absolute inset-0 opacity-30 [background-image:radial-gradient(circle_at_center,rgba(56,189,248,.35)_1px,transparent_1.5px)] [background-size:28px_28px]" />
+        <div className="relative grid h-16 w-16 place-items-center rounded-2xl border border-sky-400/25 bg-white/70 shadow-xl dark:bg-zinc-950/70"><span className="absolute inset-1 animate-ping rounded-xl border border-sky-400/30" /><Bot className="relative animate-pulse text-sky-500" size={30} /></div>
+        <p className="relative mt-4 font-serif text-xl text-zinc-800 dark:text-zinc-100">Votre arbre prend forme</p>
+        <p className="relative mt-1 text-xs text-zinc-500">Restauration de votre dernière vue…</p>
       </div>
     );
   }

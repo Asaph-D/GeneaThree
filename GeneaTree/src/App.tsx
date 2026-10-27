@@ -1,6 +1,6 @@
 // src/App.tsx
 import React, { lazy, Suspense, useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { GitBranch, X } from 'lucide-react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
@@ -15,6 +15,13 @@ const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
 const AssistantPage = lazy(() => import('./pages/AssistantPage'));
 const CreationPage = lazy(() => import('./creation/CreationPage'));
+
+function RouteLoader() {
+  return <div className="relative min-h-[55vh] overflow-hidden bg-[#f4f1ea]/70 backdrop-blur-[2px] dark:bg-[#09090b]/70" role="status" aria-label="Chargement de la page">
+    <div className="absolute inset-0 opacity-30 [background-image:linear-gradient(to_right,rgba(56,189,248,.12)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,.12)_1px,transparent_1px)] [background-size:44px_44px]" />
+    <div className="relative grid min-h-[55vh] place-items-center"><div className="flex flex-col items-center gap-4"><div className="relative grid h-16 w-16 place-items-center rounded-2xl border border-sky-400/25 bg-white/70 shadow-2xl dark:bg-zinc-950/70"><span className="absolute inset-1 animate-ping rounded-xl border border-sky-400/30" /><GitBranch className="relative animate-pulse text-sky-500" size={30} /></div><div className="text-center"><p className="font-serif text-lg">GeneaTreePro</p><p className="mt-1 text-xs text-zinc-500">Préparation de votre espace…</p></div></div></div>
+  </div>;
+}
 
 const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') !== 'light');
@@ -49,7 +56,7 @@ const App: React.FC = () => {
         </div>
       )}
       <main className={hideFooter ? 'min-h-0 flex-1' : undefined}>
-        <Suspense fallback={<div className="grid min-h-[40vh] place-items-center text-sm text-zinc-500">Chargement…</div>}>
+        <Suspense fallback={<RouteLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/demo" element={<DemoPage />} />

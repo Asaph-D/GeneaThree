@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { User, Mail, MailCheck, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import { SiGithub, SiGoogle } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
@@ -31,6 +31,10 @@ const CreateAccountForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  if (successMessage) {
+    return <div className="mx-auto my-16 w-full max-w-md rounded-3xl border border-emerald-400/25 bg-white/95 p-8 text-center shadow-2xl backdrop-blur-xl dark:bg-zinc-950/95"><div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-emerald-500/10 text-emerald-500"><MailCheck size={32} /></div><p className="mt-5 text-xs font-semibold uppercase tracking-[.2em] text-emerald-600">Inscription reçue</p><h2 className="mt-2 font-serif text-3xl text-zinc-900 dark:text-white">Confirmez votre adresse</h2><p role="status" className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-300">Nous avons envoyé un lien sécurisé à <strong>{formData.email}</strong>. Ouvrez cet e-mail pour activer votre compte GeneaTreePro.</p><p className="mt-3 text-xs text-zinc-500">Pensez à vérifier le dossier indésirable si nécessaire.</p><button type="button" onClick={() => navigate('/', { replace: true })} className="mt-7 w-full rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-3 text-sm font-semibold text-white">J’ai compris</button></div>;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;

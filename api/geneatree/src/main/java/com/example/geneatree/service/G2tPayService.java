@@ -5,6 +5,9 @@ import com.example.geneatree.dto.PaymentResponse;
 import com.example.geneatree.entity.PaymentTransaction;
 import com.example.geneatree.repository.PaymentTransactionRepository;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.util.Map;
 
 @Service
 public class G2tPayService {
+    private static final Logger log = LoggerFactory.getLogger(G2tPayService.class);
     private final PaymentTransactionRepository payments;
     private final RestClient client;
     private final boolean enabled;
@@ -26,8 +30,9 @@ public class G2tPayService {
     private final String webhookUrl;
     private final String mtnOperator;
     private final String orangeOperator;
+    private final ObjectMapper objectMapper;
 
-    public G2tPayService(PaymentTransactionRepository payments, RestClient.Builder restClientBuilder,
+    public G2tPayService(PaymentTransactionRepository payments, RestClient.Builder restClientBuilder, ObjectMapper objectMapper,
             @Value("${order.g2tpay.enabled:true}") boolean enabled,
             @Value("${order.g2tpay.api-key:}") String apiKey,
             @Value("${order.g2tpay.base-url:https://g2tpay.net}") String baseUrl,
@@ -36,6 +41,7 @@ public class G2tPayService {
             @Value("${order.g2tpay.operator-mtn:MTN_CMR}") String mtnOperator,
             @Value("${order.g2tpay.operator-orange:ORANGE_CMR}") String orangeOperator) {
         this.payments = payments;
+        this.objectMapper = objectMapper;
         this.client = restClientBuilder.baseUrl(baseUrl).build();
         this.enabled = enabled;
         this.apiKey = apiKey;
@@ -75,7 +81,11 @@ public class G2tPayService {
         } catch (RestClientResponseException exception) {
             payment.setStatus(PaymentTransaction.Status.FAILED);
             payments.save(payment);
-            throw new PaymentGatewayException("G2TPay a refusé l'initiation du paiement", exception);
+            String providerMessage = providerMessage(exception.getResponseBodyAsString());
+            log.warn("G2TPay initiation rejected with HTTP {}: {}", exception.getStatusCode().value(), providerMessage);
+            throw new PaymentGatewayException(providerMessage == null
+                    ? "Le paiement Mobile Money a été refusé. Vérifiez le numéro et réessayez."
+                    : "Paiement refusé : " + providerMessage, exception);
         }
     }
 
@@ -131,6 +141,17 @@ public class G2tPayService {
     private boolean amountMatches(String rawAmount, long expectedAmount) {
         try { return Long.parseLong(rawAmount.replaceAll("\\.0+$", "")) == expectedAmount; }
         catch (NumberFormatException exception) { return false; }
+    }
+    private String providerMessage(String body) {
+        if (body == null || body.isBlank()) return null;
+        try {
+            JsonNode json = objectMapper.readTree(body);
+            String message = firstText(json, "message", "error", "detail", "description");
+            if (message == null && json.path("errors").isObject()) message = json.path("errors").toString();
+            return message == null || message.length() > 240 ? null : message;
+        } catch (Exception ignored) {
+            return null;
+        }
     }
     private PaymentResponse response(PaymentTransaction payment, String message) {
         return new PaymentResponse(payment.getReference(), payment.getStatus().name(), payment.getPlanCode(), payment.getAmountXaf(), message, null);

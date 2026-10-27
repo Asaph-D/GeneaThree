@@ -5,12 +5,11 @@ import { API_BASE_URL } from '../config/api';
 const API_BASE = API_BASE_URL;
 
 /**
- * Interrupteur lu dans GeneaTree/.env
- * Le service local est le choix sûr par défaut pour la démonstration.
- * Seule la valeur explicite `false` active la synchronisation backend.
+ * Le service local reste le choix sûr tant que les arbres distants ne sont pas
+ * isolés par compte. Seule une activation distante explicite change ce mode.
  */
 export function usesLocalFamilyService(): boolean {
-  return import.meta.env.VITE_USE_LOCAL_FAMILY_SERVICE !== 'false';
+  return import.meta.env.VITE_ENABLE_REMOTE_FAMILY_SYNC !== 'true';
 }
 
 export async function loadFamily(): Promise<{ persons: Person[]; marriages: Marriage[] }> {
