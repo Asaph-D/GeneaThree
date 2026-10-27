@@ -19,6 +19,10 @@ services:
         sync: false
       - key: JPA_SHOW_SQL
         value: "false"
+      - key: SPRING_MAIN_LAZY_INITIALIZATION
+        value: "true"
+      - key: SPRINGDOC_ENABLED
+        value: "false"
       - key: G2TPAY_ENABLED
         value: "true"
       - key: G2TPAY_API_KEY
@@ -29,11 +33,3 @@ services:
         value: "https://geneathree.onrender.com"
       - key: CINETPAY_ENABLED
         value: "false"
-      - key: CINETPAY_API_KEY
-        sync: false
-      - key: CINETPAY_SITE_ID
-        sync: false
-      - key: CINETPAY_NOTIFY_URL
-        value: "https://geneathree.onrender.com/api/payments/cinetpay/callback"
-      - key: CINETPAY_RETURN_URL
-        value: "https://genea-three.vercel.app/quick-start?payment=return"

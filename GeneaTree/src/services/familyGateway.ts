@@ -18,15 +18,17 @@ export async function loadFamily(): Promise<{ persons: Person[]; marriages: Marr
     return loadLocalFamily();
   }
 
-  const response = await fetch(`${API_BASE}/family`);
-  if (!response.ok) {
-    throw new Error('Le serveur généalogique ne répond pas.');
+  try {
+    const response = await fetch(`${API_BASE}/family`);
+    if (!response.ok) throw new Error('server unavailable');
+    const snapshot = await response.json() as { persons?: unknown[]; marriages?: unknown[] };
+    return {
+      persons: (snapshot.persons ?? []).map(normalizePerson),
+      marriages: (snapshot.marriages ?? []).map(normalizeMarriage),
+    };
+  } catch {
+    return loadLocalFamily();
   }
-  const snapshot = await response.json() as { persons?: unknown[]; marriages?: unknown[] };
-  return {
-    persons: (snapshot.persons ?? []).map(normalizePerson),
-    marriages: (snapshot.marriages ?? []).map(normalizeMarriage),
-  };
 }
 
 export async function clearFamily(): Promise<void> {
@@ -34,9 +36,11 @@ export async function clearFamily(): Promise<void> {
     saveLocalFamily([], []);
     return;
   }
-  const res = await fetch(`${API_BASE}/family`, { method: 'DELETE' });
-  if (!res.ok) {
-    throw new Error('Le serveur n’a pas pu réinitialiser le lignage.');
+  try {
+    const res = await fetch(`${API_BASE}/family`, { method: 'DELETE' });
+    if (!res.ok) throw new Error('server unavailable');
+  } catch {
+    saveLocalFamily([], []);
   }
 }
 
@@ -46,24 +50,26 @@ export async function saveFamily(persons: Person[], marriages: Marriage[]): Prom
     return;
   }
 
-  const response = await fetch(`${API_BASE}/family`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      version: 1,
-      persons: persons.map((person) => ({
-        ...person,
-        birthPlace: placeToString(person.birthPlace),
-        deathPlace: placeToString(person.deathPlace),
-      })),
-      marriages: marriages.map((marriage) => ({
-        ...marriage,
-        location: placeToString(marriage.location),
-      })),
-    }),
-  });
-  if (!response.ok) {
-    throw new Error("Le serveur a refusé l'enregistrement atomique du lignage.");
+  try {
+    const response = await fetch(`${API_BASE}/family`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        version: 1,
+        persons: persons.map((person) => ({
+          ...person,
+          birthPlace: placeToString(person.birthPlace),
+          deathPlace: placeToString(person.deathPlace),
+        })),
+        marriages: marriages.map((marriage) => ({
+          ...marriage,
+          location: placeToString(marriage.location),
+        })),
+      }),
+    });
+    if (!response.ok) throw new Error('server unavailable');
+  } catch {
+    saveLocalFamily(persons, marriages);
   }
 }
 
