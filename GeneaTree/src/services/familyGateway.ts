@@ -6,11 +6,11 @@ const API_BASE = API_BASE_URL;
 
 /**
  * Interrupteur lu dans GeneaTree/.env
- * VITE_USE_LOCAL_FAMILY_SERVICE=true  → service local
- * toute autre valeur, ou variable absente → tentative de jointure du backend
+ * Le service local est le choix sûr par défaut pour la démonstration.
+ * Seule la valeur explicite `false` active la synchronisation backend.
  */
 export function usesLocalFamilyService(): boolean {
-  return import.meta.env.VITE_USE_LOCAL_FAMILY_SERVICE === 'true';
+  return import.meta.env.VITE_USE_LOCAL_FAMILY_SERVICE !== 'false';
 }
 
 export async function loadFamily(): Promise<{ persons: Person[]; marriages: Marriage[] }> {

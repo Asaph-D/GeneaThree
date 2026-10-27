@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff, CheckCircle, Github } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
+import { SiGithub, SiGoogle } from 'react-icons/si';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
 
@@ -119,10 +120,10 @@ const CreateAccountForm: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-2 gap-3">
-        <button type="button" disabled={!configured || submitting} onClick={() => void handleProvider('google')} className="rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900">Google</button>
-        <button type="button" disabled={!configured || submitting} onClick={() => void handleProvider('github')} className="flex items-center justify-center gap-2 rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900"><Github size={16} /> GitHub</button>
+        <button type="button" disabled={!configured || submitting} onClick={() => void handleProvider('google')} className="flex items-center justify-center gap-2 rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900"><SiGoogle size={16} /> Google</button>
+        <button type="button" disabled={!configured || submitting} onClick={() => void handleProvider('github')} className="flex items-center justify-center gap-2 rounded-xl border border-zinc-300 px-3 py-2.5 text-sm font-medium hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-45 dark:border-white/15 dark:hover:bg-zinc-900"><SiGithub size={16} /> GitHub</button>
       </div>
-      {!configured && <p className="mt-3 text-sm text-amber-600">L'authentification Supabase n'est pas configurée sur ce déploiement.</p>}
+      {!configured && <p className="mt-3 text-sm text-amber-600">La connexion est momentanément indisponible. Réessayez dans quelques instants.</p>}
       {submitError && <p role="alert" className="mt-3 text-sm text-red-600">{submitError}</p>}
       {successMessage && <p role="status" className="mt-3 text-sm text-emerald-600">{successMessage}</p>}
       <div className="my-5 flex items-center gap-3 text-xs text-zinc-400"><span className="h-px flex-1 bg-zinc-200 dark:bg-white/10" />ou par e-mail<span className="h-px flex-1 bg-zinc-200 dark:bg-white/10" /></div>

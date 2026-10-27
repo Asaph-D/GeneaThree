@@ -29,7 +29,7 @@ public class SecurityConfig {
                     .includeSubDomains(true)
                     .maxAgeInSeconds(31536000)))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/health", "/api/auth/register", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers("/api/health", "/api/auth/register", "/api/payments/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/api/family/**", "/api/people/**", "/api/marriages/**", "/api/life-events/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
                 .anyRequest().authenticated()

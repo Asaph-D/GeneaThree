@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authError,
     clearAuthError: () => setAuthError(null),
     signInWithProvider: async (provider) => {
-      if (!supabase) throw new Error('Supabase n’est pas configuré.');
+      if (!supabase) throw new Error('La connexion est momentanément indisponible.');
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: { redirectTo: `${configuredSiteUrl || window.location.origin}/demo` },
@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error) throw error;
     },
     signUpWithEmail: async ({ firstName, lastName, email, password }) => {
-      if (!supabase) throw new Error("Supabase n'est pas configuré.");
+      if (!supabase) throw new Error("La création de compte est momentanément indisponible.");
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,

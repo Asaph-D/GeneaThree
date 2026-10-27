@@ -1,6 +1,7 @@
 package com.example.geneatree.controller;
 
 import com.example.geneatree.service.ResourceNotFoundException;
+import com.example.geneatree.service.PaymentGatewayException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.security.access.AccessDeniedException;
@@ -10,6 +11,13 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    @ExceptionHandler(PaymentGatewayException.class)
+    ProblemDetail handlePaymentGateway(PaymentGatewayException exception) {
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, exception.getMessage());
+        detail.setTitle("Payment gateway unavailable");
+        return detail;
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     ProblemDetail handleAccessDenied(AccessDeniedException exception) {
         ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, exception.getMessage());
