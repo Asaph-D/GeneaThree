@@ -29,6 +29,8 @@ services:
         sync: false
       - key: G2TPAY_WEBHOOK_URL
         value: "https://geneathree.onrender.com/api/payments/g2tpay/callback"
+      - key: G2TPAY_PENDING_TIMEOUT_SECONDS
+        value: "180"
       - key: GATEWAY_PUBLIC_URL
         value: "https://geneathree.onrender.com"
       - key: CINETPAY_ENABLED

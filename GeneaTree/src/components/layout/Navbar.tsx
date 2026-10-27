@@ -1,5 +1,6 @@
 import { Menu, Moon, Sun, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import AccountButton from '../auth/AccountButton';
 
@@ -81,6 +82,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
           </div>
           <div className="flex items-center gap-1 md:hidden">
             {themeButton}
+            <AccountButton />
             <button
               type="button"
               onClick={() => setIsMenuOpen((open) => !open)}
@@ -94,9 +96,9 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
         </div>
       </div>
 
-      {isMenuOpen && (
-        <div className="fixed inset-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-[60] bg-black/35 md:hidden" onClick={() => setIsMenuOpen(false)}>
-          <div className="ml-auto flex h-full w-[min(86vw,22rem)] flex-col border-l border-zinc-200 bg-[#f4f1ea] p-3 shadow-2xl dark:border-white/10 dark:bg-zinc-950" onClick={(event) => event.stopPropagation()}>
+      {isMenuOpen && createPortal(
+        <div className="fixed inset-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-[60] bg-zinc-950/60 backdrop-blur-sm md:hidden" onClick={() => setIsMenuOpen(false)}>
+          <div className="relative z-10 ml-auto flex h-full w-[min(86vw,22rem)] isolate flex-col border-l border-zinc-300 bg-[#f4f1ea] p-3 shadow-[-20px_0_60px_rgba(0,0,0,0.35)] dark:border-white/10 dark:bg-[#09090b]" onClick={(event) => event.stopPropagation()}>
             {links.map((item) => (
               <NavLink
                 key={item.to}
@@ -114,11 +116,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
             >
               Créer
             </Link>
-            <div className="mt-auto flex items-center justify-between border-t border-zinc-200 px-2 pt-4 dark:border-white/10">
-              <span className="text-sm text-zinc-500">Mon compte</span><AccountButton />
-            </div>
           </div>
-        </div>
+        </div>, document.body
       )}
     </nav>
   );

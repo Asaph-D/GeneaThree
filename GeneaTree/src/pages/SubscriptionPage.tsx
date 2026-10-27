@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { getPaymentStatus, initiatePayment, MobileOperator, PaidPlanCode, PaymentState } from '../services/paymentService';
 
+const PAYMENT_VALIDATION_SECONDS = 180;
+
 const plans = [
   { name: 'Mémoire', price: 'Gratuit', description: 'Pour commencer et préserver un premier lignage.', features: ['1 arbre familial', 'Assistant guidé', 'Export JSON'], action: 'Commencer' },
   { name: 'Famille', code: 'FAMILY_MONTHLY' as PaidPlanCode, amount: 3500, price: '3 500 FCFA', period: '/ mois', description: 'Pour construire ensemble sans limite de générations.', features: ['Arbres illimités', 'Collaboration familiale', 'Exports PDF et image', 'Sauvegarde cloud'], action: 'Choisir Famille', featured: true },
@@ -29,14 +31,30 @@ function PaymentModal({ plan, onClose }: { plan: { name: string; code: PaidPlanC
   const [payment, setPayment] = useState<PaymentState | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [remainingSeconds, setRemainingSeconds] = useState(PAYMENT_VALIDATION_SECONDS);
+  const paymentReference = payment?.reference;
+  const paymentStatus = payment?.status;
   useEffect(() => {
-    if (!payment?.reference || payment.status !== 'PENDING' || payment.redirectUrl) return;
-    const timer = window.setInterval(async () => { try { setPayment(await getPaymentStatus(payment.reference)); } catch { /* keep polling */ } }, 4000);
+    if (!paymentReference || paymentStatus !== 'PENDING' || payment?.redirectUrl) return;
+    const timer = window.setInterval(async () => { try { setPayment(await getPaymentStatus(paymentReference)); } catch { /* keep polling */ } }, 4000);
     return () => window.clearInterval(timer);
-  }, [payment]);
+  }, [paymentReference, paymentStatus, payment?.redirectUrl]);
+  useEffect(() => {
+    if (!paymentReference || paymentStatus !== 'PENDING') return;
+    const timer = window.setInterval(() => setRemainingSeconds((seconds) => {
+      if (seconds > 1) return seconds - 1;
+      window.clearInterval(timer);
+      getPaymentStatus(paymentReference)
+        .then((latest) => setPayment(latest.status === 'PENDING' ? { ...latest, status: 'CANCELLED', message: "Le délai de validation est expiré. Aucun paiement n'a été confirmé." } : latest))
+        .catch(() => setPayment((current) => current ? { ...current, status: 'CANCELLED', message: "Le délai de validation est expiré. Aucun paiement n'a été confirmé." } : current));
+      return 0;
+    }), 1000);
+    return () => window.clearInterval(timer);
+  }, [paymentReference, paymentStatus]);
   async function submit(event: FormEvent) {
     event.preventDefault(); setBusy(true); setError('');
     try {
+      setRemainingSeconds(PAYMENT_VALIDATION_SECONDS);
       setPayment(await initiatePayment({ planCode: plan.code, phoneNumber, operator: method, email: user?.email }));
     } catch (failure) { setError(failure instanceof Error ? failure.message : 'Paiement impossible.'); }
     finally { setBusy(false); }
@@ -44,7 +62,7 @@ function PaymentModal({ plan, onClose }: { plan: { name: string; code: PaidPlanC
   const inputClass = 'mt-2 w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-sky-400';
   return <div className="fixed inset-0 z-[130] grid place-items-center bg-black/75 p-4 backdrop-blur-md" role="dialog" aria-modal="true">
     <div className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-3xl border border-white/10 bg-zinc-950 p-6 text-white shadow-2xl"><div className="flex items-start justify-between"><div><p className="text-xs uppercase tracking-[.18em] text-sky-400">Paiement sécurisé</p><h2 className="mt-1 font-serif text-2xl">Forfait {plan.name}</h2><p className="mt-1 text-zinc-400">{plan.amount.toLocaleString('fr-FR')} FCFA</p></div><button onClick={onClose} aria-label="Fermer" className="rounded-xl border border-white/10 p-2"><X size={18} /></button></div>
-      {payment ? <PaymentProgress payment={payment} /> : <form onSubmit={submit} className="mt-6 space-y-4"><div className="grid grid-cols-3 gap-2">
+      {payment ? <PaymentProgress payment={payment} remainingSeconds={remainingSeconds} onRetry={() => { setPayment(null); setError(''); }} /> : <form onSubmit={submit} className="mt-6 space-y-4"><div className="grid grid-cols-3 gap-2">
         <MethodButton active={method === 'MTN'} onClick={() => setMethod('MTN')} icon={<MtnLogo />} label="MoMo" />
         <MethodButton active={method === 'ORANGE'} onClick={() => setMethod('ORANGE')} icon={<OrangeLogo />} label="Money" />
         <button type="button" disabled title="Bientôt disponible" className="relative flex min-w-0 cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-white/10 px-2 py-3 text-sm font-semibold opacity-45"><CreditCard size={24} /><span>Carte</span><span className="absolute -top-2 right-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[8px] uppercase">Bientôt</span></button>
@@ -59,7 +77,8 @@ function MethodButton({ active, onClick, icon, label }: { active: boolean; onCli
   return <button type="button" onClick={onClick} className={`flex min-w-0 items-center justify-center gap-2 rounded-xl border px-2 py-3 text-sm font-semibold ${active ? 'border-sky-400 bg-sky-400/15' : 'border-white/10'}`}>{icon}<span>{label}</span></button>;
 }
 
-function PaymentProgress({ payment }: { payment: PaymentState }) {
+function PaymentProgress({ payment, remainingSeconds, onRetry }: { payment: PaymentState; remainingSeconds: number; onRetry: () => void }) {
   const pending = payment.status === 'PENDING';
-  return <div className="mt-8 text-center">{pending ? <Loader2 className="mx-auto animate-spin text-sky-400" size={42} /> : <div className={`mx-auto grid h-12 w-12 place-items-center rounded-full ${payment.status === 'SUCCESSFUL' ? 'bg-emerald-500' : 'bg-red-500'}`}>{payment.status === 'SUCCESSFUL' ? <Check /> : <X />}</div>}<h3 className="mt-4 text-lg font-semibold">{pending ? 'Validation en attente' : payment.status === 'SUCCESSFUL' ? 'Paiement confirmé' : 'Paiement non abouti'}</h3><p className="mt-2 text-sm text-zinc-400">{pending ? 'Confirmez la demande reçue sur votre téléphone. Cette fenêtre se met à jour automatiquement.' : `Référence : ${payment.reference}`}</p></div>;
+  const countdown = `${String(Math.floor(remainingSeconds / 60)).padStart(2, '0')}:${String(remainingSeconds % 60).padStart(2, '0')}`;
+  return <div className="mt-8 text-center">{pending ? <Loader2 className="mx-auto animate-spin text-sky-400" size={42} /> : <div className={`mx-auto grid h-12 w-12 place-items-center rounded-full ${payment.status === 'SUCCESSFUL' ? 'bg-emerald-500' : 'bg-red-500'}`}>{payment.status === 'SUCCESSFUL' ? <Check /> : <X />}</div>}<h3 className="mt-4 text-lg font-semibold">{pending ? 'Validation en attente' : payment.status === 'SUCCESSFUL' ? 'Paiement confirmé' : 'Paiement non abouti'}</h3><p className="mt-2 text-sm text-zinc-400">{pending ? 'Confirmez la demande reçue sur votre téléphone. Cette fenêtre se met à jour automatiquement.' : payment.message || `Référence : ${payment.reference}`}</p>{pending && <p className="mt-3 font-mono text-lg font-semibold text-sky-300" aria-live="polite">{countdown}</p>}{!pending && payment.status !== 'SUCCESSFUL' && <button type="button" onClick={onRetry} className="mt-5 rounded-xl border border-white/15 px-4 py-2 text-sm font-semibold hover:bg-white/10">Essayer à nouveau</button>}</div>;
 }

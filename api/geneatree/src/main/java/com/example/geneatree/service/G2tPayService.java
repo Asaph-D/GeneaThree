@@ -30,6 +30,7 @@ public class G2tPayService {
     private final String webhookUrl;
     private final String mtnOperator;
     private final String orangeOperator;
+    private final long pendingTimeoutSeconds;
     private final ObjectMapper objectMapper;
 
     public G2tPayService(PaymentTransactionRepository payments, RestClient.Builder restClientBuilder, ObjectMapper objectMapper,
@@ -39,7 +40,8 @@ public class G2tPayService {
             @Value("${order.g2tpay.webhook-url:}") String webhookUrl,
             @Value("${order.g2tpay.gateway-public-url:}") String gatewayPublicUrl,
             @Value("${order.g2tpay.operator-mtn:MTN_CMR}") String mtnOperator,
-            @Value("${order.g2tpay.operator-orange:ORANGE_CMR}") String orangeOperator) {
+            @Value("${order.g2tpay.operator-orange:ORANGE_CMR}") String orangeOperator,
+            @Value("${order.g2tpay.pending-timeout-seconds:180}") long pendingTimeoutSeconds) {
         this.payments = payments;
         this.objectMapper = objectMapper;
         this.client = restClientBuilder.baseUrl(baseUrl).build();
@@ -49,6 +51,7 @@ public class G2tPayService {
                 ? gatewayPublicUrl.replaceAll("/$", "") + "/api/payments/g2tpay/callback" : webhookUrl;
         this.mtnOperator = mtnOperator;
         this.orangeOperator = orangeOperator;
+        this.pendingTimeoutSeconds = Math.max(30, pendingTimeoutSeconds);
     }
 
     @Transactional
@@ -83,16 +86,27 @@ public class G2tPayService {
             payments.save(payment);
             String providerMessage = providerMessage(exception.getResponseBodyAsString());
             log.warn("G2TPay initiation rejected with HTTP {}: {}", exception.getStatusCode().value(), providerMessage);
-            throw new PaymentGatewayException(providerMessage == null
-                    ? "Le paiement Mobile Money a été refusé. Vérifiez le numéro et réessayez."
-                    : "Paiement refusé : " + providerMessage, exception);
+            String message = "ORANGE".equals(request.operator())
+                    ? "Orange Money est momentanément indisponible chez notre opérateur de paiement. Utilisez MTN MoMo ou réessayez plus tard."
+                    : providerMessage == null
+                            ? "Le paiement Mobile Money a été refusé. Vérifiez le numéro et réessayez."
+                            : "Paiement refusé : " + providerMessage;
+            throw new PaymentGatewayException(message, exception);
         }
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public PaymentResponse status(String reference) {
-        return response(payments.findByReference(reference)
-                .orElseThrow(() -> new ResourceNotFoundException("Payment", reference)), null);
+        PaymentTransaction payment = payments.findByReference(reference)
+                .orElseThrow(() -> new ResourceNotFoundException("Payment", reference));
+        if (payment.getStatus() == PaymentTransaction.Status.PENDING
+                && payment.getCreatedAt().plusSeconds(pendingTimeoutSeconds).isBefore(Instant.now())) {
+            payment.setStatus(PaymentTransaction.Status.CANCELLED);
+            payments.save(payment);
+            return response(payment, "Le délai de validation est expiré. Aucun paiement n'a été confirmé.");
+        }
+        return response(payment, payment.getStatus() == PaymentTransaction.Status.PENDING
+                ? "Validez la demande Mobile Money sur votre téléphone." : null);
     }
 
     @Transactional
