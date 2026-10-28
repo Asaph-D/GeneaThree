@@ -5,7 +5,7 @@ export type TextAlignment = 'left' | 'center' | 'right';
 export type ParticleType = 'none' | 'dots' | 'stars' | 'leaves' | 'diamonds' | 'lines';
 export type BackgroundPattern = 'none' | 'grid' | 'dots' | 'diagonal';
 export type BackgroundGradient = 'none' | 'aurora' | 'midnight' | 'ember' | 'ocean' | 'forest' | 'violet' | 'orbital' | 'prism' | 'topography' | 'portal';
-export type FrameStyle = 'none' | 'fine' | 'double' | 'corners' | 'wave' | 'arch' | 'geometric' | 'botanical' | 'constellation' | 'ribbon';
+export type FrameStyle = 'none' | 'fine' | 'double' | 'corners' | 'wave' | 'arch' | 'geometric' | 'ribbon';
 
 export interface PdfDesignOptions {
   templateId: string;
@@ -22,7 +22,9 @@ export interface PdfDesignOptions {
   globalBorderColor: string;
   globalBorderWidth: number;
   frameStyle: FrameStyle;
+  frameColor: string;
   particleType: ParticleType;
+  particleColor: string;
   particleDensity: number;
   particleNetwork: boolean;
   backgroundPattern: BackgroundPattern;
@@ -45,14 +47,12 @@ export interface PdfTemplate { id: string; name: string; description: string; fr
 
 export const PDF_TEMPLATES: PdfTemplate[] = [
   { id: 'pur', name: 'Pur', description: 'Aucun cadre.', frameStyle: 'none' },
-  { id: 'galerie', name: 'Galerie', description: 'Trait fin et discret.', frameStyle: 'fine' },
+  { id: 'galerie', name: 'Éditorial', description: 'Filet de musée avec cartouches.', frameStyle: 'fine' },
   { id: 'heritage', name: 'Héritage', description: 'Double filet classique.', frameStyle: 'double' },
-  { id: 'angles', name: 'Angles', description: 'Coins éditoriaux.', frameStyle: 'corners' },
-  { id: 'horizon', name: 'Horizon', description: 'Vagues inspirées de l’accueil.', frameStyle: 'wave' },
+  { id: 'angles', name: 'Art déco', description: 'Coins architecturaux étagés.', frameStyle: 'corners' },
+  { id: 'horizon', name: 'Sillage', description: 'Bordure ondulée à trois filets.', frameStyle: 'wave' },
   { id: 'portique', name: 'Portique', description: 'Arc architectural.', frameStyle: 'arch' },
   { id: 'facettes', name: 'Facettes', description: 'Cadre géométrique.', frameStyle: 'geometric' },
-  { id: 'racines', name: 'Racines', description: 'Ornement végétal.', frameStyle: 'botanical' },
-  { id: 'constellation', name: 'Constellation', description: 'Éclats reliés très fins.', frameStyle: 'constellation' },
   { id: 'ruban', name: 'Ruban', description: 'Filets cérémoniels légers.', frameStyle: 'ribbon' },
 ];
 
@@ -62,7 +62,7 @@ export function createDefaultPdfDesign(dark = false): PdfDesignOptions {
     lineColor: dark ? '#d6d3d1' : '#44403c', textColor: dark ? '#f5f5f4' : '#1c1917', portraitShape: 'circle',
     showPhotoBackground: false, borderEnabled: true, borderColor: dark ? '#d6d3d1' : '#44403c', borderWidth: 1.5,
     globalBorderEnabled: false, globalBorderColor: dark ? '#38bdf8' : '#2563eb', globalBorderWidth: 1.5,
-    frameStyle: 'none', particleType: 'none', particleDensity: 18, particleNetwork: false, backgroundPattern: 'none', backgroundGradient: 'none', gradientIntensity: 70, title: '', titleAlign: 'left',
+    frameStyle: 'none', frameColor: dark ? '#38bdf8' : '#2563eb', particleType: 'none', particleColor: dark ? '#38bdf8' : '#2563eb', particleDensity: 18, particleNetwork: false, backgroundPattern: 'none', backgroundGradient: 'none', gradientIntensity: 70, title: '', titleAlign: 'left',
     message: '', messageColor: dark ? '#bae6fd' : '#1d4ed8', messageAlign: 'center', fontFamily: 'helvetica', messagePosition: 'top',
   };
 }

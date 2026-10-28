@@ -1,5 +1,5 @@
 import { Menu, Moon, Sun, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import AccountButton from '../auth/AccountButton';
@@ -22,21 +22,11 @@ const mobileLink = 'block rounded-xl px-3 py-3 text-[15px] font-medium text-zinc
 
 const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navRef = useRef<HTMLElement>(null);
   const location = useLocation();
 
   useEffect(() => {
     setIsMenuOpen(false);
   }, [location.pathname]);
-
-  useEffect(() => {
-    if (!isMenuOpen) return;
-    const close = (event: MouseEvent) => {
-      if (!navRef.current?.contains(event.target as Node)) setIsMenuOpen(false);
-    };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
-  }, [isMenuOpen]);
 
   const themeButton = (
     <button
@@ -50,7 +40,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
   );
 
   return (
-    <nav ref={navRef} className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl transition-colors duration-300 dark:border-zinc-800 dark:bg-zinc-950/90">
+    <nav className="sticky top-0 z-50 border-b border-zinc-200 bg-white/90 pt-[env(safe-area-inset-top)] backdrop-blur-xl transition-colors duration-300 dark:border-zinc-800 dark:bg-zinc-950/90">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-14 items-center justify-between">
           <Link to="/" className="rounded-lg px-1 py-1.5">
@@ -97,8 +87,8 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
       </div>
 
       {isMenuOpen && createPortal(
-        <div className="fixed inset-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-[60] bg-zinc-950/60 backdrop-blur-sm md:hidden" onClick={() => setIsMenuOpen(false)}>
-          <div className="relative z-10 ml-auto flex h-full w-[min(86vw,22rem)] isolate flex-col border-l border-zinc-300 bg-[#f4f1ea] p-3 shadow-[-20px_0_60px_rgba(0,0,0,0.35)] dark:border-white/10 dark:bg-[#09090b]" onClick={(event) => event.stopPropagation()}>
+        <div className="fixed inset-0 top-[calc(3.5rem+env(safe-area-inset-top))] z-[60] bg-zinc-950/30 md:hidden" onClick={() => setIsMenuOpen(false)}>
+          <div className="relative z-10 ml-auto flex h-full w-[min(76vw,18rem)] isolate flex-col border-l border-zinc-300 bg-[#f4f1ea] p-3 shadow-[-20px_0_60px_rgba(0,0,0,0.35)] dark:border-white/10 dark:bg-[#09090b]" onClick={(event) => event.stopPropagation()}>
             {links.map((item) => (
               <NavLink
                 key={item.to}

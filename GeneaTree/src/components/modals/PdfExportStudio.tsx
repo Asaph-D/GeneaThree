@@ -1,6 +1,6 @@
 import { AlignCenter, AlignLeft, AlignRight, ChevronDown, Download, Image, Layers3, Minus, Palette, Plus, Shapes, Sparkles, Type, X } from 'lucide-react';
 import html2canvas from 'html2canvas';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { layoutBands } from '../demo/bandLayout';
 import { Marriage, Person } from '../../types/family';
 import { PDF_GRADIENTS, PDF_TEMPLATES, PdfDesignOptions, TextAlignment, createDefaultPdfDesign } from '../../services/pdfDesign';
@@ -16,11 +16,15 @@ interface PdfExportStudioProps {
 }
 
 type PanelId = 'templates' | 'background' | 'portraits' | 'borders' | 'effects' | 'text';
+const PARTICLE_PRESETS: Array<{ id: PdfDesignOptions['particleType']; name: string }> = [
+  { id: 'none', name: 'Aucune' }, { id: 'dots', name: 'Points' }, { id: 'stars', name: 'Étoiles' },
+  { id: 'leaves', name: 'Feuilles' }, { id: 'diamonds', name: 'Losanges' }, { id: 'lines', name: 'Traits' },
+];
 
 export default function PdfExportStudio({ persons, marriages, generations, initialSvg, testPreset = false, onClose, onDownload }: PdfExportStudioProps) {
   const [options, setOptions] = useState<PdfDesignOptions>(() => {
     const base = createDefaultPdfDesign(document.body.classList.contains('dark'));
-    return testPreset ? { ...base, templateId: 'constellation', frameStyle: 'constellation', backgroundPattern: 'grid', particleType: 'stars', particleNetwork: true, globalBorderEnabled: true, title: 'Mémoire de famille', titleAlign: 'center', message: 'Nos racines traversent les générations', messagePosition: 'bottom' } : base;
+    return testPreset ? { ...base, templateId: 'facettes', frameStyle: 'geometric', backgroundPattern: 'grid', particleType: 'stars', particleNetwork: true, globalBorderEnabled: true, title: 'Mémoire de famille', titleAlign: 'center', message: 'Nos racines traversent les générations', messagePosition: 'bottom' } : base;
   });
   const darkMode = document.body.classList.contains('dark');
   const [panel, setPanel] = useState<PanelId>('templates');
@@ -38,8 +42,8 @@ export default function PdfExportStudio({ persons, marriages, generations, initi
   } finally { setBusy(false); } };
 
   return (
-    <div className="fixed inset-0 z-[120] flex bg-zinc-950/90 backdrop-blur-xl" role="dialog" aria-modal="true" aria-labelledby="pdf-studio-title">
-      <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+    <div className="fixed inset-0 z-[120] flex flex-col bg-zinc-950/90 backdrop-blur-xl md:flex-row" role="dialog" aria-modal="true" aria-labelledby="pdf-studio-title">
+      <main className="relative flex h-[56dvh] min-h-0 min-w-0 flex-none flex-col overflow-hidden md:h-auto md:flex-1">
         <header className="flex h-16 items-center justify-between border-b border-white/10 px-4 sm:px-6">
           <div><p className="text-[10px] uppercase tracking-[0.2em] text-sky-300">Validation avant export</p><h2 id="pdf-studio-title" className="font-serif text-xl text-white">Studio PDF</h2></div>
           <div className="flex items-center gap-2"><button onClick={onClose} disabled={busy} className="rounded-xl border border-white/10 p-2 text-zinc-300 hover:bg-white/10" aria-label="Fermer"><X size={18} /></button><button onClick={() => void download()} disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 disabled:opacity-50"><Download size={16} />{busy ? 'Génération…' : 'Télécharger'}</button></div>
@@ -54,6 +58,7 @@ export default function PdfExportStudio({ persons, marriages, generations, initi
                 {!usesCssDepthBackground(options.backgroundGradient) && <PreviewDepthBackground options={options} idPrefix="studio-background" x={layout.minX - 36} y={layout.minY - 86} width={layout.width + 72} height={layout.height + 128} />}
                 <PreviewDecorations options={options} x={layout.minX - 28} y={layout.minY - (hasHeading ? 78 : 28)} width={layout.width + 56} height={layout.height + (hasHeading ? 112 : 62)} />
               </svg>
+              <ParticleNetworkCanvas options={options} />
             </div>
             <div ref={treeCaptureRef} className="absolute inset-0 z-[1] h-full w-full">
             {initialSvg ? <><div className="h-full w-full [&_svg]:static [&_svg]:h-full [&_svg]:w-full" dangerouslySetInnerHTML={{ __html: initialSvg }} /><TreeTextOverlay options={options} /></> : <svg className="h-full w-full" viewBox={viewBox} preserveAspectRatio="xMidYMid meet">
@@ -85,9 +90,9 @@ export default function PdfExportStudio({ persons, marriages, generations, initi
           </div>
         </div>
       </main>
-      <aside className="absolute inset-x-0 bottom-0 z-20 max-h-[44vh] shrink-0 overflow-y-auto border-t border-white/10 bg-zinc-950/95 shadow-2xl md:static md:block md:max-h-none md:w-[340px] md:border-l md:border-t-0">
+      <aside className="z-20 h-[44dvh] shrink-0 overflow-y-auto border-t border-white/10 bg-zinc-950/95 shadow-2xl md:h-auto md:w-[340px] md:border-l md:border-t-0">
         <div className="border-b border-white/10 p-5"><p className="text-xs font-semibold text-white">Personnalisation</p><p className="mt-1 text-xs leading-5 text-zinc-500">Ouvrez uniquement l’outil dont vous avez besoin.</p></div>
-        <Panel id="templates" icon={<Layers3 size={16} />} title="Cadres" active={panel} onToggle={setPanel}><p className="text-[11px] leading-5 text-zinc-500">Le cadre ne modifie plus vos particules.</p><div className="flex snap-x gap-2 overflow-x-auto pb-2 [scrollbar-color:#38bdf8_transparent] [scrollbar-width:thin]">{PDF_TEMPLATES.map((template) => <button key={template.id} onClick={() => setOptions((current) => ({ ...current, templateId: template.id, frameStyle: template.frameStyle }))} className={`min-w-[150px] snap-start rounded-xl border p-3 text-left transition ${options.templateId === template.id ? 'border-sky-400 bg-sky-400/10' : 'border-white/10 hover:bg-white/5'}`}><FrameThumbnail frameStyle={template.frameStyle} color={options.accentColor} /><span className="mt-3 block text-sm font-medium text-white">{template.name}</span><span className="mt-1 block text-xs leading-5 text-zinc-400">{template.description}</span></button>)}</div></Panel>
+        <Panel id="templates" icon={<Layers3 size={16} />} title="Cadres" active={panel} onToggle={setPanel}><p className="text-[11px] leading-5 text-zinc-500">Le cadre ne modifie plus vos particules.</p><div className="flex items-stretch gap-2"><div className="flex min-w-0 flex-1 snap-x gap-2 overflow-x-auto pb-2 [scrollbar-color:#38bdf8_transparent] [scrollbar-width:thin]">{PDF_TEMPLATES.map((template) => <button key={template.id} onClick={() => setOptions((current) => ({ ...current, templateId: template.id, frameStyle: template.frameStyle }))} className={`min-w-[150px] snap-start rounded-xl border p-3 text-left transition ${options.templateId === template.id ? 'border-sky-400 bg-sky-400/10' : 'border-white/10 hover:bg-white/5'}`}><FrameThumbnail frameStyle={template.frameStyle} color={options.frameColor} /><span className="mt-3 block text-sm font-medium text-white">{template.name}</span><span className="mt-1 block text-xs leading-5 text-zinc-400">{template.description}</span></button>)}</div><VerticalColorControl label="Couleur des cadres" value={options.frameColor} onChange={(value) => update('frameColor', value)} /></div></Panel>
         <Panel id="background" icon={<Palette size={16} />} title="Fond & palette" active={panel} onToggle={setPanel}>
           <button onClick={() => setOptions((current) => ({ ...createDefaultPdfDesign(darkMode), portraitShape: current.portraitShape }))} className="w-full rounded-xl border border-sky-400/30 bg-sky-400/10 px-3 py-2 text-xs text-sky-200">Reprendre exactement le thème de /demo</button>
           <p className="pt-1 text-[10px] uppercase tracking-wider text-zinc-500">Dégradés</p>
@@ -98,7 +103,16 @@ export default function PdfExportStudio({ persons, marriages, generations, initi
         </Panel>
         <Panel id="portraits" icon={<Image size={16} />} title="Portraits" active={panel} onToggle={setPanel}><div className="grid grid-cols-3 gap-2">{(['circle', 'rounded', 'square'] as const).map((shape) => <button key={shape} onClick={() => update('portraitShape', shape)} className={`rounded-lg border px-2 py-3 text-xs ${options.portraitShape === shape ? 'border-sky-400 bg-sky-400/10 text-white' : 'border-white/10 text-zinc-400'}`}>{shape === 'circle' ? 'Rond' : shape === 'rounded' ? 'Arrondi' : 'Carré'}</button>)}</div><Toggle label="Fond coloré derrière les photos" checked={options.showPhotoBackground} onChange={(value) => update('showPhotoBackground', value)} /></Panel>
         <Panel id="borders" icon={<Shapes size={16} />} title="Contours" active={panel} onToggle={setPanel}><p className="text-[10px] uppercase tracking-wider text-zinc-500">Nœuds</p><Toggle label="Contours des nœuds" checked={options.borderEnabled} onChange={(value) => update('borderEnabled', value)} /><ColorField label="Couleur" value={options.borderColor} onChange={(value) => update('borderColor', value)} /><Range label="Épaisseur" value={options.borderWidth} min={0.5} max={5} step={0.5} onChange={(value) => update('borderWidth', value)} /><p className="pt-3 text-[10px] uppercase tracking-wider text-zinc-500">Page</p><Toggle label="Contour global" checked={options.globalBorderEnabled} onChange={(value) => update('globalBorderEnabled', value)} /><ColorField label="Couleur globale" value={options.globalBorderColor} onChange={(value) => update('globalBorderColor', value)} /><Range label="Épaisseur globale" value={options.globalBorderWidth} min={0.5} max={6} step={0.5} onChange={(value) => update('globalBorderWidth', value)} /></Panel>
-        <Panel id="effects" icon={<Sparkles size={16} />} title="Particules" active={panel} onToggle={setPanel}><label className="block text-xs text-zinc-400">Type<select value={options.particleType} onChange={(event) => update('particleType', event.target.value as PdfDesignOptions['particleType'])} className="mt-2 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-white"><option value="none">Aucune</option><option value="dots">Points</option><option value="stars">Étoiles</option><option value="leaves">Feuilles</option><option value="diamonds">Losanges</option><option value="lines">Traits</option></select></label><Range label="Densité" value={options.particleDensity} min={4} max={40} step={2} onChange={(value) => update('particleDensity', value)} /><Toggle label="Réseau entre particules" checked={options.particleNetwork} onChange={(value) => update('particleNetwork', value)} /></Panel>
+        <Panel id="effects" icon={<Sparkles size={16} />} title="Particules" active={panel} onToggle={setPanel}>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Rendu</p>
+          <div className="flex items-stretch gap-2">
+            <div className="flex min-w-0 flex-1 snap-x gap-2 overflow-x-auto pb-2 [scrollbar-color:#38bdf8_transparent] [scrollbar-width:thin]">
+              {PARTICLE_PRESETS.map((preset) => <button key={preset.id} type="button" onClick={() => update('particleType', preset.id)} className={`min-w-[96px] snap-start rounded-xl border p-2 text-left transition ${options.particleType === preset.id ? 'border-sky-400 bg-sky-400/10' : 'border-white/10 hover:bg-white/5'}`}><ParticleThumbnail type={preset.id} color={options.particleColor} network={options.particleNetwork} /><span className="mt-2 block text-[11px] text-zinc-300">{preset.name}</span></button>)}
+            </div>
+            <VerticalColorControl label="Couleur des particules" value={options.particleColor} onChange={(value) => update('particleColor', value)} />
+          </div>
+          <Range label="Densité" value={options.particleDensity} min={4} max={40} step={2} onChange={(value) => update('particleDensity', value)} /><Toggle label="Réseau entre particules" checked={options.particleNetwork} onChange={(value) => update('particleNetwork', value)} />
+        </Panel>
         <Panel id="text" icon={<Type size={16} />} title="Texte & message" active={panel} onToggle={setPanel}><TextField label="Titre" value={options.title} onChange={(value) => update('title', value)} /><AlignButtons value={options.titleAlign} onChange={(value) => update('titleAlign', value)} /><TextField label="Message superposé" value={options.message} onChange={(value) => update('message', value)} multiline /><AlignButtons value={options.messageAlign} onChange={(value) => update('messageAlign', value)} /><ColorField label="Couleur du message" value={options.messageColor} onChange={(value) => update('messageColor', value)} /><label className="mt-4 block text-xs text-zinc-400">Police<select value={options.fontFamily} onChange={(event) => update('fontFamily', event.target.value as PdfDesignOptions['fontFamily'])} className="mt-2 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-white"><option value="helvetica">Helvetica</option><option value="times">Times</option><option value="courier">Courier</option></select></label><label className="mt-4 block text-xs text-zinc-400">Position<select value={options.messagePosition} onChange={(event) => update('messagePosition', event.target.value as PdfDesignOptions['messagePosition'])} className="mt-2 w-full rounded-lg border border-white/10 bg-zinc-900 px-3 py-2 text-white"><option value="top">Sous le titre</option><option value="bottom">Bas de page</option><option value="watermark">Filigrane central</option></select></label></Panel>
       </aside>
     </div>
@@ -165,14 +179,12 @@ function usesCssDepthBackground(gradient: PdfDesignOptions['backgroundGradient']
 function FrameThumbnail({ frameStyle, color }: { frameStyle: PdfDesignOptions['frameStyle']; color: string }) {
   return <svg viewBox="0 0 120 54" className="block h-14 w-full rounded-lg bg-black/25" fill="none" stroke={color} strokeWidth=".8">
     {frameStyle === 'none' && <path d="M20 27H100" strokeDasharray="3 4" opacity=".35" />}
-    {frameStyle === 'fine' && <rect x="5" y="5" width="110" height="44" rx="2" />}
+    {frameStyle === 'fine' && <><rect x="5" y="5" width="110" height="44" rx="1" /><path d="M18 9H50L60 5L70 9H102 M18 45H50L60 49L70 45H102" opacity=".65" /><path d="M60 2L63 5L60 8L57 5Z M60 46L63 49L60 52L57 49Z" fill={color} /></>}
     {frameStyle === 'double' && <><rect x="4" y="4" width="112" height="46" rx="2" /><rect x="9" y="9" width="102" height="36" rx="1" /></>}
-    {frameStyle === 'corners' && <path d="M5 19V5H19 M101 5H115V19 M5 35V49H19 M101 49H115V35" />}
-    {frameStyle === 'wave' && <path d="M4 12Q31 1 60 12T116 12 M4 42Q31 53 60 42T116 42" />}
+    {frameStyle === 'corners' && <><rect x="6" y="6" width="108" height="42" rx="1" opacity=".45" /><path d="M5 22V5H22 M11 22V11H22 M98 5H115V22 M98 11H109V22 M5 32V49H22 M11 32V43H22 M98 49H115V32 M98 43H109V32" strokeWidth="1.1" /><path d="M18 5L23 10L18 15 M102 5L97 10L102 15 M18 49L23 44L18 39 M102 49L97 44L102 39" /></>}
+    {frameStyle === 'wave' && <><path d="M8 14Q22 4 37 10T65 10T94 10T112 14V40Q98 50 83 44T55 44T26 44T8 40Z" /><path d="M8 18Q23 9 38 14T66 14T94 14T112 18 M8 36Q23 45 38 40T66 40T94 40T112 36" opacity=".55" /></>}
     {frameStyle === 'arch' && <path d="M10 49V22Q60-8 110 22V49" />}
     {frameStyle === 'geometric' && <path d="M5 15L15 5H105L115 15V39L105 49H15L5 39Z" />}
-    {frameStyle === 'botanical' && <><path d="M7 47Q15 27 38 16 M113 7Q105 27 82 38" />{[0, 1, 2].map((index) => <g key={index}><ellipse cx={14 + index * 8} cy={39 - index * 8} rx="5" ry="2" transform={`rotate(-35 ${14 + index * 8} ${39 - index * 8})`} /><ellipse cx={106 - index * 8} cy={15 + index * 8} rx="5" ry="2" transform={`rotate(-35 ${106 - index * 8} ${15 + index * 8})`} /></g>)}</>}
-    {frameStyle === 'constellation' && <><path d="M7 34L25 10L43 27 M77 27L95 44L113 20" />{[[7,34],[25,10],[43,27],[77,27],[95,44],[113,20]].map(([cx,cy]) => <circle key={`${cx}-${cy}`} cx={cx} cy={cy} r="1.8" fill={color} stroke="none" />)}</>}
     {frameStyle === 'ribbon' && <><path d="M15 10H105 M23 15H97 M15 44H105 M23 39H97" /><path d="M15 10L7 15L15 20 M105 10L113 15L105 20 M15 44L7 39L15 34 M105 44L113 39L105 34" /></>}
   </svg>;
 }
@@ -181,28 +193,133 @@ function VerticalIntensity({ value, disabled, onChange }: { value: number; disab
   return <div className={`flex w-8 shrink-0 flex-col items-center justify-between rounded-xl border border-white/10 bg-white/[.025] py-1 ${disabled ? 'opacity-35' : ''}`} title={`Intensité du fond : ${value}%`}><Plus size={12} className="text-zinc-400" /><input aria-label="Intensité du dégradé" disabled={disabled} type="range" min="15" max="100" value={value} onChange={(event) => onChange(Number(event.target.value))} className="h-16 w-4 cursor-pointer accent-sky-400 disabled:cursor-not-allowed" style={{ writingMode: 'vertical-lr', direction: 'rtl' }} /><Minus size={12} className="text-zinc-500" /></div>;
 }
 
+function VerticalColorControl({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return <label className="flex w-9 shrink-0 cursor-pointer flex-col items-center justify-between rounded-xl border border-white/10 bg-white/[.025] py-2" title={label}><Palette size={13} className="text-zinc-400" /><span className="relative grid h-12 w-5 place-items-center overflow-hidden rounded-full border border-white/20 shadow-inner" style={{ background: `linear-gradient(to top, ${value}, color-mix(in srgb, ${value} 38%, white))` }}><input aria-label={label} type="color" value={value} onChange={(event) => onChange(event.target.value)} className="absolute inset-0 h-full w-full cursor-pointer opacity-0" /></span><span className="h-2 w-2 rounded-full" style={{ backgroundColor: value, boxShadow: `0 0 8px ${value}` }} /></label>;
+}
+
+function ParticleThumbnail({ type, color, network }: { type: PdfDesignOptions['particleType']; color: string; network: boolean }) {
+  const points = [[13, 35, 2], [29, 14, 1.5], [50, 31, 2.3], [72, 12, 1.8], [88, 37, 1.4]];
+  const shape = (x: number, y: number, size: number, index: number) => {
+    if (type === 'stars') return <path key={index} d={`M${x} ${y - size * 2}L${x + size * .55} ${y - size * .55}L${x + size * 2} ${y}L${x + size * .55} ${y + size * .55}L${x} ${y + size * 2}L${x - size * .55} ${y + size * .55}L${x - size * 2} ${y}L${x - size * .55} ${y - size * .55}Z`} />;
+    if (type === 'leaves') return <ellipse key={index} cx={x} cy={y} rx={size * 2} ry={size} transform={`rotate(-35 ${x} ${y})`} />;
+    if (type === 'diamonds') return <rect key={index} x={x - size} y={y - size} width={size * 2} height={size * 2} transform={`rotate(45 ${x} ${y})`} />;
+    if (type === 'lines') return <rect key={index} x={x - .7} y={y - size * 2} width="1.4" height={size * 4} rx=".7" />;
+    return <circle key={index} cx={x} cy={y} r={size} />;
+  };
+  return <svg viewBox="0 0 100 50" className="block h-12 w-full rounded-lg bg-black/30" fill={color} stroke={color}>{type === 'none' ? <path d="M17 25H83" fill="none" strokeDasharray="3 5" opacity=".35" /> : <>{network && <g fill="none" strokeWidth=".7" opacity=".35"><path d="M13 35L29 14L50 31L72 12L88 37" /><path d="M29 14L72 12" /></g>}{points.map(([x, y, size], index) => shape(x, y, size, index))}</>}</svg>;
+}
+
 function PreviewDecorations({ options, x, y, width, height }: { options: PdfDesignOptions; x: number; y: number; width: number; height: number }) {
   const inset = 8;
-  const particles = Array.from({ length: options.particleType === 'none' ? 0 : options.particleDensity }, (_, index) => ({
-    x: x + 18 + ((index * 83) % Math.max(20, width - 36)), y: y + 18 + ((index * 47) % Math.max(20, height - 36)), size: 1.5 + (index % 3),
-  }));
-  const networkDistance = Math.min(150, Math.max(72, Math.min(width, height) * .22));
-  const networkLinks = particles.flatMap((source, sourceIndex) => particles.slice(sourceIndex + 1).map((target, offset) => ({ source, target, sourceIndex, targetIndex: sourceIndex + offset + 1, distance: Math.hypot(target.x - source.x, target.y - source.y) }))).filter((link) => link.distance <= networkDistance);
-  const motion = (particle: typeof particles[number], index: number) => ({ x: particle.x + (index % 2 ? 5 : -5), y: particle.y - 7 });
-  return <g pointerEvents="none" fill="none" stroke={options.accentColor}>
-    <g opacity=".08" strokeWidth=".65">{options.backgroundPattern === 'grid' && <>{Array.from({ length: 12 }, (_, index) => <line key={`v${index}`} x1={x + index * width / 11} y1={y} x2={x + index * width / 11} y2={y + height} />)}{Array.from({ length: 8 }, (_, index) => <line key={`h${index}`} x1={x} y1={y + index * height / 7} x2={x + width} y2={y + index * height / 7} />)}</>}{options.backgroundPattern === 'diagonal' && <>{Array.from({ length: 18 }, (_, index) => <line key={`d1-${index}`} x1={x - height + index * (width + height) / 17} y1={y + height} x2={x + index * (width + height) / 17} y2={y} />)}{Array.from({ length: 18 }, (_, index) => <line key={`d2-${index}`} x1={x - height + index * (width + height) / 17} y1={y} x2={x + index * (width + height) / 17} y2={y + height} />)}</>}{options.backgroundPattern === 'dots' && Array.from({ length: 70 }, (_, index) => <circle key={index} cx={x + 10 + (index * 43) % Math.max(20, width - 20)} cy={y + 10 + (index * 29) % Math.max(20, height - 20)} r="1.2" fill={options.accentColor} stroke="none" />)}</g>
+  return <g pointerEvents="none" fill="none" stroke={options.frameColor}>
+    <g opacity=".08" stroke={options.accentColor} strokeWidth=".65">{options.backgroundPattern === 'grid' && <>{Array.from({ length: 12 }, (_, index) => <line key={`v${index}`} x1={x + index * width / 11} y1={y} x2={x + index * width / 11} y2={y + height} />)}{Array.from({ length: 8 }, (_, index) => <line key={`h${index}`} x1={x} y1={y + index * height / 7} x2={x + width} y2={y + index * height / 7} />)}</>}{options.backgroundPattern === 'diagonal' && <>{Array.from({ length: 18 }, (_, index) => <line key={`d1-${index}`} x1={x - height + index * (width + height) / 17} y1={y + height} x2={x + index * (width + height) / 17} y2={y} />)}{Array.from({ length: 18 }, (_, index) => <line key={`d2-${index}`} x1={x - height + index * (width + height) / 17} y1={y} x2={x + index * (width + height) / 17} y2={y + height} />)}</>}{options.backgroundPattern === 'dots' && Array.from({ length: 70 }, (_, index) => <circle key={index} cx={x + 10 + (index * 43) % Math.max(20, width - 20)} cy={y + 10 + (index * 29) % Math.max(20, height - 20)} r="1.2" fill={options.accentColor} stroke="none" />)}</g>
     {options.globalBorderEnabled && <rect x={x} y={y} width={width} height={height} rx="4" stroke={options.globalBorderColor} strokeWidth={options.globalBorderWidth} />}
+    {options.frameStyle === 'fine' && <><rect x={x + 5} y={y + 5} width={width - 10} height={height - 10} rx="2" /><path d={`M${x + width * .16} ${y + 11}H${x + width * .44}L${x + width * .5} ${y + 5}L${x + width * .56} ${y + 11}H${x + width * .84} M${x + width * .16} ${y + height - 11}H${x + width * .44}L${x + width * .5} ${y + height - 5}L${x + width * .56} ${y + height - 11}H${x + width * .84}`} opacity=".65" /><path d={`M${x + width * .5} ${y + 1}L${x + width * .5 + 4} ${y + 5}L${x + width * .5} ${y + 9}L${x + width * .5 - 4} ${y + 5}Z M${x + width * .5} ${y + height - 9}L${x + width * .5 + 4} ${y + height - 5}L${x + width * .5} ${y + height - 1}L${x + width * .5 - 4} ${y + height - 5}Z`} fill={options.frameColor} /></>}
     {options.frameStyle === 'double' && <rect x={x + inset} y={y + inset} width={width - inset * 2} height={height - inset * 2} strokeWidth="1" opacity=".7" />}
-    {options.frameStyle === 'corners' && <path d={`M${x} ${y + 40}V${y}H${x + 40} M${x + width - 40} ${y}H${x + width}V${y + 40} M${x} ${y + height - 40}V${y + height}H${x + 40} M${x + width - 40} ${y + height}H${x + width}V${y + height - 40}`} />}
-    {options.frameStyle === 'wave' && <path d={`M${x} ${y + 22} Q${x + width * .25} ${y - 12} ${x + width * .5} ${y + 22} T${x + width} ${y + 22} M${x} ${y + height - 20} Q${x + width * .25} ${y + height + 12} ${x + width * .5} ${y + height - 20} T${x + width} ${y + height - 20}`} />}
+    {options.frameStyle === 'corners' && <><rect x={x + 5} y={y + 5} width={width - 10} height={height - 10} opacity=".35" /><path d={`M${x} ${y + 52}V${y}H${x + 52} M${x + 10} ${y + 52}V${y + 10}H${x + 52} M${x + width - 52} ${y}H${x + width}V${y + 52} M${x + width - 52} ${y + 10}H${x + width - 10}V${y + 52} M${x} ${y + height - 52}V${y + height}H${x + 52} M${x + 10} ${y + height - 52}V${y + height - 10}H${x + 52} M${x + width - 52} ${y + height}H${x + width}V${y + height - 52} M${x + width - 52} ${y + height - 10}H${x + width - 10}V${y + height - 52}`} strokeWidth="1.4" /></>}
+    {options.frameStyle === 'wave' && <><path d={`M${x + 12} ${y + 30}Q${x + width * .16} ${y - 4} ${x + width * .32} ${y + 18}T${x + width * .64} ${y + 18}T${x + width - 12} ${y + 30}V${y + height - 30}Q${x + width * .84} ${y + height + 4} ${x + width * .68} ${y + height - 18}T${x + width * .36} ${y + height - 18}T${x + 12} ${y + height - 30}Z`} /><path d={`M${x + 12} ${y + 39}Q${x + width * .16} ${y + 5} ${x + width * .32} ${y + 27}T${x + width * .64} ${y + 27}T${x + width - 12} ${y + 39} M${x + 12} ${y + height - 39}Q${x + width * .16} ${y + height - 5} ${x + width * .32} ${y + height - 27}T${x + width * .64} ${y + height - 27}T${x + width - 12} ${y + height - 39}`} opacity=".55" /></>}
     {options.frameStyle === 'arch' && <path d={`M${x + 24} ${y + height}V${y + 90}Q${x + width / 2} ${y - 70} ${x + width - 24} ${y + 90}V${y + height}`} />}
     {options.frameStyle === 'geometric' && <path d={`M${x} ${y + 40}L${x + 40} ${y}H${x + width - 40}L${x + width} ${y + 40}V${y + height - 40}L${x + width - 40} ${y + height}H${x + 40}L${x} ${y + height - 40}Z`} />}
-    {options.frameStyle === 'botanical' && <path d={`M${x + 12} ${y + height - 12}Q${x + 38} ${y + height - 74} ${x + 102} ${y + height - 104} M${x + width - 12} ${y + 12}Q${x + width - 38} ${y + 74} ${x + width - 102} ${y + 104}`} />}
-    {options.frameStyle === 'constellation' && <path d={`M${x + 20} ${y + 55}L${x + 70} ${y + 20}L${x + 115} ${y + 65} M${x + width - 20} ${y + height - 55}L${x + width - 70} ${y + height - 20}L${x + width - 115} ${y + height - 65}`} opacity=".7" />}
     {options.frameStyle === 'ribbon' && <path d={`M${x + 28} ${y + 18}H${x + width - 28} M${x + 42} ${y + 27}H${x + width - 42} M${x + 28} ${y + height - 18}H${x + width - 28} M${x + 42} ${y + height - 27}H${x + width - 42}`} />}
-    {options.particleNetwork && <g opacity=".16" strokeWidth=".8">{networkLinks.map((link) => { const sourceMotion = motion(link.source, link.sourceIndex); const targetMotion = motion(link.target, link.targetIndex); return <line key={`${link.sourceIndex}-${link.targetIndex}`} x1={link.source.x} y1={link.source.y} x2={link.target.x} y2={link.target.y}><animate attributeName="x1" values={`${link.source.x};${sourceMotion.x};${link.source.x}`} dur={`${4 + link.sourceIndex % 4}s`} repeatCount="indefinite" /><animate attributeName="y1" values={`${link.source.y};${sourceMotion.y};${link.source.y}`} dur={`${4 + link.sourceIndex % 4}s`} repeatCount="indefinite" /><animate attributeName="x2" values={`${link.target.x};${targetMotion.x};${link.target.x}`} dur={`${4 + link.targetIndex % 4}s`} repeatCount="indefinite" /><animate attributeName="y2" values={`${link.target.y};${targetMotion.y};${link.target.y}`} dur={`${4 + link.targetIndex % 4}s`} repeatCount="indefinite" /></line>; })}</g>}
-    <g fill={options.accentColor} stroke="none" opacity=".38">{particles.map((particle, index) => <g key={index} transform={`translate(${particle.x} ${particle.y})`}><animateTransform attributeName="transform" type="translate" values={`${particle.x} ${particle.y};${particle.x + (index % 2 ? 5 : -5)} ${particle.y - 7};${particle.x} ${particle.y}`} dur={`${4 + index % 4}s`} repeatCount="indefinite" />{options.particleType === 'stars' ? <path d="M0-4L1-1L4 0L1 1L0 4L-1 1L-4 0L-1-1Z" /> : options.particleType === 'leaves' ? <ellipse rx={particle.size * 1.8} ry={particle.size} transform="rotate(-35)" /> : options.particleType === 'diamonds' ? <rect x={-particle.size} y={-particle.size} width={particle.size * 2} height={particle.size * 2} transform="rotate(45)" /> : options.particleType === 'lines' ? <rect x="-1" y="-5" width="2" height="10" rx="1" /> : <circle r={particle.size} />}</g>)}</g>
   </g>;
+}
+
+function ParticleNetworkCanvas({ options }: { options: PdfDesignOptions }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const container = canvas?.parentElement;
+    if (!canvas || !container || options.particleType === 'none') return;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+    type Particle = { x: number; y: number; vx: number; vy: number; size: number };
+    let particles: Particle[] = [];
+    let frame = 0;
+    let width = 1;
+    let height = 1;
+    const resize = () => {
+      const rect = container.getBoundingClientRect();
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+      canvas.width = Math.round(width * pixelRatio);
+      canvas.height = Math.round(height * pixelRatio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      particles = Array.from({ length: options.particleDensity }, () => {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = .12 + Math.random() * .34;
+        return { x: Math.random() * width, y: Math.random() * height, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, size: 1.2 + Math.random() * 2.2 };
+      });
+    };
+    const drawParticle = (particle: Particle) => {
+      context.beginPath();
+      if (options.particleType === 'stars') {
+        for (let point = 0; point < 8; point += 1) {
+          const radius = point % 2 === 0 ? particle.size * 1.8 : particle.size * .55;
+          const angle = -Math.PI / 2 + point * Math.PI / 4;
+          const pointX = particle.x + Math.cos(angle) * radius;
+          const pointY = particle.y + Math.sin(angle) * radius;
+          if (point === 0) context.moveTo(pointX, pointY); else context.lineTo(pointX, pointY);
+        }
+        context.closePath();
+      } else if (options.particleType === 'diamonds') {
+        context.moveTo(particle.x, particle.y - particle.size * 1.5);
+        context.lineTo(particle.x + particle.size * 1.5, particle.y);
+        context.lineTo(particle.x, particle.y + particle.size * 1.5);
+        context.lineTo(particle.x - particle.size * 1.5, particle.y);
+        context.closePath();
+      } else if (options.particleType === 'lines') {
+        context.rect(particle.x - .7, particle.y - particle.size * 2, 1.4, particle.size * 4);
+      } else if (options.particleType === 'leaves') {
+        context.ellipse(particle.x, particle.y, particle.size * 1.8, particle.size * .75, -.6, 0, Math.PI * 2);
+      } else {
+        context.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      }
+      context.fill();
+    };
+    const render = () => {
+      context.clearRect(0, 0, width, height);
+      particles.forEach((particle) => {
+        particle.x = (particle.x + particle.vx + width) % width;
+        particle.y = (particle.y + particle.vy + height) % height;
+      });
+      if (options.particleNetwork) {
+        const connectionDistance = Math.min(120, Math.max(72, Math.min(width, height) * .24));
+        context.lineWidth = 1;
+        for (let sourceIndex = 0; sourceIndex < particles.length; sourceIndex += 1) {
+          for (let targetIndex = sourceIndex + 1; targetIndex < particles.length; targetIndex += 1) {
+            const source = particles[sourceIndex];
+            const target = particles[targetIndex];
+            const distance = Math.hypot(target.x - source.x, target.y - source.y);
+            if (distance >= connectionDistance) continue;
+            context.globalAlpha = (1 - distance / connectionDistance) * .3;
+            context.strokeStyle = options.particleColor;
+            context.beginPath();
+            context.moveTo(source.x, source.y);
+            context.lineTo(target.x, target.y);
+            context.stroke();
+          }
+        }
+      }
+      context.globalAlpha = .46;
+      context.fillStyle = options.particleColor;
+      context.shadowColor = options.particleColor;
+      context.shadowBlur = 5;
+      particles.forEach(drawParticle);
+      context.globalAlpha = 1;
+      context.shadowBlur = 0;
+      frame = window.requestAnimationFrame(render);
+    };
+    const observer = new ResizeObserver(resize);
+    observer.observe(container);
+    resize();
+    render();
+    return () => { observer.disconnect(); window.cancelAnimationFrame(frame); };
+  }, [options.particleColor, options.particleDensity, options.particleNetwork, options.particleType]);
+  if (options.particleType === 'none') return null;
+  return <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" aria-hidden="true" />;
 }
 
 function Panel({ id, icon, title, active, onToggle, children }: { id: PanelId; icon: React.ReactNode; title: string; active: PanelId; onToggle: (id: PanelId) => void; children: React.ReactNode }) { const open = active === id; return <section className="border-b border-white/10"><button onClick={() => onToggle(id)} className="flex w-full items-center gap-3 px-5 py-4 text-left text-sm text-zinc-200">{icon}<span className="flex-1">{title}</span><ChevronDown size={15} className={`transition ${open ? 'rotate-180' : ''}`} /></button>{open && <div className="space-y-3 px-5 pb-5">{children}</div>}</section>; }

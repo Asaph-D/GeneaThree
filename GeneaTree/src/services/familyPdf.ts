@@ -181,6 +181,12 @@ function drawPageDecorations(pdf: jsPDF, design: PdfDesignOptions, width: number
     if (design.backgroundPattern === 'dots') for (let x = margin + 20; x < width - margin; x += 30) for (let y = margin + 20; y < height - margin; y += 30) pdf.circle(x, y, 0.8, 'F');
     pdf.setGState(new pdf.GState({ opacity: 1 }));
   }
+  pdf.setDrawColor(design.frameColor);
+  pdf.setLineWidth(0.7);
+  if (design.frameStyle === 'fine') {
+    pdf.rect(margin, margin, width - margin * 2, height - margin * 2, 'S');
+    const center = width / 2; pdf.line(margin + 80, margin + 8, center - 20, margin + 8); pdf.line(center + 20, margin + 8, width - margin - 80, margin + 8); drawDiamond(pdf, center, margin, 4, design.frameColor, design.frameColor);
+  }
   if (design.frameStyle === 'double') pdf.rect(margin + 8, margin + 8, width - (margin + 8) * 2, height - (margin + 8) * 2, 'S');
   if (design.frameStyle === 'corners') [[margin, margin, 1, 1], [width - margin, margin, -1, 1], [margin, height - margin, 1, -1], [width - margin, height - margin, -1, -1]].forEach(([x, y, sx, sy]) => { pdf.line(x, y, x + 42 * sx, y); pdf.line(x, y, x, y + 42 * sy); });
   if (design.frameStyle === 'wave') {
@@ -195,15 +201,8 @@ function drawPageDecorations(pdf: jsPDF, design: PdfDesignOptions, width: number
     const cut = 38;
     pdf.lines([[width - margin * 2 - cut * 2, 0], [cut, cut], [0, height - margin * 2 - cut * 2], [-cut, cut], [-(width - margin * 2 - cut * 2), 0], [-cut, -cut], [0, -(height - margin * 2 - cut * 2)], [cut, -cut]], margin + cut, margin, [1, 1], 'S', true);
   }
-  if (design.frameStyle === 'botanical') {
-    for (let index = 0; index < 6; index += 1) { pdf.ellipse(margin + 18 + index * 13, height - margin - 18 - index * 10, 7, 3, 'S'); pdf.ellipse(width - margin - 18 - index * 13, margin + 18 + index * 10, 7, 3, 'S'); }
-  }
-  if (design.frameStyle === 'constellation') {
-    const points = [[margin + 20, margin + 52], [margin + 67, margin + 22], [margin + 112, margin + 64], [width - margin - 20, height - margin - 52], [width - margin - 67, height - margin - 22], [width - margin - 112, height - margin - 64]];
-    pdf.line(points[0][0], points[0][1], points[1][0], points[1][1]); pdf.line(points[1][0], points[1][1], points[2][0], points[2][1]); pdf.line(points[3][0], points[3][1], points[4][0], points[4][1]); pdf.line(points[4][0], points[4][1], points[5][0], points[5][1]);
-  }
   if (design.frameStyle === 'ribbon') [[margin + 28, width - margin - 28, margin + 10], [margin + 42, width - margin - 42, margin + 18], [margin + 28, width - margin - 28, height - margin - 10], [margin + 42, width - margin - 42, height - margin - 18]].forEach(([x1, x2, y]) => pdf.line(x1, y, x2, y));
-  pdf.setFillColor(design.accentColor);
+  pdf.setFillColor(design.particleColor);
   const particlePoints: { x: number; y: number }[] = [];
   for (let index = 0; index < (design.particleType === 'none' ? 0 : design.particleDensity); index += 1) {
     const randomX = Math.abs(Math.sin((index + 1) * 12.9898) * 43758.5453) % 1; const randomY = Math.abs(Math.sin((index + 1) * 78.233) * 12741.371) % 1;
@@ -211,14 +210,14 @@ function drawPageDecorations(pdf: jsPDF, design: PdfDesignOptions, width: number
     const y = margin + 15 + randomY * Math.max(20, height - margin * 2 - 30);
     particlePoints.push({ x, y });
     const size = 1.2 + index % 3;
-    if (design.particleType === 'diamonds') drawDiamond(pdf, x, y, size + 1, design.accentColor, design.accentColor);
+    if (design.particleType === 'diamonds') drawDiamond(pdf, x, y, size + 1, design.particleColor, design.particleColor);
     else if (design.particleType === 'lines') pdf.rect(x, y - 4, 1.5, 8, 'F');
     else if (design.particleType === 'leaves') pdf.ellipse(x, y, size * 1.8, size, 'F');
     else if (design.particleType === 'stars') pdf.lines([[1, 2], [2, 1], [-2, 1], [-1, 2], [-1, -2], [-2, -1], [2, -1], [1, -2]], x, y - 3, [1, 1], 'F', true);
     else pdf.circle(x, y, size, 'F');
   }
   if (design.particleNetwork) {
-    pdf.setDrawColor(design.accentColor); pdf.setLineWidth(0.35); const threshold = 46;
+    pdf.setDrawColor(design.particleColor); pdf.setLineWidth(0.35); const threshold = 46;
     particlePoints.forEach((source, sourceIndex) => particlePoints.slice(sourceIndex + 1).forEach((target) => { if (Math.hypot(target.x - source.x, target.y - source.y) <= threshold) pdf.line(source.x, source.y, target.x, target.y); }));
   }
 }
