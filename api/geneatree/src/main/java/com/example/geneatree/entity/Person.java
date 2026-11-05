@@ -24,6 +24,9 @@ public class Person {
     @Column(name = "client_id")
     private String clientId;
 
+    @Column(name = "snapshot_order")
+    private Integer snapshotOrder;
+
     @PrePersist
     void assignId() {
         if (id == null || id.isBlank()) id = UUID.randomUUID().toString();

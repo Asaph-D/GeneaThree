@@ -60,8 +60,8 @@ public class FamilySnapshotService {
 
     @Transactional(readOnly = true)
     public FamilySnapshotDTO load(String treeId) {
-        List<PersonDTO> persons = personRepository.findAllByTreeId(treeId).stream().map(personConverter::convertToDTO).toList();
-        List<MarriageDTO> marriages = marriageRepository.findAllByTreeId(treeId).stream().map(marriageConverter::convertToDTO).toList();
+        List<PersonDTO> persons = personRepository.findAllByTreeIdOrderBySnapshotOrderAsc(treeId).stream().map(personConverter::convertToDTO).toList();
+        List<MarriageDTO> marriages = marriageRepository.findAllByTreeIdOrderBySnapshotOrderAsc(treeId).stream().map(marriageConverter::convertToDTO).toList();
         return new FamilySnapshotDTO(CURRENT_VERSION, persons, marriages);
     }
 
@@ -99,10 +99,12 @@ public class FamilySnapshotService {
                 .orElseThrow(() -> new ResourceNotFoundException("Family tree", treeId));
         clearStoredTree(treeId);
         Map<String, Person> peopleById = new HashMap<>();
-        for (PersonDTO dto : snapshot.persons()) {
+        for (int index = 0; index < snapshot.persons().size(); index++) {
+            PersonDTO dto = snapshot.persons().get(index);
             Person person = scalarPerson(dto);
             person.setId(UUID.randomUUID().toString());
             person.setClientId(dto.getId());
+            person.setSnapshotOrder(index);
             person.setTree(tree);
             peopleById.put(dto.getId(), person);
         }
@@ -115,10 +117,12 @@ public class FamilySnapshotService {
             person.setSiblings(resolvePeople(dto.getSiblingIds(), peopleById));
         }
         entityManager.flush();
-        snapshot.marriages().stream().map(dto -> {
+        java.util.stream.IntStream.range(0, snapshot.marriages().size()).mapToObj(index -> {
+            MarriageDTO dto = snapshot.marriages().get(index);
             Marriage marriage = marriage(dto, peopleById);
             marriage.setId(UUID.randomUUID().toString());
             marriage.setClientId(dto.getId());
+            marriage.setSnapshotOrder(index);
             marriage.setTree(tree);
             return marriage;
         }).forEach(entityManager::persist);
@@ -355,13 +359,13 @@ public class FamilySnapshotService {
     }
 
     private void clearStoredTree(String treeId) {
-        List<Marriage> marriages = marriageRepository.findAllByTreeId(treeId);
+        List<Marriage> marriages = marriageRepository.findAllByTreeIdOrderBySnapshotOrderAsc(treeId);
         marriageRepository.deleteAll(marriages);
         marriageRepository.flush();
         List<LifeEvent> events = lifeEventRepository.findAllByTreeId(treeId);
         events.forEach(event -> event.setRelatedPersons(new ArrayList<>()));
         lifeEventRepository.saveAllAndFlush(events);
-        List<Person> people = personRepository.findAllByTreeId(treeId);
+        List<Person> people = personRepository.findAllByTreeIdOrderBySnapshotOrderAsc(treeId);
         people.forEach(person -> {
             person.setParents(new ArrayList<>());
             person.setSpouses(new ArrayList<>());

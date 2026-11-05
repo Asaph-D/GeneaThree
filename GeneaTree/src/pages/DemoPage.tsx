@@ -760,7 +760,7 @@ const DemoPage: React.FC = () => {
         />
       )}
       {isShareModalOpen && (
-        <ShareModal onClose={toggleShareModal} accessToken={accessToken} persons={familyData} marriages={marriagesData} />
+        <ShareModal onClose={toggleShareModal} accessToken={accessToken} persons={familyData} marriages={marriagesData} treeOptions={treeOptions} />
       )}
       {helpExperienceOpen && <HelpExperience page="demo" onBeforeStep={(target) => { if (['demo-settings', 'demo-import', 'demo-share', 'demo-export'].some((name) => target.includes(name))) setSidebarOpen(true); }} onClose={() => setHelpExperienceOpen(false)} />}
       {pdfStudioOpen && (

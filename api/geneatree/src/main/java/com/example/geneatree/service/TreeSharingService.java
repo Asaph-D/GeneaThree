@@ -4,6 +4,7 @@ import com.example.geneatree.dto.*;
 import com.example.geneatree.entity.*;
 import com.example.geneatree.repository.*;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.Locale;
@@ -16,10 +17,14 @@ public class TreeSharingService {
     private final TreeMembershipRepository memberships;
     private final TreeInvitationRepository invitations;
     private final TreeAccessService access;
+    private final AdminNotificationService notifications;
+    private final String publicUrl;
 
     public TreeSharingService(FamilyTreeRepository trees, AppUserRepository users, TreeMembershipRepository memberships,
-            TreeInvitationRepository invitations, TreeAccessService access) {
+            TreeInvitationRepository invitations, TreeAccessService access, AdminNotificationService notifications,
+            @Value("${app.public-url:https://genea-three.vercel.app}") String publicUrl) {
         this.trees = trees; this.users = users; this.memberships = memberships; this.invitations = invitations; this.access = access;
+        this.notifications = notifications; this.publicUrl = publicUrl.replaceAll("/+$", "");
     }
 
     @Transactional
@@ -42,11 +47,13 @@ public class TreeSharingService {
             TreeMembership membership = memberships.findByTreeIdAndUserId(treeId, user.get().getId()).orElseGet(TreeMembership::new);
             membership.setTree(tree); membership.setUser(user.get()); membership.setRole(request.role()); memberships.save(membership);
             invitations.findByTreeIdAndEmailIgnoreCase(treeId, email).ifPresent(invitations::delete);
-            return new TreeInvitationResponse(email, request.role().name(), "ACTIVE", null);
+            boolean notificationSent = notifications.treeInvitation(email, ownerEmail, tree.getName(), request.role().name(), publicUrl + "/demo");
+            return new TreeInvitationResponse(email, request.role().name(), "ACTIVE", null, notificationSent);
         }
         TreeInvitation invitation = invitations.findByTreeIdAndEmailIgnoreCase(treeId, email).orElseGet(TreeInvitation::new);
         invitation.setTree(tree); invitation.setEmail(email); invitation.setRole(request.role()); invitations.save(invitation);
-        return new TreeInvitationResponse(email, request.role().name(), "PENDING_REGISTRATION", invitation.getToken());
+        boolean notificationSent = notifications.treeInvitation(email, ownerEmail, tree.getName(), request.role().name(), publicUrl + "/signin?invite=" + invitation.getToken());
+        return new TreeInvitationResponse(email, request.role().name(), "PENDING_REGISTRATION", invitation.getToken(), notificationSent);
     }
 
     @Transactional
