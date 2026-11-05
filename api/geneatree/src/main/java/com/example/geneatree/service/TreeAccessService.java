@@ -26,6 +26,10 @@ public class TreeAccessService {
         return role;
     }
 
+    public void requireOwner(String treeId, String email) {
+        if (membership(treeId, email) != TreeAccessRole.OWNER) throw new AccessDeniedException("Only the tree owner can manage sharing");
+    }
+
     private TreeAccessRole membership(String treeId, String email) {
         var user = users.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new AccessDeniedException("Unknown account"));

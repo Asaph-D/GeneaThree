@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HelpCircle, Mic, RotateCcw, Send, SkipForward, Undo2 } from 'lucide-react';
+import { Clock3, HelpCircle, Mic, RotateCcw, Send, SkipForward, Undo2 } from 'lucide-react';
 import TreeVisualization from '../components/demo/TreeVisualization';
 import { loadFamily, saveFamily } from '../services/familyGateway';
 import { GenderType, Location, Marriage, Person } from '../types/family';
+import { getCurrentLocalTree, listFamilyRevisions, listLocalTrees, selectLocalTree } from '../services/localFamilyService';
 
 type Phase =
   | 'anchor-first' | 'anchor-last' | 'anchor-gender' | 'anchor-birth' | 'anchor-city'
@@ -820,6 +821,7 @@ const AssistantPage: React.FC = () => {
   const [history, setHistory] = useState<{ phase: Phase; draft: Draft; pending: Pending }[]>([]);
   const [saving, setSaving] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [treeHistoryOpen, setTreeHistoryOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; text: string }[]>(initialSession?.messages ?? [
     { role: 'assistant', text: 'Quel est le prénom qui ouvre l’arbre ?' },
   ]);
@@ -1227,11 +1229,12 @@ const AssistantPage: React.FC = () => {
       <section className="relative flex h-full w-full shrink-0 flex-col border-zinc-200/80 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85 md:max-w-md md:border-r">
         <div className="pointer-events-none absolute h-28 w-full bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.22),transparent_70%)]" />
         <div className="relative flex items-center justify-between border-b border-zinc-200/80 px-4 py-3 dark:border-white/10">
+          <span className="sr-only">{labelFor(kind)}</span>
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">Assistant</p>
             <h1 className="font-serif text-xl text-zinc-950 dark:text-white">{editingSavedTree && draft.anchor.firstName ? `Arbre de ${draft.anchor.firstName}` : 'Nouvel arbre'}</h1>
           </div>
-          <p className="text-[11px] uppercase tracking-[0.14em] text-zinc-500">{labelFor(kind)}</p>
+          <div className="relative"><button type="button" onClick={() => setTreeHistoryOpen((open) => !open)} className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] text-zinc-500 hover:border-sky-400 dark:border-white/10" aria-expanded={treeHistoryOpen}><Clock3 size={13} />Historique</button>{treeHistoryOpen && <div className="absolute right-0 top-9 z-50 w-72 rounded-2xl border border-zinc-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-zinc-950"><p className="px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-500">Mes arbres</p>{listLocalTrees().map((tree) => <button key={tree.id} type="button" onClick={() => { selectLocalTree(tree.id); window.location.reload(); }} className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm hover:bg-zinc-100 dark:hover:bg-white/5 ${tree.id === getCurrentLocalTree().id ? 'text-sky-500' : ''}`}><span className="truncate">{tree.name}</span><span className="ml-2 text-[10px] text-zinc-500">{tree.role === 'READER' ? 'lecture' : tree.source === 'imported' ? 'importé' : 'actif'}</span></button>)}<div className="my-1 border-t border-zinc-200 dark:border-white/10" /><p className="px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-500">Dernières sauvegardes</p>{listFamilyRevisions().slice(0, 4).map((revision) => <div key={revision.id} className="flex items-center justify-between px-3 py-1.5 text-xs text-zinc-500"><span>{revision.personCount} personne{revision.personCount > 1 ? 's' : ''}</span><time>{new Date(revision.savedAt).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</time></div>)}</div>}</div>
         </div>
         {savedTreeSize > 0 && !editingSavedTree && savedFamily && (
           <div className="relative border-b border-primary-200 bg-primary-50/90 px-4 py-2 text-[13px] dark:border-primary-400/20 dark:bg-primary-500/10">

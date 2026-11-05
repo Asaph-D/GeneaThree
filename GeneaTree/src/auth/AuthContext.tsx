@@ -8,6 +8,7 @@ const supabase = url && anonKey ? createClient(url, anonKey) : null;
 
 interface AuthValue {
   user: User | null;
+  accessToken: string | null;
   loading: boolean;
   configured: boolean;
   authError: string | null;
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<AuthValue>(() => ({
     user: session?.user ?? null,
+    accessToken: session?.access_token ?? null,
     loading,
     configured: Boolean(supabase),
     authError,

@@ -15,6 +15,7 @@ const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
 const AssistantPage = lazy(() => import('./pages/AssistantPage'));
 const CreationPage = lazy(() => import('./creation/CreationPage'));
+const SharedTreePage = lazy(() => import('./pages/SharedTreePage'));
 
 function RouteLoader() {
   return <div className="relative min-h-[55vh] overflow-hidden bg-[#f4f1ea]/70 backdrop-blur-[2px] dark:bg-[#09090b]/70" role="status" aria-label="Chargement de la page">
@@ -67,6 +68,7 @@ const App: React.FC = () => {
             <Route path="/signin" element={<CreateAccountForm />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/faq" element={<FaqPage />} />
+            <Route path="/shared/:token" element={<SharedTreePage />} />
           </Routes>
         </Suspense>
       </main>

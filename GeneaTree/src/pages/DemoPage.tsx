@@ -3,7 +3,7 @@ import { Bot, ChevronLeft, ChevronRight, PanelLeft, X } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loadFamily, saveFamily } from '../services/familyGateway';
-import { loadLocalFamily } from '../services/localFamilyService';
+import { createLocalTree, loadLocalFamily } from '../services/localFamilyService';
 import DemoControls from '../components/demo/DemoControls';
 import FamilyStats from '../components/demo/FamilyStats';
 import PersonProfileCard, { ProfileAnchor } from '../components/demo/PersonProfileCard';
@@ -19,8 +19,10 @@ import { Marriage, PartialPerson, Person, TreeViewOptions } from '../types/famil
 import { getSampleFamily, SAMPLE_FAMILIES } from '../examples/sampleFamilies';
 import { FamilyArchive, parseFamilyArchive, serializeFamilyArchive } from '../services/familyTransfer';
 import { PdfDesignOptions } from '../services/pdfDesign';
+import { useAuth } from '../auth/AuthContext';
 
 const DemoPage: React.FC = () => {
+  const { accessToken } = useAuth();
   const initialSnapshot = useRef(loadLocalFamily());
   const [familyData, setFamilyData] = useState<Person[]>(initialSnapshot.current.persons);
   const [marriagesData, setMarriagesData] = useState<Marriage[]>(initialSnapshot.current.marriages);
@@ -97,7 +99,7 @@ const DemoPage: React.FC = () => {
         await saveFamily(sample.persons, sample.marriages);
         setExampleId(sample.id);
         applySnapshot(sample.persons, sample.marriages, sample.focusId);
-      } else if (localStorage.getItem('geneatree.example') === 'custom' && persons.length > 0) {
+      } else if (['custom', 'imported'].includes(localStorage.getItem('geneatree.example') || '') && persons.length > 0) {
         applySnapshot(persons, marriages);
       } else if (!knownSample) {
         const savedExample = localStorage.getItem('geneatree.example');
@@ -585,6 +587,8 @@ const DemoPage: React.FC = () => {
     setImportBusy(true);
     try {
       const archive = pendingImport.archive;
+      const treeName = pendingImport.fileName.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
+      createLocalTree(treeName, { persons: archive.persons, marriages: archive.marriages }, 'imported');
       await saveFamily(archive.persons, archive.marriages);
       applySnapshot(archive.persons, archive.marriages, archive.view.focusPersonId);
       setTreeOptions(archive.view);
@@ -750,7 +754,7 @@ const DemoPage: React.FC = () => {
         />
       )}
       {isShareModalOpen && (
-        <ShareModal onClose={toggleShareModal} familyData={displayFamilyData} />
+        <ShareModal onClose={toggleShareModal} accessToken={accessToken} />
       )}
       {pdfStudioOpen && (
         <PdfExportStudio

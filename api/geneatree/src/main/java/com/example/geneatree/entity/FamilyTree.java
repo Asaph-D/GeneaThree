@@ -28,6 +28,9 @@ public class FamilyTree {
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(unique = true, length = 64)
+    private String publicShareToken;
+
     @PrePersist
     void initialize() {
         if (id == null || id.isBlank()) id = UUID.randomUUID().toString();
@@ -41,4 +44,6 @@ public class FamilyTree {
     public AppUser getOwner() { return owner; }
     public void setOwner(AppUser owner) { this.owner = owner; }
     public Instant getCreatedAt() { return createdAt; }
+    public String getPublicShareToken() { return publicShareToken; }
+    public void setPublicShareToken(String publicShareToken) { this.publicShareToken = publicShareToken; }
 }

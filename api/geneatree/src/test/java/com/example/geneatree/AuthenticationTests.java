@@ -10,6 +10,7 @@ import com.example.geneatree.repository.LifeEventRepository;
 import com.example.geneatree.repository.MarriageRepository;
 import com.example.geneatree.repository.PersonRepository;
 import com.example.geneatree.repository.TreeMembershipRepository;
+import com.example.geneatree.repository.TreeInvitationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthenticationTests {
     @Autowired MockMvc mockMvc;
     @Autowired TreeMembershipRepository membershipRepository;
+    @Autowired TreeInvitationRepository invitationRepository;
     @Autowired FamilyTreeRepository treeRepository;
     @Autowired AppUserRepository userRepository;
     @Autowired MarriageRepository marriageRepository;
@@ -47,6 +49,7 @@ class AuthenticationTests {
         marriageRepository.deleteAll();
         lifeEventRepository.deleteAll();
         personRepository.deleteAll();
+        invitationRepository.deleteAll();
         membershipRepository.deleteAll();
         treeRepository.deleteAll();
         userRepository.deleteAll();
@@ -124,6 +127,57 @@ class AuthenticationTests {
                         .content(singlePersonSnapshot()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.title").value("Tree access denied"));
+    }
+
+    @Test
+    void createsPublicReadOnlyLinkAndInvitesCollaborator() throws Exception {
+        String treeId = register("owner@example.com", "strong-passphrase", "Famille Owner");
+        register("collaborator@example.com", "collaborator-passphrase", "Famille Collaborator");
+
+        String linkResponse = mockMvc.perform(post("/api/trees/{treeId}/share-link", treeId)
+                        .header("Authorization", basic("owner@example.com", "strong-passphrase")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.access").value("READER"))
+                .andReturn().getResponse().getContentAsString();
+        String token = objectMapper.readTree(linkResponse).path("token").asText();
+        mockMvc.perform(get("/api/public/trees/{token}", token))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/trees/{treeId}/invitations", treeId)
+                        .header("Authorization", basic("owner@example.com", "strong-passphrase"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"collaborator@example.com","role":"COLLABORATOR"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ACTIVE"));
+        mockMvc.perform(put("/api/trees/{treeId}/family", treeId)
+                        .header("Authorization", basic("collaborator@example.com", "collaborator-passphrase"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(singlePersonSnapshot()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void keepsUnknownInvitePendingUntilRegistration() throws Exception {
+        String treeId = register("owner@example.com", "strong-passphrase", "Famille Owner");
+        mockMvc.perform(post("/api/trees/{treeId}/invitations", treeId)
+                        .header("Authorization", basic("owner@example.com", "strong-passphrase"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"email":"future@example.com","role":"READER"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PENDING_REGISTRATION"));
+        register("future@example.com", "future-passphrase", "Mon arbre");
+        mockMvc.perform(get("/api/trees/{treeId}/family", treeId)
+                        .header("Authorization", basic("future@example.com", "future-passphrase")))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/trees/{treeId}/family", treeId)
+                        .header("Authorization", basic("future@example.com", "future-passphrase"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(singlePersonSnapshot()))
+                .andExpect(status().isForbidden());
     }
 
     @Test

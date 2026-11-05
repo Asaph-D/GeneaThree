@@ -10,12 +10,14 @@ import com.example.geneatree.entity.TreeMembership;
 import com.example.geneatree.repository.AppUserRepository;
 import com.example.geneatree.repository.FamilyTreeRepository;
 import com.example.geneatree.repository.TreeMembershipRepository;
+import com.example.geneatree.repository.TreeInvitationRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
 import java.time.Instant;
+import java.util.UUID;
 
 @Service
 public class AccountService {
@@ -24,15 +26,20 @@ public class AccountService {
     private final TreeMembershipRepository membershipRepository;
     private final PasswordEncoder passwordEncoder;
     private final FamilySnapshotService familySnapshotService;
+    private final TreeSharingService treeSharingService;
+    private final TreeInvitationRepository invitationRepository;
 
     public AccountService(AppUserRepository userRepository, FamilyTreeRepository treeRepository,
             TreeMembershipRepository membershipRepository, PasswordEncoder passwordEncoder,
-            FamilySnapshotService familySnapshotService) {
+            FamilySnapshotService familySnapshotService, TreeSharingService treeSharingService,
+            TreeInvitationRepository invitationRepository) {
         this.userRepository = userRepository;
         this.treeRepository = treeRepository;
         this.membershipRepository = membershipRepository;
         this.passwordEncoder = passwordEncoder;
         this.familySnapshotService = familySnapshotService;
+        this.treeSharingService = treeSharingService;
+        this.invitationRepository = invitationRepository;
     }
 
     @Transactional
@@ -56,6 +63,7 @@ public class AccountService {
         membership.setUser(user);
         membership.setRole(TreeAccessRole.OWNER);
         membershipRepository.save(membership);
+        treeSharingService.acceptPending(user);
         return describe(user);
     }
 
@@ -63,6 +71,29 @@ public class AccountService {
     public AuthenticatedUserDTO describeByEmail(String email) {
         AppUser user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", email));
+        return describe(user);
+    }
+
+    @Transactional
+    public AuthenticatedUserDTO synchronizeExternalAccount(String rawEmail) {
+        String email = rawEmail.trim().toLowerCase(Locale.ROOT);
+        AppUser existing = userRepository.findByEmailIgnoreCase(email).orElse(null);
+        if (existing != null) {
+            treeSharingService.acceptPending(existing);
+            return describe(existing);
+        }
+        AppUser user = new AppUser();
+        user.setEmail(email);
+        user.setPasswordHash(passwordEncoder.encode(UUID.randomUUID().toString()));
+        userRepository.save(user);
+        FamilyTree tree = new FamilyTree();
+        tree.setName("Mon arbre");
+        tree.setOwner(user);
+        treeRepository.save(tree);
+        TreeMembership owner = new TreeMembership();
+        owner.setTree(tree); owner.setUser(user); owner.setRole(TreeAccessRole.OWNER);
+        membershipRepository.save(owner);
+        treeSharingService.acceptPending(user);
         return describe(user);
     }
 
@@ -84,6 +115,7 @@ public class AccountService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", email));
         for (FamilyTree tree : treeRepository.findByOwnerId(user.getId())) {
             familySnapshotService.clear(tree.getId());
+            invitationRepository.deleteByTreeId(tree.getId());
             membershipRepository.deleteAll(membershipRepository.findByTreeId(tree.getId()));
             treeRepository.delete(tree);
         }

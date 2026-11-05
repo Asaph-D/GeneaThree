@@ -36,6 +36,11 @@ public class AuthController {
         return accountService.describeByEmail(authentication.getName());
     }
 
+    @PostMapping("/sync")
+    public AuthenticatedUserDTO sync(Authentication authentication) {
+        return accountService.synchronizeExternalAccount(authentication.getName());
+    }
+
     @GetMapping("/export")
     public AccountExportDTO export(Authentication authentication) {
         return accountService.exportByEmail(authentication.getName());

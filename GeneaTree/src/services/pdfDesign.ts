@@ -37,6 +37,7 @@ export interface PdfDesignOptions {
   messageAlign: TextAlignment;
   fontFamily: PdfFontFamily;
   messagePosition: MessagePosition;
+  treeScale: number;
   capturedBackgroundDataUrl?: string;
   capturedTreeDataUrl?: string;
   capturedViewportWidth?: number;
@@ -63,7 +64,7 @@ export function createDefaultPdfDesign(dark = false): PdfDesignOptions {
     showPhotoBackground: false, borderEnabled: true, borderColor: dark ? '#d6d3d1' : '#44403c', borderWidth: 1.5,
     globalBorderEnabled: false, globalBorderColor: dark ? '#38bdf8' : '#2563eb', globalBorderWidth: 1.5,
     frameStyle: 'none', frameColor: dark ? '#38bdf8' : '#2563eb', particleType: 'none', particleColor: dark ? '#38bdf8' : '#2563eb', particleDensity: 18, particleNetwork: false, backgroundPattern: 'none', backgroundGradient: 'none', gradientIntensity: 70, title: '', titleAlign: 'left',
-    message: '', messageColor: dark ? '#bae6fd' : '#1d4ed8', messageAlign: 'center', fontFamily: 'helvetica', messagePosition: 'top',
+    message: '', messageColor: dark ? '#bae6fd' : '#1d4ed8', messageAlign: 'center', fontFamily: 'helvetica', messagePosition: 'top', treeScale: 1,
   };
 }
 
