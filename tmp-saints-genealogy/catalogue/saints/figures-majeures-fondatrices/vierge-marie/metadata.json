@@ -1,0 +1,28 @@
+{
+  "id": "vierge-marie",
+  "kind": "saint",
+  "category": "figures-majeures-fondatrices",
+  "title": "La Vierge Marie",
+  "description": "Reine des Saints et mère de Jésus, au cœur de nombreuses dévotions mariales.",
+  "aliases": [
+    "Marie",
+    "Notre-Dame",
+    "Lourdes",
+    "Fatima",
+    "Médaille miraculeuse"
+  ],
+  "searchText": "la vierge marie reine des saints et mère de jésus, au cœur de nombreuses dévotions mariales. marie notre-dame lourdes fatima médaille miraculeuse",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

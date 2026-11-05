@@ -6,34 +6,27 @@ const CURRENT_TREE_KEY = 'geneatree.current-tree.v1';
 const SNAPSHOT_PREFIX = 'geneatree.family.snapshot.';
 const HISTORY_PREFIX = 'geneatree.family.history.';
 const DEFAULT_TREE_ID = 'local-default';
-const HISTORY_LIMIT = 20;
+const DB_NAME = 'geneatree-family';
+const STORE_NAME = 'snapshots';
 
 export interface FamilySnapshot { persons: Person[]; marriages: Marriage[]; }
 export type LocalTreeRole = 'OWNER' | 'COLLABORATOR' | 'READER';
-export interface LocalTreeRecord {
-  id: string; name: string; role: LocalTreeRole; source: 'created' | 'imported' | 'shared';
-  createdAt: string; updatedAt: string;
-}
-export interface FamilyRevision extends FamilySnapshot {
-  id: string; treeId: string; savedAt: string; personCount: number;
-}
+export interface LocalTreeRecord { id: string; name: string; role: LocalTreeRole; source: 'created' | 'imported' | 'shared'; createdAt: string; updatedAt: string; }
+export interface FamilyRevision { id: string; treeId: string; savedAt: string; personCount: number; }
 export type FamilySaveState = 'saving' | 'saved' | 'error';
 
 const emptySnapshot = (): FamilySnapshot => ({ persons: [], marriages: [] });
 
-function readSnapshot(key: string): FamilySnapshot {
+function parseSnapshot(raw: string | null): FamilySnapshot {
   try {
-    const parsed = JSON.parse(localStorage.getItem(key) || '') as FamilySnapshot;
+    const parsed = JSON.parse(raw || '') as FamilySnapshot;
     return { persons: Array.isArray(parsed.persons) ? parsed.persons : [], marriages: Array.isArray(parsed.marriages) ? parsed.marriages : [] };
   } catch { return emptySnapshot(); }
 }
 
 function readRegistry(): LocalTreeRecord[] {
-  if (typeof localStorage === 'undefined') return [];
-  try {
-    const parsed = JSON.parse(localStorage.getItem(REGISTRY_KEY) || '[]') as LocalTreeRecord[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch { return []; }
+  try { const value = JSON.parse(localStorage.getItem(REGISTRY_KEY) || '[]'); return Array.isArray(value) ? value : []; }
+  catch { return []; }
 }
 
 function writeRegistry(trees: LocalTreeRecord[]): void {
@@ -46,22 +39,56 @@ function ensureRegistry(): LocalTreeRecord[] {
   if (existing.length) return existing;
   const now = new Date().toISOString();
   const tree: LocalTreeRecord = { id: DEFAULT_TREE_ID, name: 'Mon arbre', role: 'OWNER', source: 'created', createdAt: now, updatedAt: now };
-  localStorage.setItem(`${SNAPSHOT_PREFIX}${tree.id}`, JSON.stringify(readSnapshot(LEGACY_SNAPSHOT_KEY)));
   writeRegistry([tree]);
   localStorage.setItem(CURRENT_TREE_KEY, tree.id);
   return [tree];
 }
 
-export function listLocalTrees(): LocalTreeRecord[] {
-  return ensureRegistry().sort((left, right) => right.updatedAt.localeCompare(left.updatedAt));
+function database(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => { if (!request.result.objectStoreNames.contains(STORE_NAME)) request.result.createObjectStore(STORE_NAME); };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('Stockage IndexedDB indisponible'));
+  });
 }
 
+async function readIndexedSnapshot(treeId: string): Promise<FamilySnapshot | null> {
+  const db = await database();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readonly');
+    const request = transaction.objectStore(STORE_NAME).get(treeId);
+    request.onsuccess = () => resolve(request.result ? request.result as FamilySnapshot : null);
+    request.onerror = () => reject(request.error);
+    transaction.oncomplete = () => db.close();
+  });
+}
+
+async function writeIndexedSnapshot(treeId: string, snapshot: FamilySnapshot): Promise<void> {
+  const db = await database();
+  await new Promise<void>((resolve, reject) => {
+    const transaction = db.transaction(STORE_NAME, 'readwrite');
+    transaction.objectStore(STORE_NAME).put(snapshot, treeId);
+    transaction.oncomplete = () => resolve();
+    transaction.onerror = () => reject(transaction.error || new Error('Échec de la sauvegarde locale'));
+  });
+  db.close();
+}
+
+function purgeDuplicatedSnapshots(treeId?: string): void {
+  localStorage.removeItem(LEGACY_SNAPSHOT_KEY);
+  if (treeId) localStorage.removeItem(`${SNAPSHOT_PREFIX}${treeId}`);
+  Object.keys(localStorage).filter((key) => key.startsWith(HISTORY_PREFIX)).forEach((key) => {
+    const compact = listFamilyRevisions(key.slice(HISTORY_PREFIX.length));
+    localStorage.setItem(key, JSON.stringify(compact.map(({ id, treeId: revisionTreeId, savedAt, personCount }) => ({ id, treeId: revisionTreeId, savedAt, personCount })).slice(0, 20)));
+  });
+}
+
+export function listLocalTrees(): LocalTreeRecord[] { return ensureRegistry().sort((left, right) => right.updatedAt.localeCompare(left.updatedAt)); }
 export function getCurrentLocalTree(): LocalTreeRecord {
   const trees = ensureRegistry();
-  const id = localStorage.getItem(CURRENT_TREE_KEY);
-  return trees.find((tree) => tree.id === id) || trees[0];
+  return trees.find((tree) => tree.id === localStorage.getItem(CURRENT_TREE_KEY)) || trees[0];
 }
-
 export function selectLocalTree(treeId: string): FamilySnapshot {
   const tree = ensureRegistry().find((candidate) => candidate.id === treeId);
   if (!tree) throw new Error('Arbre introuvable');
@@ -70,32 +97,43 @@ export function selectLocalTree(treeId: string): FamilySnapshot {
   return loadLocalFamily();
 }
 
-export function createLocalTree(name: string, snapshot: FamilySnapshot = emptySnapshot(), source: LocalTreeRecord['source'] = 'created'): LocalTreeRecord {
+export async function createLocalTree(name: string, snapshot: FamilySnapshot = emptySnapshot(), source: LocalTreeRecord['source'] = 'created'): Promise<LocalTreeRecord> {
   const now = new Date().toISOString();
   const tree: LocalTreeRecord = { id: crypto.randomUUID(), name: name.trim() || 'Arbre sans titre', role: 'OWNER', source, createdAt: now, updatedAt: now };
-  localStorage.setItem(`${SNAPSHOT_PREFIX}${tree.id}`, JSON.stringify(snapshot));
+  await writeIndexedSnapshot(tree.id, snapshot);
+  purgeDuplicatedSnapshots();
   writeRegistry([tree, ...ensureRegistry()]);
   localStorage.setItem(CURRENT_TREE_KEY, tree.id);
-  appendRevision(tree.id, snapshot);
+  appendRevision(tree.id, snapshot.persons.length);
   return tree;
 }
 
 export function loadLocalFamily(): FamilySnapshot {
   if (typeof localStorage === 'undefined') return emptySnapshot();
-  return readSnapshot(`${SNAPSHOT_PREFIX}${getCurrentLocalTree().id}`);
+  const treeId = getCurrentLocalTree().id;
+  return parseSnapshot(localStorage.getItem(`${SNAPSHOT_PREFIX}${treeId}`) || localStorage.getItem(LEGACY_SNAPSHOT_KEY));
 }
 
-export function saveLocalFamily(persons: Person[], marriages: Marriage[]): void {
+export async function loadPersistentLocalFamily(): Promise<FamilySnapshot> {
+  const treeId = getCurrentLocalTree().id;
+  const indexed = await readIndexedSnapshot(treeId);
+  if (indexed) { purgeDuplicatedSnapshots(treeId); return indexed; }
+  const legacy = loadLocalFamily();
+  if (legacy.persons.length || legacy.marriages.length) await writeIndexedSnapshot(treeId, legacy);
+  purgeDuplicatedSnapshots(treeId);
+  return legacy;
+}
+
+export async function saveLocalFamily(persons: Person[], marriages: Marriage[]): Promise<void> {
   const tree = getCurrentLocalTree();
   if (tree.role === 'READER') throw new Error('Cet arbre est accessible en lecture seule.');
-  const snapshot = { persons, marriages };
   window.dispatchEvent(new CustomEvent('geneatree:save-state', { detail: 'saving' satisfies FamilySaveState }));
   try {
-    localStorage.setItem(`${SNAPSHOT_PREFIX}${tree.id}`, JSON.stringify(snapshot));
-    localStorage.setItem(LEGACY_SNAPSHOT_KEY, JSON.stringify(snapshot));
+    await writeIndexedSnapshot(tree.id, { persons, marriages });
+    purgeDuplicatedSnapshots(tree.id);
     const updatedAt = new Date().toISOString();
     writeRegistry(ensureRegistry().map((candidate) => candidate.id === tree.id ? { ...candidate, updatedAt } : candidate));
-    appendRevision(tree.id, snapshot);
+    appendRevision(tree.id, persons.length);
     window.dispatchEvent(new CustomEvent('geneatree:save-state', { detail: 'saved' satisfies FamilySaveState }));
   } catch (error) {
     window.dispatchEvent(new CustomEvent('geneatree:save-state', { detail: 'error' satisfies FamilySaveState }));
@@ -106,21 +144,15 @@ export function saveLocalFamily(persons: Person[], marriages: Marriage[]): void 
 export function listFamilyRevisions(treeId = getCurrentLocalTree().id): FamilyRevision[] {
   try {
     const parsed = JSON.parse(localStorage.getItem(`${HISTORY_PREFIX}${treeId}`) || '[]') as FamilyRevision[];
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map(({ id, treeId: storedTreeId, savedAt, personCount }) => ({ id, treeId: storedTreeId, savedAt, personCount })) : [];
   } catch { return []; }
 }
 
-export function restoreFamilyRevision(revisionId: string, treeId = getCurrentLocalTree().id): FamilySnapshot {
-  const revision = listFamilyRevisions(treeId).find((candidate) => candidate.id === revisionId);
-  if (!revision) throw new Error('Version introuvable');
-  saveLocalFamily(revision.persons, revision.marriages);
-  return { persons: revision.persons, marriages: revision.marriages };
-}
-
-function appendRevision(treeId: string, snapshot: FamilySnapshot): void {
+function appendRevision(treeId: string, personCount: number): void {
   const history = listFamilyRevisions(treeId);
   const latest = history[0];
-  if (latest && JSON.stringify({ persons: latest.persons, marriages: latest.marriages }) === JSON.stringify(snapshot)) return;
-  const revision: FamilyRevision = { ...snapshot, id: crypto.randomUUID(), treeId, savedAt: new Date().toISOString(), personCount: snapshot.persons.length };
-  localStorage.setItem(`${HISTORY_PREFIX}${treeId}`, JSON.stringify([revision, ...history].slice(0, HISTORY_LIMIT)));
+  const now = new Date();
+  if (latest && latest.personCount === personCount && now.getTime() - new Date(latest.savedAt).getTime() < 30_000) return;
+  const revision: FamilyRevision = { id: crypto.randomUUID(), treeId, savedAt: now.toISOString(), personCount };
+  localStorage.setItem(`${HISTORY_PREFIX}${treeId}`, JSON.stringify([revision, ...history].slice(0, 20)));
 }

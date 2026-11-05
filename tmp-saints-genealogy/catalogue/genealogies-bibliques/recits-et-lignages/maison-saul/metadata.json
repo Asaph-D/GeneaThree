@@ -1,0 +1,30 @@
+{
+  "id": "maison-saul",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Maison du roi Saül",
+  "description": "Famille de Saül, Jonathan, Ish-Bosheth et descendants mentionnés dans Samuel et les Chroniques.",
+  "aliases": [
+    "Saül",
+    "Jonathan",
+    "Méphibosheth"
+  ],
+  "searchText": "maison du roi saül famille de saül, jonathan, ish-bosheth et descendants mentionnés dans samuel et les chroniques. saül jonathan méphibosheth 1 samuel 9-14 2 samuel 2-4 1 chroniques 8:29-40",
+  "scripturePassages": [
+    "1 Samuel 9-14",
+    "2 Samuel 2-4",
+    "1 Chroniques 8:29-40"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

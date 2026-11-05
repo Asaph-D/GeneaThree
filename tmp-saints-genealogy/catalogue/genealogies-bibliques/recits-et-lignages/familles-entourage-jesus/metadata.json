@@ -1,0 +1,33 @@
+{
+  "id": "familles-entourage-jesus",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Familles de l’entourage de Jésus",
+  "description": "Cartographie prudente des parentés explicitement nommées autour de Jésus dans les Évangiles.",
+  "aliases": [
+    "Jésus",
+    "Marie",
+    "Élisabeth",
+    "Zacharie",
+    "Jean-Baptiste"
+  ],
+  "searchText": "familles de l’entourage de jésus cartographie prudente des parentés explicitement nommées autour de jésus dans les évangiles. jésus marie élisabeth zacharie jean-baptiste matthieu 13:55-56 marc 6:3 luc 1-2 jean 19:25",
+  "scripturePassages": [
+    "Matthieu 13:55-56",
+    "Marc 6:3",
+    "Luc 1-2",
+    "Jean 19:25"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

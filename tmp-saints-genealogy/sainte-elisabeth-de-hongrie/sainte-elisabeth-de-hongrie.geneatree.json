@@ -1,0 +1,1964 @@
+{
+  "format": "geneatree-family",
+  "version": 1,
+  "exportedAt": "2026-11-05T11:03:56.935Z",
+  "persons": [
+    {
+      "id": "wd-Q159862",
+      "firstName": "Élisabeth",
+      "lastName": "de Hongrie",
+      "birthDate": "1207-07-07",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1231-11-17",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Marburg%20Elisabethkirche%20Elisabethschrein%20Elisabethfigur.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q159862",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q271104",
+        "wd-Q61491"
+      ],
+      "childrenIds": [],
+      "spouseIds": [],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q271104",
+      "firstName": "André",
+      "lastName": "II",
+      "birthDate": "1175-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1235-10-26",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Andrew%20II%20seal%201224.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q271104",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q86978",
+        "wd-Q86846"
+      ],
+      "childrenIds": [
+        "wd-Q159862"
+      ],
+      "spouseIds": [
+        "wd-Q61491"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q86978",
+      "firstName": "Béla",
+      "lastName": "III",
+      "birthDate": "1148-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1196-04-23",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Bela%203.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q86978",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q86940",
+        "wd-Q238341"
+      ],
+      "childrenIds": [
+        "wd-Q271104"
+      ],
+      "spouseIds": [
+        "wd-Q86846"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q86940",
+      "firstName": "Géza",
+      "lastName": "II",
+      "birthDate": "1130-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1162-05-31",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/G%C3%A9za%20II.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q86940",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q82686",
+        "wd-Q267849"
+      ],
+      "childrenIds": [
+        "wd-Q86978"
+      ],
+      "spouseIds": [
+        "wd-Q238341"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q82686",
+      "firstName": "Béla",
+      "lastName": "II de Hongrie",
+      "birthDate": "1108-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1141-02-13",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/II%20Bela%20KK.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q82686",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q250731",
+        "wd-Q19663453"
+      ],
+      "childrenIds": [
+        "wd-Q86940"
+      ],
+      "spouseIds": [
+        "wd-Q267849"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q250731",
+      "firstName": "Almos",
+      "lastName": "de Hongrie",
+      "birthDate": "1070-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1129-09-01",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Chronicon%20Pictum%20P105%20K%C3%A1lm%C3%A1n%20%C3%A9s%20%C3%81lmos%20kib%C3%A9k%C3%BCl%C3%A9se%20D%C3%B6m%C3%B6s%C3%B6n.JPG?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q250731",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q82686"
+      ],
+      "spouseIds": [
+        "wd-Q19663453"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q19663453",
+      "firstName": "Predslava",
+      "lastName": "of Kyiv",
+      "birthDate": "1090-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Stamp%20of%20Ukraine%20s1509.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q19663453",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q82686"
+      ],
+      "spouseIds": [
+        "wd-Q250731"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q267849",
+      "firstName": "Hélène",
+      "lastName": "Vukanović",
+      "birthDate": "1109-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1146-00-00",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/HelenaofSerbien.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q267849",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q2142592",
+        "wd-Q3932110"
+      ],
+      "childrenIds": [
+        "wd-Q86940"
+      ],
+      "spouseIds": [
+        "wd-Q82686"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2142592",
+      "firstName": "Uroš",
+      "lastName": "Ier Vukanović",
+      "birthDate": "1083-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1145-00-00",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2142592",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q267849"
+      ],
+      "spouseIds": [
+        "wd-Q3932110"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q3932110",
+      "firstName": "Anna",
+      "lastName": "Diogenissa",
+      "birthDate": "1075-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1145-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q3932110",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q267849"
+      ],
+      "spouseIds": [
+        "wd-Q2142592"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q238341",
+      "firstName": "Euphrosine",
+      "lastName": "de Kiev",
+      "birthDate": "1130-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1186-01-01",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Flight%20of%20Vladimir%20Mstislavich%20to%20Hungary%3B%20Vladimir%20with%20his%20brother-in-law%2C%20G%C3%A9za%20II%20of%20Hungary%2C%20and%20his%20wife%20and%20sister%20of%20Vladimir%2C%20Euphrosyne%20of%20Kiev.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q238341",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q41514",
+        "wd-Q9023075"
+      ],
+      "childrenIds": [
+        "wd-Q86978"
+      ],
+      "spouseIds": [
+        "wd-Q86940"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q41514",
+      "firstName": "Mstislav",
+      "lastName": "Ier Harald",
+      "birthDate": "1076-02-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1132-04-14",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Mstislav%20I%20of%20Rus.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q41514",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q60928",
+        "wd-Q2995934"
+      ],
+      "childrenIds": [
+        "wd-Q238341"
+      ],
+      "spouseIds": [
+        "wd-Q9023075"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q60928",
+      "firstName": "Vladimir",
+      "lastName": "II Monomaque",
+      "birthDate": "1053-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1125-05-19",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Vladimir%20monomakh.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q60928",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q41514"
+      ],
+      "spouseIds": [
+        "wd-Q2995934"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2995934",
+      "firstName": "Gytha",
+      "lastName": "de Wessex",
+      "birthDate": "1053-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1098-03-10",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2995934",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q41514"
+      ],
+      "spouseIds": [
+        "wd-Q60928"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q9023075",
+      "firstName": "Liubava",
+      "lastName": "Dmitrievna Zavidich",
+      "birthDate": "1104-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1167-00-00",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Wedding%20of%20Mstislav%20I%20of%20Kiev%20and%20Liubava%20Dmitrievna%3B%20Death%20of%20a%20bishop.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q9023075",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q4162682",
+        "wd-Q141628334"
+      ],
+      "childrenIds": [
+        "wd-Q238341"
+      ],
+      "spouseIds": [
+        "wd-Q41514"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q4162682",
+      "firstName": "Dmitr",
+      "lastName": "Zavidich",
+      "birthDate": "1050-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1118-06-09",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q4162682",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q9023075"
+      ],
+      "spouseIds": [
+        "wd-Q141628334"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q141628334",
+      "firstName": "Q141628334",
+      "lastName": "",
+      "birthDate": "1080-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q141628334",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q9023075"
+      ],
+      "spouseIds": [
+        "wd-Q4162682"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q86846",
+      "firstName": "Agnès",
+      "lastName": "de Châtillon-Antioche",
+      "birthDate": "1154-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1184-01-01",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Chatillon%20Anna%20arcrekonstrukci%C3%B3.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q86846",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q316831",
+        "wd-Q238609"
+      ],
+      "childrenIds": [
+        "wd-Q271104"
+      ],
+      "spouseIds": [
+        "wd-Q86978"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q316831",
+      "firstName": "Renaud",
+      "lastName": "de Châtillon",
+      "birthDate": "1120-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1187-07-04",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Raynald%20of%20Ch%C3%A2tillon%20(Cropped).jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q316831",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q66756245",
+        "wd-Q141632455"
+      ],
+      "childrenIds": [
+        "wd-Q86846"
+      ],
+      "spouseIds": [
+        "wd-Q238609"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q66756245",
+      "firstName": "Hervé",
+      "lastName": "II de Donzy",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "male",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q66756245",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q4181142",
+        "wd-Q110520567"
+      ],
+      "childrenIds": [
+        "wd-Q316831"
+      ],
+      "spouseIds": [
+        "wd-Q141632455"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q4181142",
+      "firstName": "Geoffroy",
+      "lastName": "II de Donzy",
+      "birthDate": "1040-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "male",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q4181142",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q66756245"
+      ],
+      "spouseIds": [
+        "wd-Q110520567"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q110520567",
+      "firstName": "NN",
+      "lastName": "de Vergy",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q110520567",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q66756245"
+      ],
+      "spouseIds": [
+        "wd-Q4181142"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q141632455",
+      "firstName": "Mahaut",
+      "lastName": "le Blanc de La Ferté",
+      "birthDate": "1080-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1157-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q141632455",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q141633822",
+        "wd-Q141649533"
+      ],
+      "childrenIds": [
+        "wd-Q316831"
+      ],
+      "spouseIds": [
+        "wd-Q66756245"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q141633822",
+      "firstName": "Hugues",
+      "lastName": "de La Ferté seigneur de La Ferté-Milon",
+      "birthDate": "1055-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1121-00-00",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q141633822",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q141632455"
+      ],
+      "spouseIds": [
+        "wd-Q141649533"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q141649533",
+      "firstName": "Helvide",
+      "lastName": "de Soissons",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1110-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q141649533",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q141632455"
+      ],
+      "spouseIds": [
+        "wd-Q141633822"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q238609",
+      "firstName": "Constance",
+      "lastName": "d'Antioche",
+      "birthDate": "1127-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1163-01-01",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q238609",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q333884",
+        "wd-Q53117"
+      ],
+      "childrenIds": [
+        "wd-Q86846"
+      ],
+      "spouseIds": [
+        "wd-Q316831"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q333884",
+      "firstName": "Bohémond",
+      "lastName": "II d'Antioche",
+      "birthDate": "1108-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1130-02-01",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q333884",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q220806",
+        "wd-Q669639"
+      ],
+      "childrenIds": [
+        "wd-Q238609"
+      ],
+      "spouseIds": [
+        "wd-Q53117"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q220806",
+      "firstName": "Bohémond",
+      "lastName": "de Tarente",
+      "birthDate": "1054-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1111-03-03",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Bohemond%20I%20of%20Antioch%20lib%20(Cropped).jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q220806",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q333884"
+      ],
+      "spouseIds": [
+        "wd-Q669639"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q669639",
+      "firstName": "Constance",
+      "lastName": "de France",
+      "birthDate": "1078-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1126-09-14",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Constance%20of%20France%2C%20widow%20of%20Bohemund%20of%20Taranto.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q669639",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q333884"
+      ],
+      "spouseIds": [
+        "wd-Q220806"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q53117",
+      "firstName": "Alix",
+      "lastName": "de Jérusalem",
+      "birthDate": "1110-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q53117",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q51718",
+        "wd-Q53116"
+      ],
+      "childrenIds": [
+        "wd-Q238609"
+      ],
+      "spouseIds": [
+        "wd-Q333884"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q51718",
+      "firstName": "Baudouin",
+      "lastName": "II de Jérusalem",
+      "birthDate": "1060-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1131-08-21",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Baldwin%20II%20ceeding%20the%20Temple%20of%20Salomon%20to%20Hugues%20de%20Payens%20and%20Gaudefroy%20de%20Saint-Homer%20(Cropped).jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q51718",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q53117"
+      ],
+      "spouseIds": [
+        "wd-Q53116"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q53116",
+      "firstName": "Morfia",
+      "lastName": "de Mélitène",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1126-10-01",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q53116",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q53117"
+      ],
+      "spouseIds": [
+        "wd-Q51718"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q61491",
+      "firstName": "Gertrude",
+      "lastName": "de Méran",
+      "birthDate": "1185-09-24",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1213-09-28",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/GertrudaMeranskaHedviky.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q61491",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q61454",
+        "wd-Q3488841"
+      ],
+      "childrenIds": [
+        "wd-Q159862"
+      ],
+      "spouseIds": [
+        "wd-Q271104"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q61454",
+      "firstName": "Berthold",
+      "lastName": "IV von Diessen",
+      "birthDate": "1153-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1204-08-12",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Agnes%20Bertold%20Mechtilda.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q61454",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q68632",
+        "wd-Q80909567"
+      ],
+      "childrenIds": [
+        "wd-Q61491"
+      ],
+      "spouseIds": [
+        "wd-Q3488841"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q68632",
+      "firstName": "Berthold",
+      "lastName": "III",
+      "birthDate": "1110-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1188-12-04",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q68632",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q96566",
+        "wd-Q1784647"
+      ],
+      "childrenIds": [
+        "wd-Q61454"
+      ],
+      "spouseIds": [
+        "wd-Q80909567"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q96566",
+      "firstName": "Berthold",
+      "lastName": "II d'Andechs",
+      "birthDate": "1105-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1151-06-27",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q96566",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q2254106",
+        "wd-Q80934446"
+      ],
+      "childrenIds": [
+        "wd-Q68632"
+      ],
+      "spouseIds": [
+        "wd-Q1784647"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2254106",
+      "firstName": "Arnold",
+      "lastName": "IV d'Andechs",
+      "birthDate": "1050-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1080-00-00",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2254106",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q96566"
+      ],
+      "spouseIds": [
+        "wd-Q80934446"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q80934446",
+      "firstName": "Gisèle",
+      "lastName": "de Schweinfurt",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q80934446",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q96566"
+      ],
+      "spouseIds": [
+        "wd-Q2254106"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q1784647",
+      "firstName": "Sophie",
+      "lastName": "d'Istrie",
+      "birthDate": "1050-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1132-09-06",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q1784647",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q1303429",
+        "wd-Q62732411"
+      ],
+      "childrenIds": [
+        "wd-Q68632"
+      ],
+      "spouseIds": [
+        "wd-Q96566"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q1303429",
+      "firstName": "Poppo",
+      "lastName": "II",
+      "birthDate": "1065-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1098-01-01",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q1303429",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q1784647"
+      ],
+      "spouseIds": [
+        "wd-Q62732411"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q62732411",
+      "firstName": "Richardis",
+      "lastName": "of Sponheim",
+      "birthDate": "1070-10-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1200-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q62732411",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q1784647"
+      ],
+      "spouseIds": [
+        "wd-Q1303429"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q80909567",
+      "firstName": "Edwige",
+      "lastName": "de Wittelsbach",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1174-07-16",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q80909567",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q69620",
+        "wd-Q120365"
+      ],
+      "childrenIds": [
+        "wd-Q61454"
+      ],
+      "spouseIds": [
+        "wd-Q68632"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q69620",
+      "firstName": "Otton",
+      "lastName": "II de Wittelsbach",
+      "birthDate": "1104-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1156-08-04",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Otto%20IV.%20von%20Scheyern-1.png?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q69620",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q96284",
+        "wd-Q80963466"
+      ],
+      "childrenIds": [
+        "wd-Q80909567"
+      ],
+      "spouseIds": [
+        "wd-Q120365"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q96284",
+      "firstName": "Ekkehard",
+      "lastName": "Ier de Scheyern",
+      "birthDate": "1050-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1091-05-11",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q96284",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q69620"
+      ],
+      "spouseIds": [
+        "wd-Q80963466"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q80963466",
+      "firstName": "Richardis",
+      "lastName": "de Carniole",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q80963466",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q69620"
+      ],
+      "spouseIds": [
+        "wd-Q96284"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q120365",
+      "firstName": "Heilika",
+      "lastName": "von Pettendorf",
+      "birthDate": "1103-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1170-09-14",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Heilika%20von%20Lengenfeld.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q120365",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q76330080",
+        "wd-Q80939210"
+      ],
+      "childrenIds": [
+        "wd-Q80909567"
+      ],
+      "spouseIds": [
+        "wd-Q69620"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q76330080",
+      "firstName": "Friedrich",
+      "lastName": "III Graf von Pettendorf-Lengenfeld",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1119-04-03",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q76330080",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q120365"
+      ],
+      "spouseIds": [
+        "wd-Q80939210"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q80939210",
+      "firstName": "Heilika",
+      "lastName": "von Staufen",
+      "birthDate": "1087-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q80939210",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q281245",
+        "wd-Q242187"
+      ],
+      "childrenIds": [
+        "wd-Q120365"
+      ],
+      "spouseIds": [
+        "wd-Q76330080"
+      ],
+      "siblingIds": [
+        "wd-Q75247175"
+      ],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q3488841",
+      "firstName": "Agnès",
+      "lastName": "de Wettin",
+      "birthDate": "1152-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1195-03-25",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Agnes%20of%20Rochlitz.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q3488841",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q90423",
+        "wd-Q2788640"
+      ],
+      "childrenIds": [
+        "wd-Q61491"
+      ],
+      "spouseIds": [
+        "wd-Q61454"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q90423",
+      "firstName": "Dedo",
+      "lastName": "III de Lusace",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1190-08-16",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Dedo%20III%20(V.).jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q90423",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q531805",
+        "wd-Q75247175"
+      ],
+      "childrenIds": [
+        "wd-Q3488841"
+      ],
+      "spouseIds": [
+        "wd-Q2788640"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q531805",
+      "firstName": "Conrad",
+      "lastName": "Ier le Pieux",
+      "birthDate": "1098-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1157-02-05",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Dresden%20Fuerstenzug%20Konrad%20der%20Grosse.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q531805",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q513229",
+        "wd-Q75247718"
+      ],
+      "childrenIds": [
+        "wd-Q90423"
+      ],
+      "spouseIds": [
+        "wd-Q75247175"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q513229",
+      "firstName": "Thimo",
+      "lastName": "Ier de Wettin",
+      "birthDate": "1015-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1091-03-09",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Fotothek%20df%20roe-neg%200002385%20004%20Stifterfigur%20Thimo%20von%20Kistritz'%20im%20Westchor.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q513229",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q531805"
+      ],
+      "spouseIds": [
+        "wd-Q75247718"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q75247718",
+      "firstName": "Ida",
+      "lastName": "de Nordheim",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q75247718",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q531805"
+      ],
+      "spouseIds": [
+        "wd-Q513229"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q75247175",
+      "firstName": "Luitgarde",
+      "lastName": "de Souabe",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1146-06-19",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q75247175",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q281245",
+        "wd-Q242187"
+      ],
+      "childrenIds": [
+        "wd-Q90423"
+      ],
+      "spouseIds": [
+        "wd-Q531805"
+      ],
+      "siblingIds": [
+        "wd-Q80939210"
+      ],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q281245",
+      "firstName": "Frédéric",
+      "lastName": "Ier",
+      "birthDate": "1050-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1105-07-21",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Rauchbeinchronik%20Herzog%20Friedrich%20I.%20von%20Schwaben.png?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q281245",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q80939210",
+        "wd-Q75247175"
+      ],
+      "spouseIds": [
+        "wd-Q242187"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q242187",
+      "firstName": "Agnès",
+      "lastName": "de Franconie",
+      "birthDate": "1072-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1143-09-24",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Markgraefin%20Agnes.JPG?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q242187",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q80939210",
+        "wd-Q75247175"
+      ],
+      "spouseIds": [
+        "wd-Q281245"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2788640",
+      "firstName": "Mathilde",
+      "lastName": "de Heinsberg",
+      "birthDate": "1135-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1189-01-20",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Tomb%20monument%20of%20Dedo%20von%20Groipsch%20and%20his%20wife%20Mechtitis%20in%20the%20castle%20church%20of%20Wechselburg%20(drawing).tif?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2788640",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q2029751",
+        "wd-Q2191456"
+      ],
+      "childrenIds": [
+        "wd-Q3488841"
+      ],
+      "spouseIds": [
+        "wd-Q90423"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2029751",
+      "firstName": "Gossuin",
+      "lastName": "II de Falkenburg",
+      "birthDate": "1108-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1168-04-08",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2029751",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q1989025",
+        "wd-Q76191561"
+      ],
+      "childrenIds": [
+        "wd-Q2788640"
+      ],
+      "spouseIds": [
+        "wd-Q2191456"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q1989025",
+      "firstName": "Gossuin",
+      "lastName": "Ier de Heinsberg",
+      "birthDate": "1060-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1128-01-01",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q1989025",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q2029751"
+      ],
+      "spouseIds": [
+        "wd-Q76191561"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q76191561",
+      "firstName": "Oda",
+      "lastName": "von Walbeck",
+      "birthDate": "1070-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1152-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q76191561",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q2029751"
+      ],
+      "spouseIds": [
+        "wd-Q1989025"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2191456",
+      "firstName": "Adelheid",
+      "lastName": "van Sommerschenburg",
+      "birthDate": "1105-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1170-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2191456",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q2746728",
+        "wd-Q354829"
+      ],
+      "childrenIds": [
+        "wd-Q2788640"
+      ],
+      "spouseIds": [
+        "wd-Q2029751"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2746728",
+      "firstName": "Frederik",
+      "lastName": "I van Sommerschenburg",
+      "birthDate": "1050-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1120-01-01",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2746728",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q2191456"
+      ],
+      "spouseIds": [
+        "wd-Q354829"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q354829",
+      "firstName": "Adelheid",
+      "lastName": "von Lauffen",
+      "birthDate": "1075-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1200-01-01",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q354829",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q2191456"
+      ],
+      "spouseIds": [
+        "wd-Q2746728"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    }
+  ],
+  "marriages": [
+    {
+      "id": "union-Q271104-Q61491",
+      "spouse1Id": "wd-Q271104",
+      "spouse2Id": "wd-Q61491",
+      "childrenIds": [
+        "wd-Q159862"
+      ]
+    },
+    {
+      "id": "union-Q86846-Q86978",
+      "spouse1Id": "wd-Q86846",
+      "spouse2Id": "wd-Q86978",
+      "childrenIds": [
+        "wd-Q271104"
+      ]
+    },
+    {
+      "id": "union-Q238341-Q86940",
+      "spouse1Id": "wd-Q238341",
+      "spouse2Id": "wd-Q86940",
+      "childrenIds": [
+        "wd-Q86978"
+      ]
+    },
+    {
+      "id": "union-Q267849-Q82686",
+      "spouse1Id": "wd-Q267849",
+      "spouse2Id": "wd-Q82686",
+      "childrenIds": [
+        "wd-Q86940"
+      ]
+    },
+    {
+      "id": "union-Q19663453-Q250731",
+      "spouse1Id": "wd-Q19663453",
+      "spouse2Id": "wd-Q250731",
+      "childrenIds": [
+        "wd-Q82686"
+      ]
+    },
+    {
+      "id": "union-Q2142592-Q3932110",
+      "spouse1Id": "wd-Q2142592",
+      "spouse2Id": "wd-Q3932110",
+      "childrenIds": [
+        "wd-Q267849"
+      ]
+    },
+    {
+      "id": "union-Q41514-Q9023075",
+      "spouse1Id": "wd-Q41514",
+      "spouse2Id": "wd-Q9023075",
+      "childrenIds": [
+        "wd-Q238341"
+      ]
+    },
+    {
+      "id": "union-Q2995934-Q60928",
+      "spouse1Id": "wd-Q2995934",
+      "spouse2Id": "wd-Q60928",
+      "childrenIds": [
+        "wd-Q41514"
+      ]
+    },
+    {
+      "id": "union-Q141628334-Q4162682",
+      "spouse1Id": "wd-Q141628334",
+      "spouse2Id": "wd-Q4162682",
+      "childrenIds": [
+        "wd-Q9023075"
+      ]
+    },
+    {
+      "id": "union-Q238609-Q316831",
+      "spouse1Id": "wd-Q238609",
+      "spouse2Id": "wd-Q316831",
+      "childrenIds": [
+        "wd-Q86846"
+      ]
+    },
+    {
+      "id": "union-Q141632455-Q66756245",
+      "spouse1Id": "wd-Q141632455",
+      "spouse2Id": "wd-Q66756245",
+      "childrenIds": [
+        "wd-Q316831"
+      ]
+    },
+    {
+      "id": "union-Q110520567-Q4181142",
+      "spouse1Id": "wd-Q110520567",
+      "spouse2Id": "wd-Q4181142",
+      "childrenIds": [
+        "wd-Q66756245"
+      ]
+    },
+    {
+      "id": "union-Q141633822-Q141649533",
+      "spouse1Id": "wd-Q141633822",
+      "spouse2Id": "wd-Q141649533",
+      "childrenIds": [
+        "wd-Q141632455"
+      ]
+    },
+    {
+      "id": "union-Q333884-Q53117",
+      "spouse1Id": "wd-Q333884",
+      "spouse2Id": "wd-Q53117",
+      "childrenIds": [
+        "wd-Q238609"
+      ]
+    },
+    {
+      "id": "union-Q220806-Q669639",
+      "spouse1Id": "wd-Q220806",
+      "spouse2Id": "wd-Q669639",
+      "childrenIds": [
+        "wd-Q333884"
+      ]
+    },
+    {
+      "id": "union-Q51718-Q53116",
+      "spouse1Id": "wd-Q51718",
+      "spouse2Id": "wd-Q53116",
+      "childrenIds": [
+        "wd-Q53117"
+      ]
+    },
+    {
+      "id": "union-Q3488841-Q61454",
+      "spouse1Id": "wd-Q3488841",
+      "spouse2Id": "wd-Q61454",
+      "childrenIds": [
+        "wd-Q61491"
+      ]
+    },
+    {
+      "id": "union-Q68632-Q80909567",
+      "spouse1Id": "wd-Q68632",
+      "spouse2Id": "wd-Q80909567",
+      "childrenIds": [
+        "wd-Q61454"
+      ]
+    },
+    {
+      "id": "union-Q1784647-Q96566",
+      "spouse1Id": "wd-Q1784647",
+      "spouse2Id": "wd-Q96566",
+      "childrenIds": [
+        "wd-Q68632"
+      ]
+    },
+    {
+      "id": "union-Q2254106-Q80934446",
+      "spouse1Id": "wd-Q2254106",
+      "spouse2Id": "wd-Q80934446",
+      "childrenIds": [
+        "wd-Q96566"
+      ]
+    },
+    {
+      "id": "union-Q1303429-Q62732411",
+      "spouse1Id": "wd-Q1303429",
+      "spouse2Id": "wd-Q62732411",
+      "childrenIds": [
+        "wd-Q1784647"
+      ]
+    },
+    {
+      "id": "union-Q120365-Q69620",
+      "spouse1Id": "wd-Q120365",
+      "spouse2Id": "wd-Q69620",
+      "childrenIds": [
+        "wd-Q80909567"
+      ]
+    },
+    {
+      "id": "union-Q80963466-Q96284",
+      "spouse1Id": "wd-Q80963466",
+      "spouse2Id": "wd-Q96284",
+      "childrenIds": [
+        "wd-Q69620"
+      ]
+    },
+    {
+      "id": "union-Q76330080-Q80939210",
+      "spouse1Id": "wd-Q76330080",
+      "spouse2Id": "wd-Q80939210",
+      "childrenIds": [
+        "wd-Q120365"
+      ]
+    },
+    {
+      "id": "union-Q242187-Q281245",
+      "spouse1Id": "wd-Q242187",
+      "spouse2Id": "wd-Q281245",
+      "childrenIds": [
+        "wd-Q80939210",
+        "wd-Q75247175"
+      ]
+    },
+    {
+      "id": "union-Q2788640-Q90423",
+      "spouse1Id": "wd-Q2788640",
+      "spouse2Id": "wd-Q90423",
+      "childrenIds": [
+        "wd-Q3488841"
+      ]
+    },
+    {
+      "id": "union-Q531805-Q75247175",
+      "spouse1Id": "wd-Q531805",
+      "spouse2Id": "wd-Q75247175",
+      "childrenIds": [
+        "wd-Q90423"
+      ]
+    },
+    {
+      "id": "union-Q513229-Q75247718",
+      "spouse1Id": "wd-Q513229",
+      "spouse2Id": "wd-Q75247718",
+      "childrenIds": [
+        "wd-Q531805"
+      ]
+    },
+    {
+      "id": "union-Q2029751-Q2191456",
+      "spouse1Id": "wd-Q2029751",
+      "spouse2Id": "wd-Q2191456",
+      "childrenIds": [
+        "wd-Q2788640"
+      ]
+    },
+    {
+      "id": "union-Q1989025-Q76191561",
+      "spouse1Id": "wd-Q1989025",
+      "spouse2Id": "wd-Q76191561",
+      "childrenIds": [
+        "wd-Q2029751"
+      ]
+    },
+    {
+      "id": "union-Q2746728-Q354829",
+      "spouse1Id": "wd-Q2746728",
+      "spouse2Id": "wd-Q354829",
+      "childrenIds": [
+        "wd-Q2191456"
+      ]
+    }
+  ],
+  "view": {
+    "viewType": "tree",
+    "generations": 6,
+    "focusPersonId": "wd-Q159862"
+  },
+  "research": {
+    "subject": "Q159862",
+    "generatedFrom": "Wikidata",
+    "sources": [
+      "https://www.vatican.va/content/benedict-xvi/en/audiences/2010/documents/hf_ben-xvi_aud_20101020.html",
+      "https://www.newadvent.org/cathen/05389a.htm"
+    ],
+    "imagePolicy": "Wikimedia Commons P18 only",
+    "caveat": "Les généalogies médiévales peuvent contenir des filiations discutées. Ne pas présenter ces fichiers comme des actes d’état civil."
+  }
+}

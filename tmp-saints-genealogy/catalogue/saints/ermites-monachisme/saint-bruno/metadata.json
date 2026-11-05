@@ -1,0 +1,25 @@
+{
+  "id": "saint-bruno",
+  "kind": "saint",
+  "category": "ermites-monachisme",
+  "title": "Saint Bruno",
+  "description": "Fondateur de l’ordre des Chartreux.",
+  "aliases": [
+    "Bruno le Chartreux",
+    "Chartreuse"
+  ],
+  "searchText": "saint bruno fondateur de l’ordre des chartreux. bruno le chartreux chartreuse",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

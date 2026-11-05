@@ -1,0 +1,29 @@
+{
+  "id": "noe-a-abraham",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "De Noé à Abraham",
+  "description": "Descendance de Sem conduisant à Abram dans le récit de la Genèse.",
+  "aliases": [
+    "Noé",
+    "Sem",
+    "Abraham"
+  ],
+  "searchText": "de noé à abraham descendance de sem conduisant à abram dans le récit de la genèse. noé sem abraham genèse 10 genèse 11:10-32",
+  "scripturePassages": [
+    "Genèse 10",
+    "Genèse 11:10-32"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

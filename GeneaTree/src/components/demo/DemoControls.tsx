@@ -141,11 +141,11 @@ const DemoControls: React.FC<DemoControlsProps> = ({
 
   const actions = (
     <div data-print-control className={`flex ${compact ? 'flex-col items-center gap-1.5' : 'gap-1.5'}`}>
-      <button type="button" title="Exporter l’arbre" aria-label="Exporter l’arbre" onClick={onExportTree} className={iconBtn}><Download size={16} /></button>
-      <button type="button" title="Importer un arbre" aria-label="Importer un arbre" onClick={() => importRef.current?.click()} className={iconBtn}><Upload size={16} /></button>
+      <button data-tour="demo-export" type="button" title="Exporter l’arbre" aria-label="Exporter l’arbre" onClick={onExportTree} className={iconBtn}><Download size={16} /></button>
+      <button data-tour="demo-import" type="button" title="Importer un arbre" aria-label="Importer un arbre" onClick={() => importRef.current?.click()} className={iconBtn}><Upload size={16} /></button>
       <input ref={importRef} type="file" accept=".json,.geneatree.json,application/json" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) onImportTree(file); event.target.value = ''; }} />
-      <button type="button" title="Exporter un PDF haute définition" aria-label="Exporter un PDF haute définition" onClick={onExportPDF} className={iconBtn}><FileDown size={16} /></button>
-      <button type="button" title="Partager" onClick={onShare} className={`${iconBtn} !border-primary-600 !bg-primary-600 !text-white`}><Share size={16} /></button>
+      <button data-tour="demo-export" type="button" title="Exporter un PDF haute définition" aria-label="Exporter un PDF haute définition" onClick={onExportPDF} className={iconBtn}><FileDown size={16} /></button>
+      <button data-tour="demo-share" type="button" title="Partager" onClick={onShare} className={`${iconBtn} !border-primary-600 !bg-primary-600 !text-white`}><Share size={16} /></button>
       <button type="button" title={isEditMode ? 'Terminer l\'édition' : 'Modifier l\'arbre'} onClick={onToggleEditMode} className={`${iconBtn} ${isEditMode ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-200' : ''}`}><Edit size={16} /></button>
       <button type="button" title="Réinitialiser" onClick={onResetTree} className={iconBtn}><RefreshCw size={16} /></button>
     </div>

@@ -1,0 +1,26 @@
+{
+  "id": "saint-louis-ix",
+  "kind": "saint",
+  "category": "saints-royaux-historiques",
+  "title": "Saint Louis IX",
+  "description": "Roi de France du XIIIe siècle, fils de Louis VIII et de Blanche de Castille.",
+  "aliases": [
+    "Louis IX",
+    "Saint Louis",
+    "roi de France"
+  ],
+  "searchText": "saint louis ix roi de france du xiiie siècle, fils de louis viii et de blanche de castille. louis ix saint louis roi de france",
+  "scripturePassages": [],
+  "status": {
+    "research": "reviewed-seed",
+    "genealogy": "available",
+    "images": "pending"
+  },
+  "archive": "../../../../saint-louis-ix/saint-louis-ix.geneatree.json",
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

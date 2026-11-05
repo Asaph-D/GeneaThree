@@ -1,0 +1,26 @@
+{
+  "id": "sainte-anne",
+  "kind": "saint",
+  "category": "saintes-femmes",
+  "title": "Sainte Anne",
+  "description": "Mère de Marie selon la tradition chrétienne ancienne.",
+  "aliases": [
+    "Anne",
+    "mère de Marie",
+    "grand-mère de Jésus"
+  ],
+  "searchText": "sainte anne mère de marie selon la tradition chrétienne ancienne. anne mère de marie grand-mère de jésus",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

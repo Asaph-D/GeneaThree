@@ -1,0 +1,26 @@
+{
+  "id": "saint-jean-paul-ii",
+  "kind": "saint",
+  "category": "epoque-moderne-contemporaine",
+  "title": "Saint Jean-Paul II",
+  "description": "Pape du XXe siècle particulièrement associé aux jeunes, aux familles et aux voyages apostoliques.",
+  "aliases": [
+    "Jean-Paul II",
+    "Karol Wojtyła",
+    "pape"
+  ],
+  "searchText": "saint jean-paul ii pape du xxe siècle particulièrement associé aux jeunes, aux familles et aux voyages apostoliques. jean-paul ii karol wojtyła pape",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "sainte-angela-merici",
+  "kind": "saint",
+  "category": "jeunesse-education",
+  "title": "Sainte Angèle Merici",
+  "description": "Fondatrice de la Compagnie de Sainte-Ursule, engagée dans l’éducation des jeunes filles.",
+  "aliases": [
+    "Angèle Merici",
+    "Ursulines",
+    "éducation"
+  ],
+  "searchText": "sainte angèle merici fondatrice de la compagnie de sainte-ursule, engagée dans l’éducation des jeunes filles. angèle merici ursulines éducation",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

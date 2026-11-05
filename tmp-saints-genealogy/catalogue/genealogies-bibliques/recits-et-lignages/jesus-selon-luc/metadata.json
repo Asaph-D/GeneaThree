@@ -1,0 +1,28 @@
+{
+  "id": "jesus-selon-luc",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Généalogie de Jésus selon Luc",
+  "description": "Lignée ascendante selon Luc 3, de Jésus jusqu’à Adam.",
+  "aliases": [
+    "Jésus",
+    "Adam",
+    "Luc"
+  ],
+  "searchText": "généalogie de jésus selon luc lignée ascendante selon luc 3, de jésus jusqu’à adam. jésus adam luc luc 3:23-38",
+  "scripturePassages": [
+    "Luc 3:23-38"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

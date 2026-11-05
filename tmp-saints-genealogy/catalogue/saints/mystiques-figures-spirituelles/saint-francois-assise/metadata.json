@@ -1,0 +1,28 @@
+{
+  "id": "saint-francois-assise",
+  "kind": "saint",
+  "category": "mystiques-figures-spirituelles",
+  "title": "Saint François d’Assise",
+  "description": "Fondateur des Franciscains, associé à la pauvreté évangélique, à la paix et à la création.",
+  "aliases": [
+    "François",
+    "Assise",
+    "animaux",
+    "nature",
+    "franciscain"
+  ],
+  "searchText": "saint françois d’assise fondateur des franciscains, associé à la pauvreté évangélique, à la paix et à la création. françois assise animaux nature franciscain",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

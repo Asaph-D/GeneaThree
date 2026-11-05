@@ -1,0 +1,29 @@
+{
+  "id": "abraham-israel",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Maison d’Abraham et d’Israël",
+  "description": "Familles d’Abraham, Isaac et Jacob, avec les branches d’Ismaël, Ésaü et des fils d’Israël.",
+  "aliases": [
+    "Abraham",
+    "Isaac",
+    "Jacob",
+    "Israël"
+  ],
+  "searchText": "maison d’abraham et d’israël familles d’abraham, isaac et jacob, avec les branches d’ismaël, ésaü et des fils d’israël. abraham isaac jacob israël genèse 16-36",
+  "scripturePassages": [
+    "Genèse 16-36"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

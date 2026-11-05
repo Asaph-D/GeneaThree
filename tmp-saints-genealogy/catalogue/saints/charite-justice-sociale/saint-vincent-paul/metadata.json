@@ -1,0 +1,25 @@
+{
+  "id": "saint-vincent-paul",
+  "kind": "saint",
+  "category": "charite-justice-sociale",
+  "title": "Saint Vincent de Paul",
+  "description": "Prêtre français associé à l’organisation durable du service des pauvres.",
+  "aliases": [
+    "Vincent de Paul",
+    "charité"
+  ],
+  "searchText": "saint vincent de paul prêtre français associé à l’organisation durable du service des pauvres. vincent de paul charité",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

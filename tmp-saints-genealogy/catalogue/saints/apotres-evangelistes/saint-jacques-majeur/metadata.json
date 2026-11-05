@@ -1,0 +1,25 @@
+{
+  "id": "saint-jacques-majeur",
+  "kind": "saint",
+  "category": "apotres-evangelistes",
+  "title": "Saint Jacques le Majeur",
+  "description": "Apôtre, fils de Zébédée et frère de Jean.",
+  "aliases": [
+    "Jacques de Zébédée",
+    "Jacques le Majeur"
+  ],
+  "searchText": "saint jacques le majeur apôtre, fils de zébédée et frère de jean. jacques de zébédée jacques le majeur",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

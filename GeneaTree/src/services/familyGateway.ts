@@ -1,5 +1,5 @@
 import { Marriage, Person } from '../types/family';
-import { loadLocalFamily, saveLocalFamily } from './localFamilyService';
+import { loadPersistentLocalFamily, saveLocalFamily } from './localFamilyService';
 import { API_BASE_URL } from '../config/api';
 
 const API_BASE = API_BASE_URL;
@@ -14,7 +14,7 @@ export function usesLocalFamilyService(): boolean {
 
 export async function loadFamily(): Promise<{ persons: Person[]; marriages: Marriage[] }> {
   if (usesLocalFamilyService()) {
-    return loadLocalFamily();
+    return loadPersistentLocalFamily();
   }
 
   try {
@@ -26,26 +26,26 @@ export async function loadFamily(): Promise<{ persons: Person[]; marriages: Marr
       marriages: (snapshot.marriages ?? []).map(normalizeMarriage),
     };
   } catch {
-    return loadLocalFamily();
+    return loadPersistentLocalFamily();
   }
 }
 
 export async function clearFamily(): Promise<void> {
   if (usesLocalFamilyService()) {
-    saveLocalFamily([], []);
+    await saveLocalFamily([], []);
     return;
   }
   try {
     const res = await fetch(`${API_BASE}/family`, { method: 'DELETE' });
     if (!res.ok) throw new Error('server unavailable');
   } catch {
-    saveLocalFamily([], []);
+    await saveLocalFamily([], []);
   }
 }
 
 export async function saveFamily(persons: Person[], marriages: Marriage[]): Promise<void> {
   if (usesLocalFamilyService()) {
-    saveLocalFamily(persons, marriages);
+    await saveLocalFamily(persons, marriages);
     return;
   }
 
@@ -68,7 +68,7 @@ export async function saveFamily(persons: Person[], marriages: Marriage[]): Prom
     });
     if (!response.ok) throw new Error('server unavailable');
   } catch {
-    saveLocalFamily(persons, marriages);
+    await saveLocalFamily(persons, marriages);
   }
 }
 

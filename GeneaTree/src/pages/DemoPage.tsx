@@ -1,5 +1,5 @@
 // src/pages/DemoPage.tsx
-import { Bot, ChevronLeft, ChevronRight, PanelLeft, X } from 'lucide-react';
+import { Bot, ChevronLeft, ChevronRight, HelpCircle, PanelLeft, X } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { loadFamily, saveFamily } from '../services/familyGateway';
@@ -20,6 +20,7 @@ import { getSampleFamily, SAMPLE_FAMILIES } from '../examples/sampleFamilies';
 import { FamilyArchive, parseFamilyArchive, serializeFamilyArchive } from '../services/familyTransfer';
 import { PdfDesignOptions } from '../services/pdfDesign';
 import { useAuth } from '../auth/AuthContext';
+import HelpExperience from '../components/help/HelpExperience';
 
 const DemoPage: React.FC = () => {
   const { accessToken } = useAuth();
@@ -36,6 +37,7 @@ const DemoPage: React.FC = () => {
   });
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false);
+  const [helpExperienceOpen, setHelpExperienceOpen] = useState(false);
   const [pdfStudioOpen, setPdfStudioOpen] = useState(false);
   const [pdfInitialSvg, setPdfInitialSvg] = useState('');
   const [pendingImport, setPendingImport] = useState<{ fileName: string; archive?: FamilyArchive; error?: string } | null>(null);
@@ -588,13 +590,15 @@ const DemoPage: React.FC = () => {
     try {
       const archive = pendingImport.archive;
       const treeName = pendingImport.fileName.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
-      createLocalTree(treeName, { persons: archive.persons, marriages: archive.marriages }, 'imported');
+      await createLocalTree(treeName, { persons: archive.persons, marriages: archive.marriages }, 'imported');
       await saveFamily(archive.persons, archive.marriages);
       applySnapshot(archive.persons, archive.marriages, archive.view.focusPersonId);
       setTreeOptions(archive.view);
       setExampleId('imported');
       localStorage.setItem('geneatree.example', 'imported');
       setPendingImport(null);
+    } catch (importError) {
+      setPendingImport((current) => current ? { ...current, archive: undefined, error: importError instanceof Error ? importError.message : 'Impossible d’enregistrer cet arbre.' } : current);
     } finally { setImportBusy(false); }
   };
 
@@ -641,7 +645,7 @@ const DemoPage: React.FC = () => {
         />
       )}
       <div className={narrow ? 'contents' : 'relative flex shrink-0'}>
-        <aside aria-hidden={narrow && !sidebarOpen} className={`overflow-hidden border-zinc-200/80 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85 ${narrow && !sidebarOpen ? 'pointer-events-none' : ''} ${
+        <aside data-tour="demo-settings" aria-hidden={narrow && !sidebarOpen} className={`overflow-hidden border-zinc-200/80 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85 ${narrow && !sidebarOpen ? 'pointer-events-none' : ''} ${
           narrow
             ? `absolute inset-y-0 left-0 z-50 w-[min(18rem,calc(100vw-3rem))] border-r shadow-2xl transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`
             : `h-full border-r transition-[width] duration-300 ${sidebarOpen ? 'w-64' : 'w-14'}`
@@ -695,16 +699,18 @@ const DemoPage: React.FC = () => {
           </button>
         )}
       </div>
-      <div className="relative min-h-0 min-w-0 flex-1" ref={treeContainerRef}>
+      <div data-tour="demo-tree" className="relative min-h-0 min-w-0 flex-1" ref={treeContainerRef}>
         <Link
           to="/assistant?from=demo"
           data-print-control
+          data-tour="demo-assistant"
           className="absolute right-3 top-3 z-30 inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white/90 px-3 py-2 text-[13px] font-medium text-primary-800 shadow-md backdrop-blur hover:bg-primary-50 dark:border-primary-400/30 dark:bg-zinc-950/90 dark:text-primary-200 dark:hover:bg-zinc-900"
           title="Ouvrir l’assistant sans perdre cet arbre"
         >
           <Bot size={16} />
           <span className="hidden sm:inline">Assistant</span>
         </Link>
+        <button type="button" data-print-control onClick={() => setHelpExperienceOpen(true)} className="absolute bottom-3 right-3 z-30 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white/90 px-3 py-2 text-xs font-medium text-zinc-700 shadow-md backdrop-blur hover:border-sky-400 dark:border-white/10 dark:bg-zinc-950/90 dark:text-zinc-200"><HelpCircle size={15} />Aide</button>
         {narrow && !sidebarOpen && (
           <button
             type="button"
@@ -756,6 +762,7 @@ const DemoPage: React.FC = () => {
       {isShareModalOpen && (
         <ShareModal onClose={toggleShareModal} accessToken={accessToken} />
       )}
+      {helpExperienceOpen && <HelpExperience page="demo" onBeforeStep={(target) => { if (['demo-settings', 'demo-import', 'demo-share', 'demo-export'].some((name) => target.includes(name))) setSidebarOpen(true); }} onClose={() => setHelpExperienceOpen(false)} />}
       {pdfStudioOpen && (
         <PdfExportStudio
           persons={displayFamilyData}

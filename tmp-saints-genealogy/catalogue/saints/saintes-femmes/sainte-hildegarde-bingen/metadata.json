@@ -1,0 +1,25 @@
+{
+  "id": "sainte-hildegarde-bingen",
+  "kind": "saint",
+  "category": "saintes-femmes",
+  "title": "Sainte Hildegarde de Bingen",
+  "description": "Abbesse, compositrice, naturaliste et docteur de l’Église.",
+  "aliases": [
+    "Hildegarde",
+    "Bingen"
+  ],
+  "searchText": "sainte hildegarde de bingen abbesse, compositrice, naturaliste et docteur de l’église. hildegarde bingen",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

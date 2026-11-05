@@ -1,0 +1,26 @@
+{
+  "id": "saint-laurent",
+  "kind": "saint",
+  "category": "martyrs-premiers-siecles",
+  "title": "Saint Laurent de Rome",
+  "description": "Diacre et martyr romain du IIIe siècle.",
+  "aliases": [
+    "Laurent",
+    "diacre",
+    "Rome"
+  ],
+  "searchText": "saint laurent de rome diacre et martyr romain du iiie siècle. laurent diacre rome",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

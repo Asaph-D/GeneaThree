@@ -1,0 +1,26 @@
+{
+  "id": "sainte-therese-avila",
+  "kind": "saint",
+  "category": "mystiques-figures-spirituelles",
+  "title": "Sainte Thérèse d’Avila",
+  "description": "Mystique espagnole, réformatrice du Carmel et docteur de l’Église.",
+  "aliases": [
+    "Thérèse de Jésus",
+    "Avila",
+    "Carmel"
+  ],
+  "searchText": "sainte thérèse d’avila mystique espagnole, réformatrice du carmel et docteur de l’église. thérèse de jésus avila carmel",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

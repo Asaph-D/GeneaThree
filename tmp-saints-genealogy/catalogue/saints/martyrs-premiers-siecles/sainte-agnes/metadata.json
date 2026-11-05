@@ -1,0 +1,26 @@
+{
+  "id": "sainte-agnes",
+  "kind": "saint",
+  "category": "martyrs-premiers-siecles",
+  "title": "Sainte Agnès de Rome",
+  "description": "Jeune martyre romaine honorée depuis l’Antiquité chrétienne.",
+  "aliases": [
+    "Agnès",
+    "Rome",
+    "martyre"
+  ],
+  "searchText": "sainte agnès de rome jeune martyre romaine honorée depuis l’antiquité chrétienne. agnès rome martyre",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "saint-pacome",
+  "kind": "saint",
+  "category": "ermites-monachisme",
+  "title": "Saint Pacôme",
+  "description": "Fondateur du cénobitisme chrétien en Égypte.",
+  "aliases": [
+    "Pacôme",
+    "Égypte",
+    "monachisme"
+  ],
+  "searchText": "saint pacôme fondateur du cénobitisme chrétien en égypte. pacôme égypte monachisme",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "saint-bernard-clairvaux",
+  "kind": "saint",
+  "category": "ermites-monachisme",
+  "title": "Saint Bernard de Clairvaux",
+  "description": "Abbé cistercien, prédicateur et docteur de l’Église.",
+  "aliases": [
+    "Bernard",
+    "Clairvaux",
+    "cistercien"
+  ],
+  "searchText": "saint bernard de clairvaux abbé cistercien, prédicateur et docteur de l’église. bernard clairvaux cistercien",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

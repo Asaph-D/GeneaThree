@@ -1,0 +1,30 @@
+{
+  "id": "descendants-cham",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Descendants de Cham",
+  "description": "Branches attribuées à Cham dans la table des peuples.",
+  "aliases": [
+    "Cham",
+    "Canaan",
+    "Koush",
+    "Mitsraïm"
+  ],
+  "searchText": "descendants de cham branches attribuées à cham dans la table des peuples. cham canaan koush mitsraïm genèse 10:6-20 1 chroniques 1:8-16",
+  "scripturePassages": [
+    "Genèse 10:6-20",
+    "1 Chroniques 1:8-16"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

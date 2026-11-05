@@ -1,0 +1,29 @@
+{
+  "id": "lignage-sacerdotal-aaron",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Lignage sacerdotal d’Aaron",
+  "description": "Généalogie de la maison d’Aaron et des lignées sacerdotales mentionnées dans la Torah et les Chroniques.",
+  "aliases": [
+    "Aaron",
+    "Lévi",
+    "prêtres"
+  ],
+  "searchText": "lignage sacerdotal d’aaron généalogie de la maison d’aaron et des lignées sacerdotales mentionnées dans la torah et les chroniques. aaron lévi prêtres exode 6:14-27 1 chroniques 6",
+  "scripturePassages": [
+    "Exode 6:14-27",
+    "1 Chroniques 6"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

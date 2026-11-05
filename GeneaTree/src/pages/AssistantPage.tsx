@@ -5,6 +5,7 @@ import TreeVisualization from '../components/demo/TreeVisualization';
 import { loadFamily, saveFamily } from '../services/familyGateway';
 import { GenderType, Location, Marriage, Person } from '../types/family';
 import { getCurrentLocalTree, listFamilyRevisions, listLocalTrees, selectLocalTree } from '../services/localFamilyService';
+import HelpExperience from '../components/help/HelpExperience';
 
 type Phase =
   | 'anchor-first' | 'anchor-last' | 'anchor-gender' | 'anchor-birth' | 'anchor-city'
@@ -820,7 +821,7 @@ const AssistantPage: React.FC = () => {
   const [notice, setNotice] = useState('');
   const [history, setHistory] = useState<{ phase: Phase; draft: Draft; pending: Pending }[]>([]);
   const [saving, setSaving] = useState(false);
-  const [helpOpen, setHelpOpen] = useState(false);
+  const [helpExperienceOpen, setHelpExperienceOpen] = useState(false);
   const [treeHistoryOpen, setTreeHistoryOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; text: string }[]>(initialSession?.messages ?? [
     { role: 'assistant', text: 'Quel est le prénom qui ouvre l’arbre ?' },
@@ -858,7 +859,7 @@ const AssistantPage: React.FC = () => {
   useEffect(() => {
     const node = threadRef.current;
     if (node) node.scrollTop = node.scrollHeight;
-  }, [messages, helpOpen]);
+  }, [messages]);
 
   useEffect(() => {
     void loadFamily()
@@ -1228,7 +1229,7 @@ const AssistantPage: React.FC = () => {
     <div className="flex h-full overflow-hidden bg-[#f4f1ea] dark:bg-[#09090b]">
       <section className="relative flex h-full w-full shrink-0 flex-col border-zinc-200/80 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85 md:max-w-md md:border-r">
         <div className="pointer-events-none absolute h-28 w-full bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.22),transparent_70%)]" />
-        <div className="relative flex items-center justify-between border-b border-zinc-200/80 px-4 py-3 dark:border-white/10">
+        <div data-tour="assistant-history" className="relative flex items-center justify-between border-b border-zinc-200/80 px-4 py-3 dark:border-white/10">
           <span className="sr-only">{labelFor(kind)}</span>
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">Assistant</p>
@@ -1243,7 +1244,7 @@ const AssistantPage: React.FC = () => {
             </button>
           </div>
         )}
-        <div ref={threadRef} className="relative flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
+        <div ref={threadRef} data-tour="assistant-thread" className="relative flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
           {messages.map((message, index) => (
             <div key={`${message.role}-${index}`} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <p className={`max-w-[85%] rounded-2xl px-3 py-2 text-sm leading-relaxed ${message.role === 'user' ? 'bg-zinc-950 text-white dark:bg-white dark:text-zinc-950' : 'bg-white text-zinc-800 shadow-sm dark:bg-zinc-900 dark:text-zinc-100'}`}>
@@ -1251,15 +1252,10 @@ const AssistantPage: React.FC = () => {
               </p>
             </div>
           ))}
-          {helpOpen && (
-            <p className="rounded-2xl border border-dashed border-primary-300 px-3 py-2 text-sm text-zinc-600 dark:text-zinc-300">
-              {helpFor(kind)} Les pastilles remplissent la réponse. Le bouton à droite de la zone envoie.
-            </p>
-          )}
           {notice && <p className="text-sm text-red-700 dark:text-red-300">{notice}</p>}
         </div>
         <div className="border-t border-zinc-200/80 bg-white/90 px-3 py-3 backdrop-blur dark:border-white/10 dark:bg-zinc-950/90">
-          <div className="mb-2 flex flex-wrap gap-1.5">
+          <div data-tour="assistant-choices" className="mb-2 flex flex-wrap gap-1.5">
             {chips.map((chip) => (
               <button key={chip.label} type="button" onClick={() => answer(chip.value)} className="rounded-full border border-zinc-200 bg-white px-2.5 py-1 text-xs text-zinc-800 hover:border-primary-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
                 {chip.label}
@@ -1297,12 +1293,12 @@ const AssistantPage: React.FC = () => {
             <ToolButton label="Revenir" disabled={history.length === 0} onClick={back}><Undo2 className="h-3.5 w-3.5" /></ToolButton>
             <ToolButton label="Passer" disabled={!optional} onClick={() => answer('')}><SkipForward className="h-3.5 w-3.5" /></ToolButton>
             <ToolButton label="Dicter" onClick={listen}><Mic className="h-3.5 w-3.5" /></ToolButton>
-            <ToolButton label="Aide" onClick={() => setHelpOpen((open) => !open)}><HelpCircle className="h-3.5 w-3.5" /></ToolButton>
+            <ToolButton label="Aide" onClick={() => setHelpExperienceOpen(true)}><HelpCircle className="h-3.5 w-3.5" /></ToolButton>
             <ToolButton label="Recommencer" onClick={resetDraft}><RotateCcw className="h-3.5 w-3.5" /></ToolButton>
           </div>
         </div>
       </section>
-      <div className="relative hidden min-w-0 flex-1 md:block">
+      <div data-tour="assistant-preview" className="relative hidden min-w-0 flex-1 md:block">
         <div className="pointer-events-none absolute left-4 top-4 z-30 flex flex-col gap-2">
           <span className="pointer-events-auto rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs text-zinc-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-zinc-950/80 dark:text-zinc-200">
             {workingFamily.persons.length} personne{workingFamily.persons.length > 1 ? 's' : ''}
@@ -1312,7 +1308,7 @@ const AssistantPage: React.FC = () => {
           </span>
         </div>
         <div className="absolute right-4 top-4 z-30 flex gap-2">
-          <ToolButton label="Aide" onClick={() => setHelpOpen(true)}><HelpCircle className="h-3.5 w-3.5" /></ToolButton>
+          <ToolButton label="Aide" onClick={() => setHelpExperienceOpen(true)}><HelpCircle className="h-3.5 w-3.5" /></ToolButton>
           <ToolButton label="Revenir" disabled={history.length === 0} onClick={back}><Undo2 className="h-3.5 w-3.5" /></ToolButton>
         </div>
         <button type="button" onClick={resetDraft} className="absolute bottom-24 right-4 z-30 rounded-full border border-white/70 bg-white/85 px-3 py-1.5 text-xs text-zinc-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-zinc-950/80 dark:text-zinc-200">
@@ -1335,6 +1331,7 @@ const AssistantPage: React.FC = () => {
           </div>
         )}
       </div>
+      {helpExperienceOpen && <HelpExperience page="assistant" contextText={`${helpFor(kind)} Les choix proposés remplissent la réponse et le bouton rond l’envoie.`} onClose={() => setHelpExperienceOpen(false)} />}
     </div>
   );
 };

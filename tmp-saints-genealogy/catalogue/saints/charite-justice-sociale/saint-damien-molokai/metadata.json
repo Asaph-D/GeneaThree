@@ -1,0 +1,26 @@
+{
+  "id": "saint-damien-molokai",
+  "kind": "saint",
+  "category": "charite-justice-sociale",
+  "title": "Saint Damien de Molokaï",
+  "description": "Missionnaire belge ayant servi les personnes atteintes de la lèpre à Molokaï.",
+  "aliases": [
+    "Damien de Veuster",
+    "Molokaï",
+    "malades"
+  ],
+  "searchText": "saint damien de molokaï missionnaire belge ayant servi les personnes atteintes de la lèpre à molokaï. damien de veuster molokaï malades",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

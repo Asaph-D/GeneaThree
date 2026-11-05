@@ -1,0 +1,26 @@
+{
+  "id": "saint-augustin-hippone",
+  "kind": "saint",
+  "category": "peres-docteurs-eglise",
+  "title": "Saint Augustin d’Hippone",
+  "description": "Évêque d’Hippone, auteur des Confessions et figure majeure de la pensée chrétienne.",
+  "aliases": [
+    "Augustin",
+    "Hippone",
+    "docteur de l’Église"
+  ],
+  "searchText": "saint augustin d’hippone évêque d’hippone, auteur des confessions et figure majeure de la pensée chrétienne. augustin hippone docteur de l’église",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

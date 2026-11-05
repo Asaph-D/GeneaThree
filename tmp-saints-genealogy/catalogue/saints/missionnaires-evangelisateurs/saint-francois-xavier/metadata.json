@@ -1,0 +1,27 @@
+{
+  "id": "saint-francois-xavier",
+  "kind": "saint",
+  "category": "missionnaires-evangelisateurs",
+  "title": "Saint François Xavier",
+  "description": "Jésuite missionnaire actif en Asie au XVIe siècle.",
+  "aliases": [
+    "François Xavier",
+    "jésuite",
+    "Inde",
+    "Japon"
+  ],
+  "searchText": "saint françois xavier jésuite missionnaire actif en asie au xvie siècle. françois xavier jésuite inde japon",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "id": "saints-cyrille-methode",
+  "kind": "saint",
+  "category": "missionnaires-evangelisateurs",
+  "title": "Saints Cyrille et Méthode",
+  "description": "Frères missionnaires associés à l’évangélisation slave et à la traduction liturgique.",
+  "aliases": [
+    "Cyrille",
+    "Méthode",
+    "apôtres des Slaves"
+  ],
+  "searchText": "saints cyrille et méthode frères missionnaires associés à l’évangélisation slave et à la traduction liturgique. cyrille méthode apôtres des slaves",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

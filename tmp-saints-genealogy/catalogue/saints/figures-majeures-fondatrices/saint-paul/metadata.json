@@ -1,0 +1,27 @@
+{
+  "id": "saint-paul",
+  "kind": "saint",
+  "category": "figures-majeures-fondatrices",
+  "title": "Saint Paul",
+  "description": "Apôtre des nations et auteur de plusieurs épîtres du Nouveau Testament.",
+  "aliases": [
+    "Saul de Tarse",
+    "Paul de Tarse",
+    "épîtres",
+    "apôtre"
+  ],
+  "searchText": "saint paul apôtre des nations et auteur de plusieurs épîtres du nouveau testament. saul de tarse paul de tarse épîtres apôtre",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

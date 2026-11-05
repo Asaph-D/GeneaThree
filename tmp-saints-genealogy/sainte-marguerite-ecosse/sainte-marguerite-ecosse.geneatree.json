@@ -1,0 +1,562 @@
+{
+  "format": "geneatree-family",
+  "version": 1,
+  "exportedAt": "2026-11-05T11:04:09.860Z",
+  "persons": [
+    {
+      "id": "wd-Q230507",
+      "firstName": "Marguerite",
+      "lastName": "d'Écosse",
+      "birthDate": "1045-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1093-11-16",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/StMargareth%20edinburgh%20castle2.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q230507",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q117647",
+        "wd-Q2826477"
+      ],
+      "childrenIds": [],
+      "spouseIds": [],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q117647",
+      "firstName": "Édouard",
+      "lastName": "l'Exilé",
+      "birthDate": "1016-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1057-04-19",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Edward%20the%20Exile.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q117647",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q188684",
+        "wd-Q3495067"
+      ],
+      "childrenIds": [
+        "wd-Q230507"
+      ],
+      "spouseIds": [
+        "wd-Q2826477"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q188684",
+      "firstName": "Edmond",
+      "lastName": "Côte-de-Fer",
+      "birthDate": "0993-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1016-11-30",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Edmund%20Iron.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q188684",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q183499",
+        "wd-Q3486550"
+      ],
+      "childrenIds": [
+        "wd-Q117647"
+      ],
+      "spouseIds": [
+        "wd-Q3495067"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q183499",
+      "firstName": "Æthelred",
+      "lastName": "le Malavisé",
+      "birthDate": "0967-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1016-04-23",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/EthelUn.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q183499",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q192925",
+        "wd-Q2746341"
+      ],
+      "childrenIds": [
+        "wd-Q188684"
+      ],
+      "spouseIds": [
+        "wd-Q3486550"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q192925",
+      "firstName": "Edgar",
+      "lastName": "le Pacifique",
+      "birthDate": "0943-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "0975-07-08",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/New%20Minster%20Charter%20966%20detail%20Edgar.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q192925",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q190166",
+        "wd-Q2278338"
+      ],
+      "childrenIds": [
+        "wd-Q183499"
+      ],
+      "spouseIds": [
+        "wd-Q2746341"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q190166",
+      "firstName": "Edmond",
+      "lastName": "Ier",
+      "birthDate": "0920-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "0946-05-26",
+      "gender": "male",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Edmund%20I%20-%20MS%20Royal%2014%20B%20V.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q190166",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q192925"
+      ],
+      "spouseIds": [
+        "wd-Q2278338"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2278338",
+      "firstName": "Ælfgifu",
+      "lastName": "de Shaftesbury",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "0944-01-01",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2278338",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q192925"
+      ],
+      "spouseIds": [
+        "wd-Q190166"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2746341",
+      "firstName": "Ælfthryth",
+      "lastName": "",
+      "birthDate": "0940-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1000-11-17",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Pictures%20of%20English%20History%20Plate%20IX%20-%20The%20Wicked%20Queen%20Elfrida.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2746341",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q2536872",
+        "wd-Q242670"
+      ],
+      "childrenIds": [
+        "wd-Q183499"
+      ],
+      "spouseIds": [
+        "wd-Q192925"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2536872",
+      "firstName": "Ordgar",
+      "lastName": "",
+      "birthDate": "0896-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "0971-01-01",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2536872",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q2746341"
+      ],
+      "spouseIds": [
+        "wd-Q242670"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q242670",
+      "firstName": "Ealhswith",
+      "lastName": "",
+      "birthDate": "0852-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "0902-12-05",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q242670",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q2746341"
+      ],
+      "spouseIds": [
+        "wd-Q2536872"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q3486550",
+      "firstName": "Ælfgifu",
+      "lastName": "d'York",
+      "birthDate": "0901-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1002-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q3486550",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q7796194",
+        "wd-Q75386600"
+      ],
+      "childrenIds": [
+        "wd-Q188684"
+      ],
+      "spouseIds": [
+        "wd-Q183499"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q7796194",
+      "firstName": "Thored",
+      "lastName": "",
+      "birthDate": "0979-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "0990-01-01",
+      "gender": "male",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q7796194",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q3064546"
+      ],
+      "childrenIds": [
+        "wd-Q3486550"
+      ],
+      "spouseIds": [
+        "wd-Q75386600"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q3064546",
+      "firstName": "Oslac",
+      "lastName": "d'York",
+      "birthDate": "0901-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "male",
+      "deceased": false,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Kingdom%20of%20Jorvik.png?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q3064546",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q7796194"
+      ],
+      "spouseIds": [],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q75386600",
+      "firstName": "Hilda",
+      "lastName": "(?)",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q75386600",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q3486550"
+      ],
+      "spouseIds": [
+        "wd-Q7796194"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q3495067",
+      "firstName": "Ealdgyth",
+      "lastName": "",
+      "birthDate": "0990-01-01",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q3495067",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q103560123",
+        "wd-Q103560123"
+      ],
+      "childrenIds": [
+        "wd-Q117647"
+      ],
+      "spouseIds": [
+        "wd-Q188684"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q103560123",
+      "firstName": "Aelfthryth",
+      "lastName": "",
+      "birthDate": "",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "gender": "female",
+      "deceased": false,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q103560123",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [
+        "wd-Q5302554"
+      ],
+      "childrenIds": [
+        "wd-Q3495067",
+        "wd-Q3495067"
+      ],
+      "spouseIds": [],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q5302554",
+      "firstName": "Wulfrun",
+      "lastName": "",
+      "birthDate": "0935-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1005-00-00",
+      "gender": "female",
+      "deceased": true,
+      "photoUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Lady%20Wulfrun%20statue.jpg?width=512",
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q5302554",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q103560123"
+      ],
+      "spouseIds": [],
+      "siblingIds": [],
+      "eventIds": []
+    },
+    {
+      "id": "wd-Q2826477",
+      "firstName": "Agathe",
+      "lastName": "",
+      "birthDate": "1100-00-00",
+      "birthPlace": {
+        "city": "",
+        "region": "",
+        "country": ""
+      },
+      "deathDate": "1100-00-00",
+      "gender": "female",
+      "deceased": true,
+      "biography": "Notice structurée : https://www.wikidata.org/wiki/Q2826477",
+      "notes": "Parenté importée depuis Wikidata. Vérification éditoriale recommandée pour les filiations médiévales discutées.",
+      "parentIds": [],
+      "childrenIds": [
+        "wd-Q230507"
+      ],
+      "spouseIds": [
+        "wd-Q117647"
+      ],
+      "siblingIds": [],
+      "eventIds": []
+    }
+  ],
+  "marriages": [
+    {
+      "id": "union-Q117647-Q2826477",
+      "spouse1Id": "wd-Q117647",
+      "spouse2Id": "wd-Q2826477",
+      "childrenIds": [
+        "wd-Q230507"
+      ]
+    },
+    {
+      "id": "union-Q188684-Q3495067",
+      "spouse1Id": "wd-Q188684",
+      "spouse2Id": "wd-Q3495067",
+      "childrenIds": [
+        "wd-Q117647"
+      ]
+    },
+    {
+      "id": "union-Q183499-Q3486550",
+      "spouse1Id": "wd-Q183499",
+      "spouse2Id": "wd-Q3486550",
+      "childrenIds": [
+        "wd-Q188684"
+      ]
+    },
+    {
+      "id": "union-Q192925-Q2746341",
+      "spouse1Id": "wd-Q192925",
+      "spouse2Id": "wd-Q2746341",
+      "childrenIds": [
+        "wd-Q183499"
+      ]
+    },
+    {
+      "id": "union-Q190166-Q2278338",
+      "spouse1Id": "wd-Q190166",
+      "spouse2Id": "wd-Q2278338",
+      "childrenIds": [
+        "wd-Q192925"
+      ]
+    },
+    {
+      "id": "union-Q242670-Q2536872",
+      "spouse1Id": "wd-Q242670",
+      "spouse2Id": "wd-Q2536872",
+      "childrenIds": [
+        "wd-Q2746341"
+      ]
+    },
+    {
+      "id": "union-Q75386600-Q7796194",
+      "spouse1Id": "wd-Q75386600",
+      "spouse2Id": "wd-Q7796194",
+      "childrenIds": [
+        "wd-Q3486550"
+      ]
+    },
+    {
+      "id": "union-Q103560123-Q103560123",
+      "spouse1Id": "wd-Q103560123",
+      "spouse2Id": "wd-Q103560123",
+      "childrenIds": [
+        "wd-Q3495067"
+      ]
+    }
+  ],
+  "view": {
+    "viewType": "tree",
+    "generations": 6,
+    "focusPersonId": "wd-Q230507"
+  },
+  "research": {
+    "subject": "Q230507",
+    "generatedFrom": "Wikidata",
+    "sources": [
+      "https://www.newadvent.org/cathen/09655c.htm",
+      "https://www.britannica.com/biography/Saint-Margaret-of-Scotland"
+    ],
+    "imagePolicy": "Wikimedia Commons P18 only",
+    "caveat": "Les généalogies médiévales peuvent contenir des filiations discutées. Ne pas présenter ces fichiers comme des actes d’état civil."
+  }
+}

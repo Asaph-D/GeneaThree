@@ -1,0 +1,26 @@
+{
+  "id": "sainte-therese-benedicte-croix",
+  "kind": "saint",
+  "category": "missionnaires-evangelisateurs",
+  "title": "Sainte Thérèse-Bénédicte de la Croix",
+  "description": "Philosophe carmélite, née Edith Stein, morte à Auschwitz.",
+  "aliases": [
+    "Edith Stein",
+    "carmélite",
+    "Auschwitz"
+  ],
+  "searchText": "sainte thérèse-bénédicte de la croix philosophe carmélite, née edith stein, morte à auschwitz. edith stein carmélite auschwitz",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "id": "saint-dominique-savio",
+  "kind": "saint",
+  "category": "jeunesse-education",
+  "title": "Saint Dominique Savio",
+  "description": "Jeune élève de Jean Bosco proposé comme modèle de jeunesse chrétienne.",
+  "aliases": [
+    "Dominique Savio",
+    "jeunes"
+  ],
+  "searchText": "saint dominique savio jeune élève de jean bosco proposé comme modèle de jeunesse chrétienne. dominique savio jeunes",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

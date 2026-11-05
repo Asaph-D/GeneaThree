@@ -1,0 +1,27 @@
+{
+  "id": "saint-carlo-acutis",
+  "kind": "saint",
+  "category": "epoque-moderne-contemporaine",
+  "title": "Saint Carlo Acutis",
+  "description": "Jeune catholique italien associé à l’évangélisation numérique et à la documentation des miracles eucharistiques.",
+  "aliases": [
+    "Carlo Acutis",
+    "Internet",
+    "numérique",
+    "Eucharistie"
+  ],
+  "searchText": "saint carlo acutis jeune catholique italien associé à l’évangélisation numérique et à la documentation des miracles eucharistiques. carlo acutis internet numérique eucharistie",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

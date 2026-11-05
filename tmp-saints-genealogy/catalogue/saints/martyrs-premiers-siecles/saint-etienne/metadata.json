@@ -1,0 +1,25 @@
+{
+  "id": "saint-etienne",
+  "kind": "saint",
+  "category": "martyrs-premiers-siecles",
+  "title": "Saint Étienne",
+  "description": "Figure présentée dans les Actes des Apôtres comme premier martyr chrétien.",
+  "aliases": [
+    "Étienne protomartyr",
+    "Actes des Apôtres"
+  ],
+  "searchText": "saint étienne figure présentée dans les actes des apôtres comme premier martyr chrétien. étienne protomartyr actes des apôtres",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

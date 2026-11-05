@@ -1,0 +1,29 @@
+{
+  "id": "famille-noemi-ruth",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Famille de Noémi et Ruth",
+  "description": "Relations familiales reliant Élimélek, Noémi, Ruth, Booz et la lignée de David.",
+  "aliases": [
+    "Noémi",
+    "Ruth",
+    "Booz",
+    "Obed"
+  ],
+  "searchText": "famille de noémi et ruth relations familiales reliant élimélek, noémi, ruth, booz et la lignée de david. noémi ruth booz obed ruth 1-4",
+  "scripturePassages": [
+    "Ruth 1-4"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

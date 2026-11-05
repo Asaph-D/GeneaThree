@@ -1,0 +1,29 @@
+{
+  "id": "tribu-juda",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Généalogies de la tribu de Juda",
+  "description": "Lignées de Juda, de Pérets et des clans associés.",
+  "aliases": [
+    "Juda",
+    "Pérets",
+    "Hetsron"
+  ],
+  "searchText": "généalogies de la tribu de juda lignées de juda, de pérets et des clans associés. juda pérets hetsron genèse 38 1 chroniques 2-4",
+  "scripturePassages": [
+    "Genèse 38",
+    "1 Chroniques 2-4"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

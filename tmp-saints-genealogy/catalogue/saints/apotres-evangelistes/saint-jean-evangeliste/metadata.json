@@ -1,0 +1,25 @@
+{
+  "id": "saint-jean-evangeliste",
+  "kind": "saint",
+  "category": "apotres-evangelistes",
+  "title": "Saint Jean l’Évangéliste",
+  "description": "Apôtre et figure traditionnellement associée au quatrième Évangile.",
+  "aliases": [
+    "Jean apôtre",
+    "disciple bien-aimé"
+  ],
+  "searchText": "saint jean l’évangéliste apôtre et figure traditionnellement associée au quatrième évangile. jean apôtre disciple bien-aimé",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

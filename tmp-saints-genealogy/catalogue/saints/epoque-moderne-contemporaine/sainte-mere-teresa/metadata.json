@@ -1,0 +1,26 @@
+{
+  "id": "sainte-mere-teresa",
+  "kind": "saint",
+  "category": "epoque-moderne-contemporaine",
+  "title": "Sainte Mère Teresa de Calcutta",
+  "description": "Fondatrice des Missionnaires de la Charité et figure du service des plus pauvres.",
+  "aliases": [
+    "Mère Teresa",
+    "Calcutta",
+    "pauvres"
+  ],
+  "searchText": "sainte mère teresa de calcutta fondatrice des missionnaires de la charité et figure du service des plus pauvres. mère teresa calcutta pauvres",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

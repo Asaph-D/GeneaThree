@@ -1,0 +1,25 @@
+{
+  "id": "sainte-lucie",
+  "kind": "saint",
+  "category": "martyrs-premiers-siecles",
+  "title": "Sainte Lucie de Syracuse",
+  "description": "Martyre sicilienne associée dans la tradition à la lumière et à la vue.",
+  "aliases": [
+    "Lucie",
+    "Syracuse"
+  ],
+  "searchText": "sainte lucie de syracuse martyre sicilienne associée dans la tradition à la lumière et à la vue. lucie syracuse",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

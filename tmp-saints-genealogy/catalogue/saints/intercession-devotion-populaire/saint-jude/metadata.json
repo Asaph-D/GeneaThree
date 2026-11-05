@@ -1,0 +1,26 @@
+{
+  "id": "saint-jude",
+  "kind": "saint",
+  "category": "intercession-devotion-populaire",
+  "title": "Saint Jude",
+  "description": "Apôtre traditionnellement invoqué pour les causes difficiles ou désespérées.",
+  "aliases": [
+    "Jude Thaddée",
+    "causes perdues",
+    "apôtre"
+  ],
+  "searchText": "saint jude apôtre traditionnellement invoqué pour les causes difficiles ou désespérées. jude thaddée causes perdues apôtre",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

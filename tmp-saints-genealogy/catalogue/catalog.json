@@ -1,0 +1,1723 @@
+{
+  "version": 1,
+  "generatedAt": "2026-11-05T11:30:04.065Z",
+  "categories": [
+    {
+      "id": "figures-majeures-fondatrices",
+      "label": "Figures majeures et fondatrices",
+      "description": "Figures centrales des Évangiles, des Actes et des premières communautés chrétiennes."
+    },
+    {
+      "id": "intercession-devotion-populaire",
+      "label": "Intercession et dévotion populaire",
+      "description": "Saints particulièrement invoqués dans la piété populaire et les situations difficiles."
+    },
+    {
+      "id": "mystiques-figures-spirituelles",
+      "label": "Mystiques et figures spirituelles",
+      "description": "Fondateurs, contemplatifs, réformateurs et docteurs ayant marqué la spiritualité chrétienne."
+    },
+    {
+      "id": "saints-patrons-culture",
+      "label": "Saints patrons et culture générale",
+      "description": "Figures connues pour leurs patronages, traditions, symboles et héritages culturels."
+    },
+    {
+      "id": "epoque-moderne-contemporaine",
+      "label": "Époque moderne et contemporaine",
+      "description": "Témoins, martyrs et figures canonisées des périodes moderne et contemporaine."
+    },
+    {
+      "id": "saints-royaux-historiques",
+      "label": "Saints royaux et figures historiques",
+      "description": "Souverains et membres de dynasties dont les parentés historiques permettent des arbres étendus."
+    },
+    {
+      "id": "apotres-evangelistes",
+      "label": "Apôtres et évangélistes",
+      "description": "Disciples, témoins apostoliques et auteurs traditionnellement associés aux écrits du Nouveau Testament."
+    },
+    {
+      "id": "peres-docteurs-eglise",
+      "label": "Pères et docteurs de l’Église",
+      "description": "Théologiens, prédicateurs et auteurs majeurs de la tradition chrétienne."
+    },
+    {
+      "id": "martyrs-premiers-siecles",
+      "label": "Martyrs et premiers siècles",
+      "description": "Témoins des premières communautés chrétiennes et des périodes de persécution."
+    },
+    {
+      "id": "saintes-femmes",
+      "label": "Saintes femmes et grandes témoins",
+      "description": "Femmes ayant marqué la vie spirituelle, familiale, intellectuelle ou sociale."
+    },
+    {
+      "id": "missionnaires-evangelisateurs",
+      "label": "Missionnaires et évangélisateurs",
+      "description": "Figures associées à la transmission de la foi entre peuples, langues et continents."
+    },
+    {
+      "id": "afrique-diaspora",
+      "label": "Saints d’Afrique et de la diaspora",
+      "description": "Saints nés, établis ou engagés dans les Églises et sociétés africaines."
+    },
+    {
+      "id": "jeunesse-education",
+      "label": "Jeunesse et éducation",
+      "description": "Éducateurs, fondateurs d’écoles et modèles particulièrement associés aux jeunes."
+    },
+    {
+      "id": "charite-justice-sociale",
+      "label": "Charité et justice sociale",
+      "description": "Figures engagées auprès des pauvres, des malades, des exclus et pour la dignité humaine."
+    },
+    {
+      "id": "ermites-monachisme",
+      "label": "Ermites et monachisme",
+      "description": "Pères et mères du désert, fondateurs et réformateurs de communautés monastiques."
+    }
+  ],
+  "biblicalCategory": {
+    "id": "recits-et-lignages",
+    "label": "Généalogies bibliques",
+    "description": "Lignages reconstruits séparément selon les passages bibliques, sans fusion automatique des traditions textuelles."
+  },
+  "filters": [
+    "kind",
+    "category",
+    "status.research",
+    "status.genealogy",
+    "status.images",
+    "aliases",
+    "scripturePassages"
+  ],
+  "entries": [
+    {
+      "id": "vierge-marie",
+      "kind": "saint",
+      "category": "figures-majeures-fondatrices",
+      "title": "La Vierge Marie",
+      "description": "Reine des Saints et mère de Jésus, au cœur de nombreuses dévotions mariales.",
+      "aliases": [
+        "Marie",
+        "Notre-Dame",
+        "Lourdes",
+        "Fatima",
+        "Médaille miraculeuse"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/figures-majeures-fondatrices/vierge-marie/metadata.json"
+    },
+    {
+      "id": "saint-joseph",
+      "kind": "saint",
+      "category": "figures-majeures-fondatrices",
+      "title": "Saint Joseph",
+      "description": "Époux de Marie et père nourricier de Jésus, patron de la Sainte Famille et des travailleurs.",
+      "aliases": [
+        "Joseph",
+        "Sainte Famille",
+        "travailleurs"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/figures-majeures-fondatrices/saint-joseph/metadata.json"
+    },
+    {
+      "id": "saint-pierre",
+      "kind": "saint",
+      "category": "figures-majeures-fondatrices",
+      "title": "Saint Pierre",
+      "description": "Apôtre de Jésus et figure de premier plan de l’Église primitive.",
+      "aliases": [
+        "Simon Pierre",
+        "Céphas",
+        "apôtre",
+        "pape"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/figures-majeures-fondatrices/saint-pierre/metadata.json"
+    },
+    {
+      "id": "saint-paul",
+      "kind": "saint",
+      "category": "figures-majeures-fondatrices",
+      "title": "Saint Paul",
+      "description": "Apôtre des nations et auteur de plusieurs épîtres du Nouveau Testament.",
+      "aliases": [
+        "Saul de Tarse",
+        "Paul de Tarse",
+        "épîtres",
+        "apôtre"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/figures-majeures-fondatrices/saint-paul/metadata.json"
+    },
+    {
+      "id": "saint-jean-baptiste",
+      "kind": "saint",
+      "category": "figures-majeures-fondatrices",
+      "title": "Saint Jean-Baptiste",
+      "description": "Précurseur de Jésus et prédicateur du baptême de conversion.",
+      "aliases": [
+        "Jean le Baptiste",
+        "précurseur"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/figures-majeures-fondatrices/saint-jean-baptiste/metadata.json"
+    },
+    {
+      "id": "saint-antoine-de-padoue",
+      "kind": "saint",
+      "category": "intercession-devotion-populaire",
+      "title": "Saint Antoine de Padoue",
+      "description": "Franciscain et docteur de l’Église, populaire pour les objets perdus et les situations difficiles.",
+      "aliases": [
+        "Antoine",
+        "objets perdus",
+        "franciscain"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/intercession-devotion-populaire/saint-antoine-de-padoue/metadata.json"
+    },
+    {
+      "id": "saint-jude",
+      "kind": "saint",
+      "category": "intercession-devotion-populaire",
+      "title": "Saint Jude",
+      "description": "Apôtre traditionnellement invoqué pour les causes difficiles ou désespérées.",
+      "aliases": [
+        "Jude Thaddée",
+        "causes perdues",
+        "apôtre"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/intercession-devotion-populaire/saint-jude/metadata.json"
+    },
+    {
+      "id": "sainte-rita-de-cascia",
+      "kind": "saint",
+      "category": "intercession-devotion-populaire",
+      "title": "Sainte Rita de Cascia",
+      "description": "Religieuse italienne associée aux causes impossibles et aux épreuves familiales.",
+      "aliases": [
+        "Rita",
+        "causes impossibles",
+        "couple"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/intercession-devotion-populaire/sainte-rita-de-cascia/metadata.json"
+    },
+    {
+      "id": "saint-expedit",
+      "kind": "saint",
+      "category": "intercession-devotion-populaire",
+      "title": "Saint Expédit",
+      "description": "Figure de dévotion populaire invoquée pour les demandes urgentes.",
+      "aliases": [
+        "Expédit",
+        "urgence",
+        "demandes pressantes"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/intercession-devotion-populaire/saint-expedit/metadata.json"
+    },
+    {
+      "id": "saint-padre-pio",
+      "kind": "saint",
+      "category": "intercession-devotion-populaire",
+      "title": "Saint Padre Pio",
+      "description": "Capucin italien du XXe siècle connu pour sa vie de prière et son ministère spirituel.",
+      "aliases": [
+        "Padre Pio",
+        "Pie de Pietrelcina",
+        "capucin"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/intercession-devotion-populaire/saint-padre-pio/metadata.json"
+    },
+    {
+      "id": "saint-francois-assise",
+      "kind": "saint",
+      "category": "mystiques-figures-spirituelles",
+      "title": "Saint François d’Assise",
+      "description": "Fondateur des Franciscains, associé à la pauvreté évangélique, à la paix et à la création.",
+      "aliases": [
+        "François",
+        "Assise",
+        "animaux",
+        "nature",
+        "franciscain"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/mystiques-figures-spirituelles/saint-francois-assise/metadata.json"
+    },
+    {
+      "id": "sainte-therese-lisieux",
+      "kind": "saint",
+      "category": "mystiques-figures-spirituelles",
+      "title": "Sainte Thérèse de Lisieux",
+      "description": "Carmélite française et docteur de l’Église, connue pour la spiritualité de la petite voie.",
+      "aliases": [
+        "Petite Thérèse",
+        "Thérèse de l’Enfant-Jésus",
+        "carmélite"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/mystiques-figures-spirituelles/sainte-therese-lisieux/metadata.json"
+    },
+    {
+      "id": "sainte-therese-avila",
+      "kind": "saint",
+      "category": "mystiques-figures-spirituelles",
+      "title": "Sainte Thérèse d’Avila",
+      "description": "Mystique espagnole, réformatrice du Carmel et docteur de l’Église.",
+      "aliases": [
+        "Thérèse de Jésus",
+        "Avila",
+        "Carmel"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/mystiques-figures-spirituelles/sainte-therese-avila/metadata.json"
+    },
+    {
+      "id": "saint-benoit-nursie",
+      "kind": "saint",
+      "category": "mystiques-figures-spirituelles",
+      "title": "Saint Benoît de Nursie",
+      "description": "Auteur de la Règle de saint Benoît, figure majeure du monachisme occidental.",
+      "aliases": [
+        "Benoît",
+        "Nursie",
+        "monachisme",
+        "Europe"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/mystiques-figures-spirituelles/saint-benoit-nursie/metadata.json"
+    },
+    {
+      "id": "saint-nicolas",
+      "kind": "saint",
+      "category": "saints-patrons-culture",
+      "title": "Saint Nicolas",
+      "description": "Évêque associé à la protection des enfants et à de nombreuses traditions populaires.",
+      "aliases": [
+        "Nicolas de Myre",
+        "enfants",
+        "Père Noël"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-patrons-culture/saint-nicolas/metadata.json"
+    },
+    {
+      "id": "saint-valentin",
+      "kind": "saint",
+      "category": "saints-patrons-culture",
+      "title": "Saint Valentin",
+      "description": "Nom associé dans la tradition populaire au patronage des amoureux.",
+      "aliases": [
+        "Valentin",
+        "amoureux"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-patrons-culture/saint-valentin/metadata.json"
+    },
+    {
+      "id": "saint-christophe",
+      "kind": "saint",
+      "category": "saints-patrons-culture",
+      "title": "Saint Christophe",
+      "description": "Figure traditionnellement invoquée par les voyageurs et les conducteurs.",
+      "aliases": [
+        "Christophe",
+        "voyageurs",
+        "conducteurs"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-patrons-culture/saint-christophe/metadata.json"
+    },
+    {
+      "id": "saint-georges",
+      "kind": "saint",
+      "category": "saints-patrons-culture",
+      "title": "Saint Georges",
+      "description": "Martyr associé à la légende du dragon et patron de plusieurs pays et mouvements.",
+      "aliases": [
+        "Georges",
+        "dragon",
+        "scouts"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-patrons-culture/saint-georges/metadata.json"
+    },
+    {
+      "id": "sainte-jeanne-arc",
+      "kind": "saint",
+      "category": "saints-patrons-culture",
+      "title": "Sainte Jeanne d’Arc",
+      "description": "Héroïne française, martyre et patronne secondaire de la France.",
+      "aliases": [
+        "Jeanne d’Arc",
+        "France",
+        "Orléans"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-patrons-culture/sainte-jeanne-arc/metadata.json"
+    },
+    {
+      "id": "sainte-mere-teresa",
+      "kind": "saint",
+      "category": "epoque-moderne-contemporaine",
+      "title": "Sainte Mère Teresa de Calcutta",
+      "description": "Fondatrice des Missionnaires de la Charité et figure du service des plus pauvres.",
+      "aliases": [
+        "Mère Teresa",
+        "Calcutta",
+        "pauvres"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/epoque-moderne-contemporaine/sainte-mere-teresa/metadata.json"
+    },
+    {
+      "id": "saint-jean-paul-ii",
+      "kind": "saint",
+      "category": "epoque-moderne-contemporaine",
+      "title": "Saint Jean-Paul II",
+      "description": "Pape du XXe siècle particulièrement associé aux jeunes, aux familles et aux voyages apostoliques.",
+      "aliases": [
+        "Jean-Paul II",
+        "Karol Wojtyła",
+        "pape"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/epoque-moderne-contemporaine/saint-jean-paul-ii/metadata.json"
+    },
+    {
+      "id": "saint-maximilien-kolbe",
+      "kind": "saint",
+      "category": "epoque-moderne-contemporaine",
+      "title": "Saint Maximilien Kolbe",
+      "description": "Franciscain polonais mort à Auschwitz après avoir offert sa vie à la place d’un autre prisonnier.",
+      "aliases": [
+        "Maximilien Kolbe",
+        "Auschwitz",
+        "martyr",
+        "franciscain"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/epoque-moderne-contemporaine/saint-maximilien-kolbe/metadata.json"
+    },
+    {
+      "id": "saint-carlo-acutis",
+      "kind": "saint",
+      "category": "epoque-moderne-contemporaine",
+      "title": "Saint Carlo Acutis",
+      "description": "Jeune catholique italien associé à l’évangélisation numérique et à la documentation des miracles eucharistiques.",
+      "aliases": [
+        "Carlo Acutis",
+        "Internet",
+        "numérique",
+        "Eucharistie"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/epoque-moderne-contemporaine/saint-carlo-acutis/metadata.json"
+    },
+    {
+      "id": "saint-louis-ix",
+      "kind": "saint",
+      "category": "saints-royaux-historiques",
+      "title": "Saint Louis IX",
+      "description": "Roi de France du XIIIe siècle, fils de Louis VIII et de Blanche de Castille.",
+      "aliases": [
+        "Louis IX",
+        "Saint Louis",
+        "roi de France"
+      ],
+      "status": {
+        "research": "reviewed-seed",
+        "genealogy": "available",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-royaux-historiques/saint-louis-ix/metadata.json"
+    },
+    {
+      "id": "sainte-elisabeth-de-hongrie",
+      "kind": "saint",
+      "category": "saints-royaux-historiques",
+      "title": "Sainte Élisabeth de Hongrie",
+      "description": "Princesse de Hongrie et landgravine de Thuringe, connue pour son service des pauvres.",
+      "aliases": [
+        "Élisabeth de Thuringe",
+        "Elizabeth of Hungary"
+      ],
+      "status": {
+        "research": "reviewed-seed",
+        "genealogy": "available",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-royaux-historiques/sainte-elisabeth-de-hongrie/metadata.json"
+    },
+    {
+      "id": "sainte-marguerite-ecosse",
+      "kind": "saint",
+      "category": "saints-royaux-historiques",
+      "title": "Sainte Marguerite d’Écosse",
+      "description": "Reine d’Écosse du XIe siècle, fille d’Édouard l’Exilé et épouse de Malcolm III.",
+      "aliases": [
+        "Margaret of Scotland",
+        "Marguerite reine d’Écosse"
+      ],
+      "status": {
+        "research": "reviewed-seed",
+        "genealogy": "available",
+        "images": "pending"
+      },
+      "metadata": "saints/saints-royaux-historiques/sainte-marguerite-ecosse/metadata.json"
+    },
+    {
+      "id": "saint-andre",
+      "kind": "saint",
+      "category": "apotres-evangelistes",
+      "title": "Saint André",
+      "description": "Apôtre, frère de Simon Pierre, présent dans les récits évangéliques.",
+      "aliases": [
+        "André apôtre",
+        "frère de Pierre"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/apotres-evangelistes/saint-andre/metadata.json"
+    },
+    {
+      "id": "saint-jacques-majeur",
+      "kind": "saint",
+      "category": "apotres-evangelistes",
+      "title": "Saint Jacques le Majeur",
+      "description": "Apôtre, fils de Zébédée et frère de Jean.",
+      "aliases": [
+        "Jacques de Zébédée",
+        "Jacques le Majeur"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/apotres-evangelistes/saint-jacques-majeur/metadata.json"
+    },
+    {
+      "id": "saint-jean-evangeliste",
+      "kind": "saint",
+      "category": "apotres-evangelistes",
+      "title": "Saint Jean l’Évangéliste",
+      "description": "Apôtre et figure traditionnellement associée au quatrième Évangile.",
+      "aliases": [
+        "Jean apôtre",
+        "disciple bien-aimé"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/apotres-evangelistes/saint-jean-evangeliste/metadata.json"
+    },
+    {
+      "id": "saint-matthieu",
+      "kind": "saint",
+      "category": "apotres-evangelistes",
+      "title": "Saint Matthieu",
+      "description": "Apôtre et figure traditionnellement associée à l’Évangile selon Matthieu.",
+      "aliases": [
+        "Matthieu évangéliste",
+        "Lévi"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/apotres-evangelistes/saint-matthieu/metadata.json"
+    },
+    {
+      "id": "saint-marc",
+      "kind": "saint",
+      "category": "apotres-evangelistes",
+      "title": "Saint Marc",
+      "description": "Évangéliste associé à Pierre dans la tradition chrétienne ancienne.",
+      "aliases": [
+        "Marc évangéliste",
+        "Jean Marc"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/apotres-evangelistes/saint-marc/metadata.json"
+    },
+    {
+      "id": "saint-luc",
+      "kind": "saint",
+      "category": "apotres-evangelistes",
+      "title": "Saint Luc",
+      "description": "Évangéliste traditionnellement associé à l’Évangile selon Luc et aux Actes.",
+      "aliases": [
+        "Luc évangéliste",
+        "médecin"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/apotres-evangelistes/saint-luc/metadata.json"
+    },
+    {
+      "id": "sainte-marie-madeleine",
+      "kind": "saint",
+      "category": "apotres-evangelistes",
+      "title": "Sainte Marie Madeleine",
+      "description": "Disciple de Jésus et témoin de la Résurrection dans les récits évangéliques.",
+      "aliases": [
+        "Marie de Magdala",
+        "apôtre des apôtres"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/apotres-evangelistes/sainte-marie-madeleine/metadata.json"
+    },
+    {
+      "id": "saint-augustin-hippone",
+      "kind": "saint",
+      "category": "peres-docteurs-eglise",
+      "title": "Saint Augustin d’Hippone",
+      "description": "Évêque d’Hippone, auteur des Confessions et figure majeure de la pensée chrétienne.",
+      "aliases": [
+        "Augustin",
+        "Hippone",
+        "docteur de l’Église"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/peres-docteurs-eglise/saint-augustin-hippone/metadata.json"
+    },
+    {
+      "id": "sainte-monique",
+      "kind": "saint",
+      "category": "peres-docteurs-eglise",
+      "title": "Sainte Monique",
+      "description": "Mère d’Augustin d’Hippone, connue à travers le récit des Confessions.",
+      "aliases": [
+        "Monique",
+        "mère de saint Augustin"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/peres-docteurs-eglise/sainte-monique/metadata.json"
+    },
+    {
+      "id": "saint-ambroise",
+      "kind": "saint",
+      "category": "peres-docteurs-eglise",
+      "title": "Saint Ambroise de Milan",
+      "description": "Évêque, prédicateur et docteur de l’Église du IVe siècle.",
+      "aliases": [
+        "Ambroise",
+        "Milan"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/peres-docteurs-eglise/saint-ambroise/metadata.json"
+    },
+    {
+      "id": "saint-jerome",
+      "kind": "saint",
+      "category": "peres-docteurs-eglise",
+      "title": "Saint Jérôme",
+      "description": "Bibliste et docteur de l’Église associé à la traduction latine de la Bible.",
+      "aliases": [
+        "Jérôme de Stridon",
+        "Vulgate"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/peres-docteurs-eglise/saint-jerome/metadata.json"
+    },
+    {
+      "id": "saint-gregoire-grand",
+      "kind": "saint",
+      "category": "peres-docteurs-eglise",
+      "title": "Saint Grégoire le Grand",
+      "description": "Pape, auteur spirituel et docteur de l’Église.",
+      "aliases": [
+        "Grégoire Ier",
+        "pape"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/peres-docteurs-eglise/saint-gregoire-grand/metadata.json"
+    },
+    {
+      "id": "saint-thomas-aquin",
+      "kind": "saint",
+      "category": "peres-docteurs-eglise",
+      "title": "Saint Thomas d’Aquin",
+      "description": "Dominicain, théologien et docteur de l’Église.",
+      "aliases": [
+        "Thomas d’Aquin",
+        "docteur angélique"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/peres-docteurs-eglise/saint-thomas-aquin/metadata.json"
+    },
+    {
+      "id": "sainte-catherine-sienne",
+      "kind": "saint",
+      "category": "peres-docteurs-eglise",
+      "title": "Sainte Catherine de Sienne",
+      "description": "Mystique dominicaine, conseillère spirituelle et docteur de l’Église.",
+      "aliases": [
+        "Catherine de Sienne",
+        "dominicaine"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/peres-docteurs-eglise/sainte-catherine-sienne/metadata.json"
+    },
+    {
+      "id": "saint-etienne",
+      "kind": "saint",
+      "category": "martyrs-premiers-siecles",
+      "title": "Saint Étienne",
+      "description": "Figure présentée dans les Actes des Apôtres comme premier martyr chrétien.",
+      "aliases": [
+        "Étienne protomartyr",
+        "Actes des Apôtres"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/martyrs-premiers-siecles/saint-etienne/metadata.json"
+    },
+    {
+      "id": "sainte-perpetue",
+      "kind": "saint",
+      "category": "martyrs-premiers-siecles",
+      "title": "Sainte Perpétue",
+      "description": "Martyre de Carthage dont la Passion conserve un témoignage ancien.",
+      "aliases": [
+        "Perpétue de Carthage",
+        "martyre"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/martyrs-premiers-siecles/sainte-perpetue/metadata.json"
+    },
+    {
+      "id": "sainte-felicite",
+      "kind": "saint",
+      "category": "martyrs-premiers-siecles",
+      "title": "Sainte Félicité",
+      "description": "Martyre de Carthage commémorée avec Perpétue.",
+      "aliases": [
+        "Félicité de Carthage",
+        "martyre"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/martyrs-premiers-siecles/sainte-felicite/metadata.json"
+    },
+    {
+      "id": "sainte-agnes",
+      "kind": "saint",
+      "category": "martyrs-premiers-siecles",
+      "title": "Sainte Agnès de Rome",
+      "description": "Jeune martyre romaine honorée depuis l’Antiquité chrétienne.",
+      "aliases": [
+        "Agnès",
+        "Rome",
+        "martyre"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/martyrs-premiers-siecles/sainte-agnes/metadata.json"
+    },
+    {
+      "id": "sainte-lucie",
+      "kind": "saint",
+      "category": "martyrs-premiers-siecles",
+      "title": "Sainte Lucie de Syracuse",
+      "description": "Martyre sicilienne associée dans la tradition à la lumière et à la vue.",
+      "aliases": [
+        "Lucie",
+        "Syracuse"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/martyrs-premiers-siecles/sainte-lucie/metadata.json"
+    },
+    {
+      "id": "saint-laurent",
+      "kind": "saint",
+      "category": "martyrs-premiers-siecles",
+      "title": "Saint Laurent de Rome",
+      "description": "Diacre et martyr romain du IIIe siècle.",
+      "aliases": [
+        "Laurent",
+        "diacre",
+        "Rome"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/martyrs-premiers-siecles/saint-laurent/metadata.json"
+    },
+    {
+      "id": "sainte-anne",
+      "kind": "saint",
+      "category": "saintes-femmes",
+      "title": "Sainte Anne",
+      "description": "Mère de Marie selon la tradition chrétienne ancienne.",
+      "aliases": [
+        "Anne",
+        "mère de Marie",
+        "grand-mère de Jésus"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saintes-femmes/sainte-anne/metadata.json"
+    },
+    {
+      "id": "sainte-claire-assise",
+      "kind": "saint",
+      "category": "saintes-femmes",
+      "title": "Sainte Claire d’Assise",
+      "description": "Fondatrice des Clarisses et proche de François d’Assise.",
+      "aliases": [
+        "Claire",
+        "Assise",
+        "Clarisses"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saintes-femmes/sainte-claire-assise/metadata.json"
+    },
+    {
+      "id": "sainte-hildegarde-bingen",
+      "kind": "saint",
+      "category": "saintes-femmes",
+      "title": "Sainte Hildegarde de Bingen",
+      "description": "Abbesse, compositrice, naturaliste et docteur de l’Église.",
+      "aliases": [
+        "Hildegarde",
+        "Bingen"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saintes-femmes/sainte-hildegarde-bingen/metadata.json"
+    },
+    {
+      "id": "sainte-brigitte-suede",
+      "kind": "saint",
+      "category": "saintes-femmes",
+      "title": "Sainte Brigitte de Suède",
+      "description": "Mystique, fondatrice et copatronne de l’Europe.",
+      "aliases": [
+        "Brigitte de Suède",
+        "Brigittines"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saintes-femmes/sainte-brigitte-suede/metadata.json"
+    },
+    {
+      "id": "sainte-josephine-bakhita",
+      "kind": "saint",
+      "category": "saintes-femmes",
+      "title": "Sainte Joséphine Bakhita",
+      "description": "Religieuse soudanaise devenue symbole de liberté, de pardon et de dignité.",
+      "aliases": [
+        "Bakhita",
+        "Soudan",
+        "Canossienne"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/saintes-femmes/sainte-josephine-bakhita/metadata.json"
+    },
+    {
+      "id": "saint-patrice",
+      "kind": "saint",
+      "category": "missionnaires-evangelisateurs",
+      "title": "Saint Patrick",
+      "description": "Missionnaire et évêque traditionnellement associé à l’évangélisation de l’Irlande.",
+      "aliases": [
+        "Patrick",
+        "Irlande"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/missionnaires-evangelisateurs/saint-patrice/metadata.json"
+    },
+    {
+      "id": "saint-boniface",
+      "kind": "saint",
+      "category": "missionnaires-evangelisateurs",
+      "title": "Saint Boniface",
+      "description": "Missionnaire et évêque associé à l’organisation de l’Église en Germanie.",
+      "aliases": [
+        "Boniface de Mayence",
+        "Germanie"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/missionnaires-evangelisateurs/saint-boniface/metadata.json"
+    },
+    {
+      "id": "saint-francois-xavier",
+      "kind": "saint",
+      "category": "missionnaires-evangelisateurs",
+      "title": "Saint François Xavier",
+      "description": "Jésuite missionnaire actif en Asie au XVIe siècle.",
+      "aliases": [
+        "François Xavier",
+        "jésuite",
+        "Inde",
+        "Japon"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/missionnaires-evangelisateurs/saint-francois-xavier/metadata.json"
+    },
+    {
+      "id": "saints-cyrille-methode",
+      "kind": "saint",
+      "category": "missionnaires-evangelisateurs",
+      "title": "Saints Cyrille et Méthode",
+      "description": "Frères missionnaires associés à l’évangélisation slave et à la traduction liturgique.",
+      "aliases": [
+        "Cyrille",
+        "Méthode",
+        "apôtres des Slaves"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/missionnaires-evangelisateurs/saints-cyrille-methode/metadata.json"
+    },
+    {
+      "id": "sainte-therese-benedicte-croix",
+      "kind": "saint",
+      "category": "missionnaires-evangelisateurs",
+      "title": "Sainte Thérèse-Bénédicte de la Croix",
+      "description": "Philosophe carmélite, née Edith Stein, morte à Auschwitz.",
+      "aliases": [
+        "Edith Stein",
+        "carmélite",
+        "Auschwitz"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/missionnaires-evangelisateurs/sainte-therese-benedicte-croix/metadata.json"
+    },
+    {
+      "id": "saint-cyprien-carthage",
+      "kind": "saint",
+      "category": "afrique-diaspora",
+      "title": "Saint Cyprien de Carthage",
+      "description": "Évêque de Carthage, auteur chrétien ancien et martyr.",
+      "aliases": [
+        "Cyprien",
+        "Carthage",
+        "Tunisie"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/afrique-diaspora/saint-cyprien-carthage/metadata.json"
+    },
+    {
+      "id": "saint-charles-lwanga",
+      "kind": "saint",
+      "category": "afrique-diaspora",
+      "title": "Saint Charles Lwanga",
+      "description": "Martyr ougandais du XIXe siècle, commémoré avec ses compagnons.",
+      "aliases": [
+        "Charles Lwanga",
+        "Ouganda",
+        "martyrs de l’Ouganda"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/afrique-diaspora/saint-charles-lwanga/metadata.json"
+    },
+    {
+      "id": "saint-kizito",
+      "kind": "saint",
+      "category": "afrique-diaspora",
+      "title": "Saint Kizito",
+      "description": "Jeune martyr ougandais, compagnon de Charles Lwanga.",
+      "aliases": [
+        "Kizito",
+        "Ouganda",
+        "jeune martyr"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/afrique-diaspora/saint-kizito/metadata.json"
+    },
+    {
+      "id": "bienheureuse-anwarite",
+      "kind": "saint",
+      "category": "afrique-diaspora",
+      "title": "Bienheureuse Anuarite Nengapeta",
+      "description": "Religieuse congolaise morte en 1964 et reconnue martyre.",
+      "aliases": [
+        "Anuarite",
+        "Nengapeta",
+        "Congo",
+        "RDC"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/afrique-diaspora/bienheureuse-anwarite/metadata.json"
+    },
+    {
+      "id": "saint-jean-bosco",
+      "kind": "saint",
+      "category": "jeunesse-education",
+      "title": "Saint Jean Bosco",
+      "description": "Prêtre et éducateur, fondateur des Salésiens.",
+      "aliases": [
+        "Don Bosco",
+        "jeunes",
+        "Salésiens"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/jeunesse-education/saint-jean-bosco/metadata.json"
+    },
+    {
+      "id": "saint-dominique-savio",
+      "kind": "saint",
+      "category": "jeunesse-education",
+      "title": "Saint Dominique Savio",
+      "description": "Jeune élève de Jean Bosco proposé comme modèle de jeunesse chrétienne.",
+      "aliases": [
+        "Dominique Savio",
+        "jeunes"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/jeunesse-education/saint-dominique-savio/metadata.json"
+    },
+    {
+      "id": "saint-jean-baptiste-salle",
+      "kind": "saint",
+      "category": "jeunesse-education",
+      "title": "Saint Jean-Baptiste de La Salle",
+      "description": "Fondateur des Frères des Écoles chrétiennes et patron des éducateurs.",
+      "aliases": [
+        "La Salle",
+        "éducation",
+        "enseignants"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/jeunesse-education/saint-jean-baptiste-salle/metadata.json"
+    },
+    {
+      "id": "sainte-angela-merici",
+      "kind": "saint",
+      "category": "jeunesse-education",
+      "title": "Sainte Angèle Merici",
+      "description": "Fondatrice de la Compagnie de Sainte-Ursule, engagée dans l’éducation des jeunes filles.",
+      "aliases": [
+        "Angèle Merici",
+        "Ursulines",
+        "éducation"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/jeunesse-education/sainte-angela-merici/metadata.json"
+    },
+    {
+      "id": "saint-vincent-paul",
+      "kind": "saint",
+      "category": "charite-justice-sociale",
+      "title": "Saint Vincent de Paul",
+      "description": "Prêtre français associé à l’organisation durable du service des pauvres.",
+      "aliases": [
+        "Vincent de Paul",
+        "charité"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/charite-justice-sociale/saint-vincent-paul/metadata.json"
+    },
+    {
+      "id": "sainte-louise-marillac",
+      "kind": "saint",
+      "category": "charite-justice-sociale",
+      "title": "Sainte Louise de Marillac",
+      "description": "Cofondatrice des Filles de la Charité avec Vincent de Paul.",
+      "aliases": [
+        "Louise de Marillac",
+        "Filles de la Charité"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/charite-justice-sociale/sainte-louise-marillac/metadata.json"
+    },
+    {
+      "id": "saint-damien-molokai",
+      "kind": "saint",
+      "category": "charite-justice-sociale",
+      "title": "Saint Damien de Molokaï",
+      "description": "Missionnaire belge ayant servi les personnes atteintes de la lèpre à Molokaï.",
+      "aliases": [
+        "Damien de Veuster",
+        "Molokaï",
+        "malades"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/charite-justice-sociale/saint-damien-molokai/metadata.json"
+    },
+    {
+      "id": "sainte-katharine-drexel",
+      "kind": "saint",
+      "category": "charite-justice-sociale",
+      "title": "Sainte Katharine Drexel",
+      "description": "Fondatrice américaine engagée dans l’éducation et la dignité des populations marginalisées.",
+      "aliases": [
+        "Katharine Drexel",
+        "éducation",
+        "justice sociale"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/charite-justice-sociale/sainte-katharine-drexel/metadata.json"
+    },
+    {
+      "id": "saint-antoine-grand",
+      "kind": "saint",
+      "category": "ermites-monachisme",
+      "title": "Saint Antoine le Grand",
+      "description": "Père du désert égyptien et figure fondatrice du monachisme chrétien.",
+      "aliases": [
+        "Antoine d’Égypte",
+        "père du désert"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/ermites-monachisme/saint-antoine-grand/metadata.json"
+    },
+    {
+      "id": "saint-pacome",
+      "kind": "saint",
+      "category": "ermites-monachisme",
+      "title": "Saint Pacôme",
+      "description": "Fondateur du cénobitisme chrétien en Égypte.",
+      "aliases": [
+        "Pacôme",
+        "Égypte",
+        "monachisme"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/ermites-monachisme/saint-pacome/metadata.json"
+    },
+    {
+      "id": "sainte-scolastique",
+      "kind": "saint",
+      "category": "ermites-monachisme",
+      "title": "Sainte Scholastique",
+      "description": "Sœur de Benoît de Nursie selon la tradition et figure du monachisme féminin.",
+      "aliases": [
+        "Scholastique",
+        "sœur de saint Benoît"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/ermites-monachisme/sainte-scolastique/metadata.json"
+    },
+    {
+      "id": "saint-bruno",
+      "kind": "saint",
+      "category": "ermites-monachisme",
+      "title": "Saint Bruno",
+      "description": "Fondateur de l’ordre des Chartreux.",
+      "aliases": [
+        "Bruno le Chartreux",
+        "Chartreuse"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/ermites-monachisme/saint-bruno/metadata.json"
+    },
+    {
+      "id": "saint-bernard-clairvaux",
+      "kind": "saint",
+      "category": "ermites-monachisme",
+      "title": "Saint Bernard de Clairvaux",
+      "description": "Abbé cistercien, prédicateur et docteur de l’Église.",
+      "aliases": [
+        "Bernard",
+        "Clairvaux",
+        "cistercien"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "saints/ermites-monachisme/saint-bernard-clairvaux/metadata.json"
+    },
+    {
+      "id": "jesus-selon-matthieu",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Généalogie de Jésus selon Matthieu",
+      "description": "Lignée structurée selon Matthieu 1, d’Abraham à Jésus, organisée en séries généalogiques.",
+      "aliases": [
+        "Jésus",
+        "Abraham",
+        "David",
+        "Matthieu"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/jesus-selon-matthieu/metadata.json"
+    },
+    {
+      "id": "jesus-selon-luc",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Généalogie de Jésus selon Luc",
+      "description": "Lignée ascendante selon Luc 3, de Jésus jusqu’à Adam.",
+      "aliases": [
+        "Jésus",
+        "Adam",
+        "Luc"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/jesus-selon-luc/metadata.json"
+    },
+    {
+      "id": "adam-a-noe",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "D’Adam à Noé",
+      "description": "Premières générations bibliques depuis Adam jusqu’à Noé.",
+      "aliases": [
+        "Adam",
+        "Seth",
+        "Noé",
+        "patriarches"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/adam-a-noe/metadata.json"
+    },
+    {
+      "id": "noe-a-abraham",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "De Noé à Abraham",
+      "description": "Descendance de Sem conduisant à Abram dans le récit de la Genèse.",
+      "aliases": [
+        "Noé",
+        "Sem",
+        "Abraham"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/noe-a-abraham/metadata.json"
+    },
+    {
+      "id": "abraham-israel",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Maison d’Abraham et d’Israël",
+      "description": "Familles d’Abraham, Isaac et Jacob, avec les branches d’Ismaël, Ésaü et des fils d’Israël.",
+      "aliases": [
+        "Abraham",
+        "Isaac",
+        "Jacob",
+        "Israël"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/abraham-israel/metadata.json"
+    },
+    {
+      "id": "douze-tribus-israel",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Les douze tribus d’Israël",
+      "description": "Structure familiale des fils de Jacob à l’origine des tribus d’Israël.",
+      "aliases": [
+        "Jacob",
+        "Israël",
+        "tribus"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/douze-tribus-israel/metadata.json"
+    },
+    {
+      "id": "maison-de-david",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Maison de David",
+      "description": "Lignée royale associée à David et aux rois de Juda.",
+      "aliases": [
+        "David",
+        "Juda",
+        "rois"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/maison-de-david/metadata.json"
+    },
+    {
+      "id": "lignage-sacerdotal-aaron",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Lignage sacerdotal d’Aaron",
+      "description": "Généalogie de la maison d’Aaron et des lignées sacerdotales mentionnées dans la Torah et les Chroniques.",
+      "aliases": [
+        "Aaron",
+        "Lévi",
+        "prêtres"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/lignage-sacerdotal-aaron/metadata.json"
+    },
+    {
+      "id": "descendance-cain",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Descendance de Caïn",
+      "description": "Lignée de Caïn jusqu’aux familles mentionnées avant le déluge.",
+      "aliases": [
+        "Caïn",
+        "Hénoc",
+        "Lamek"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/descendance-cain/metadata.json"
+    },
+    {
+      "id": "descendants-cham",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Descendants de Cham",
+      "description": "Branches attribuées à Cham dans la table des peuples.",
+      "aliases": [
+        "Cham",
+        "Canaan",
+        "Koush",
+        "Mitsraïm"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/descendants-cham/metadata.json"
+    },
+    {
+      "id": "descendants-japhet",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Descendants de Japhet",
+      "description": "Branches attribuées à Japhet dans la table des peuples.",
+      "aliases": [
+        "Japhet",
+        "Gomer",
+        "Javan"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/descendants-japhet/metadata.json"
+    },
+    {
+      "id": "maison-esau-edom",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Maison d’Ésaü et chefs d’Édom",
+      "description": "Famille d’Ésaü, ses épouses, ses fils et les chefs d’Édom.",
+      "aliases": [
+        "Ésaü",
+        "Édom",
+        "Séir"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/maison-esau-edom/metadata.json"
+    },
+    {
+      "id": "tribu-juda",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Généalogies de la tribu de Juda",
+      "description": "Lignées de Juda, de Pérets et des clans associés.",
+      "aliases": [
+        "Juda",
+        "Pérets",
+        "Hetsron"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/tribu-juda/metadata.json"
+    },
+    {
+      "id": "tribu-benjamin",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Généalogies de Benjamin",
+      "description": "Maisons et clans associés à Benjamin, incluant la lignée de Saül.",
+      "aliases": [
+        "Benjamin",
+        "Saül",
+        "Kish"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/tribu-benjamin/metadata.json"
+    },
+    {
+      "id": "famille-moise",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Famille de Moïse",
+      "description": "Maison d’Amram, Moïse, Aaron et leurs proches selon les textes du Pentateuque.",
+      "aliases": [
+        "Moïse",
+        "Aaron",
+        "Myriam",
+        "Amram"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/famille-moise/metadata.json"
+    },
+    {
+      "id": "maison-saul",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Maison du roi Saül",
+      "description": "Famille de Saül, Jonathan, Ish-Bosheth et descendants mentionnés dans Samuel et les Chroniques.",
+      "aliases": [
+        "Saül",
+        "Jonathan",
+        "Méphibosheth"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/maison-saul/metadata.json"
+    },
+    {
+      "id": "famille-noemi-ruth",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Famille de Noémi et Ruth",
+      "description": "Relations familiales reliant Élimélek, Noémi, Ruth, Booz et la lignée de David.",
+      "aliases": [
+        "Noémi",
+        "Ruth",
+        "Booz",
+        "Obed"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/famille-noemi-ruth/metadata.json"
+    },
+    {
+      "id": "familles-entourage-jesus",
+      "kind": "biblical-genealogy",
+      "category": "recits-et-lignages",
+      "title": "Familles de l’entourage de Jésus",
+      "description": "Cartographie prudente des parentés explicitement nommées autour de Jésus dans les Évangiles.",
+      "aliases": [
+        "Jésus",
+        "Marie",
+        "Élisabeth",
+        "Zacharie",
+        "Jean-Baptiste"
+      ],
+      "status": {
+        "research": "planned",
+        "genealogy": "pending",
+        "images": "pending"
+      },
+      "metadata": "genealogies-bibliques/recits-et-lignages/familles-entourage-jesus/metadata.json"
+    }
+  ]
+}

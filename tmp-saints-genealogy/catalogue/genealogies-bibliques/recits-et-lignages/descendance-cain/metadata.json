@@ -1,0 +1,28 @@
+{
+  "id": "descendance-cain",
+  "kind": "biblical-genealogy",
+  "category": "recits-et-lignages",
+  "title": "Descendance de Caïn",
+  "description": "Lignée de Caïn jusqu’aux familles mentionnées avant le déluge.",
+  "aliases": [
+    "Caïn",
+    "Hénoc",
+    "Lamek"
+  ],
+  "searchText": "descendance de caïn lignée de caïn jusqu’aux familles mentionnées avant le déluge. caïn hénoc lamek genèse 4:16-24",
+  "scripturePassages": [
+    "Genèse 4:16-24"
+  ],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "biblical-text",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}

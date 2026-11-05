@@ -1,0 +1,26 @@
+{
+  "id": "sainte-josephine-bakhita",
+  "kind": "saint",
+  "category": "saintes-femmes",
+  "title": "Sainte Joséphine Bakhita",
+  "description": "Religieuse soudanaise devenue symbole de liberté, de pardon et de dignité.",
+  "aliases": [
+    "Bakhita",
+    "Soudan",
+    "Canossienne"
+  ],
+  "searchText": "sainte joséphine bakhita religieuse soudanaise devenue symbole de liberté, de pardon et de dignité. bakhita soudan canossienne",
+  "scripturePassages": [],
+  "status": {
+    "research": "planned",
+    "genealogy": "pending",
+    "images": "pending"
+  },
+  "archive": null,
+  "editorial": {
+    "tradition": "christian",
+    "historicalCertainty": "to-review",
+    "notes": [],
+    "sources": []
+  }
+}
