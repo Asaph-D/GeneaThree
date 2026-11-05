@@ -1,20 +1,21 @@
 import { AlertCircle, Check, Copy, Link, Loader2 as LoaderCircle, Mail, ShieldCheck, UserRoundCog, X } from 'lucide-react';
 import { useState } from 'react';
 import { API_BASE_URL } from '../../config/api';
+import { Marriage, Person } from '../../types/family';
 
 interface TreeAccess { id: string; name: string; role: 'OWNER' | 'COLLABORATOR' | 'READER'; }
 interface AccountResponse { trees: TreeAccess[]; }
-export interface ShareModalProps { onClose: () => void; accessToken: string | null; }
+export interface ShareModalProps { onClose: () => void; accessToken: string | null; persons: Person[]; marriages: Marriage[]; }
 
-export default function ShareModal({ onClose, accessToken }: ShareModalProps) {
+export default function ShareModal({ onClose, accessToken, persons, marriages }: ShareModalProps) {
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<'READER' | 'COLLABORATOR'>('READER');
   const [shareUrl, setShareUrl] = useState('');
   const [status, setStatus] = useState<{ kind: 'success' | 'error'; message: string } | null>(null);
   const [busy, setBusy] = useState<'link' | 'invite' | null>(null);
-  const request = async <T,>(path: string, body?: unknown): Promise<T> => {
+  const request = async <T,>(path: string, body?: unknown, method: 'POST' | 'PUT' = 'POST'): Promise<T> => {
     if (!accessToken) throw new Error('Connectez-vous pour partager cet arbre.');
-    const response = await fetch(`${API_BASE_URL}${path}`, { method: 'POST', headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
+    const response = await fetch(`${API_BASE_URL}${path}`, { method, headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
     if (!response.ok) throw new Error((await response.json().catch(() => null))?.detail || 'Le partage est momentanément indisponible.');
     return response.json() as Promise<T>;
   };
@@ -22,6 +23,20 @@ export default function ShareModal({ onClose, accessToken }: ShareModalProps) {
     const account = await request<AccountResponse>('/auth/sync');
     const tree = account.trees.find((candidate) => candidate.role === 'OWNER');
     if (!tree) throw new Error('Aucun arbre administrable trouvé.');
+    const place = (value?: Person['birthPlace'] | string) => typeof value === 'string'
+      ? value
+      : [value?.city, value?.region, value?.country].filter(Boolean).join(', ');
+    await request(`/trees/${tree.id}/family`, {
+      version: 1,
+      persons: persons.map((person) => ({
+        ...person,
+        birthPlace: place(person.birthPlace),
+        deathPlace: place(person.deathPlace),
+        email: person.contact?.email,
+        phone: person.contact?.phone,
+      })),
+      marriages: marriages.map((marriage) => ({ ...marriage, location: place(marriage.location) })),
+    }, 'PUT');
     return tree;
   };
   const createLink = async () => {

@@ -206,10 +206,16 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
         const svgW = host.clientWidth || 800;
         const svgH = host.clientHeight || 640;
         const fit = Math.min((svgW - 48) / Math.max(layout.width, 1), (svgH - 48) / Math.max(layout.height, 1));
-        const safeScale = Math.max(0.32, Math.min(0.8, fit));
-        const tx = (svgW - layout.width * safeScale) / 2 - layout.minX * safeScale;
-        const ty = (svgH - layout.height * safeScale) / 2 - layout.minY * safeScale;
-        const fitKey = `${viewType}|${generations}|${annotated.map((person) => person.id).join(',')}|${visibleMarriages.map((marriage) => marriage.id).join(',')}`;
+        const focusNode = layout.nodes.find((node) => node.person.id === validFocusPerson);
+        const needsFocusFraming = fit < 0.32 && Boolean(focusNode);
+        const safeScale = needsFocusFraming ? 0.4 : Math.max(0.32, Math.min(0.8, fit));
+        const tx = needsFocusFraming && focusNode
+          ? svgW / 2 - focusNode.x * safeScale
+          : (svgW - layout.width * safeScale) / 2 - layout.minX * safeScale;
+        const ty = needsFocusFraming && focusNode
+          ? svgH - 64 - focusNode.y * safeScale
+          : (svgH - layout.height * safeScale) / 2 - layout.minY * safeScale;
+        const fitKey = `${viewType}|${generations}|${validFocusPerson}|${annotated.map((person) => person.id).join(',')}|${visibleMarriages.map((marriage) => marriage.id).join(',')}`;
         if (fitKeyRef.current !== fitKey) {
           fitKeyRef.current = fitKey;
           svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(safeScale));

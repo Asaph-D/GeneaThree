@@ -28,11 +28,12 @@ public class AccountService {
     private final FamilySnapshotService familySnapshotService;
     private final TreeSharingService treeSharingService;
     private final TreeInvitationRepository invitationRepository;
+    private final AdminNotificationService notifications;
 
     public AccountService(AppUserRepository userRepository, FamilyTreeRepository treeRepository,
             TreeMembershipRepository membershipRepository, PasswordEncoder passwordEncoder,
             FamilySnapshotService familySnapshotService, TreeSharingService treeSharingService,
-            TreeInvitationRepository invitationRepository) {
+            TreeInvitationRepository invitationRepository, AdminNotificationService notifications) {
         this.userRepository = userRepository;
         this.treeRepository = treeRepository;
         this.membershipRepository = membershipRepository;
@@ -40,6 +41,7 @@ public class AccountService {
         this.familySnapshotService = familySnapshotService;
         this.treeSharingService = treeSharingService;
         this.invitationRepository = invitationRepository;
+        this.notifications = notifications;
     }
 
     @Transactional
@@ -64,6 +66,7 @@ public class AccountService {
         membership.setRole(TreeAccessRole.OWNER);
         membershipRepository.save(membership);
         treeSharingService.acceptPending(user);
+        notifications.newAccount(email, "formulaire");
         return describe(user);
     }
 
@@ -94,6 +97,7 @@ public class AccountService {
         owner.setTree(tree); owner.setUser(user); owner.setRole(TreeAccessRole.OWNER);
         membershipRepository.save(owner);
         treeSharingService.acceptPending(user);
+        notifications.newAccount(email, "Supabase OAuth");
         return describe(user);
     }
 

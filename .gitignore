@@ -6,6 +6,7 @@
 # Generated visual and PDF test artifacts
 **/test-artifacts/
 tmp-shots/
+tmp-saints-genealogy/
 
 # JVM crash and replay logs
 hs_err_pid*.log
