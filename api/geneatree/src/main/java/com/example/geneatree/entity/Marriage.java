@@ -21,6 +21,9 @@ public class Marriage {
     @Id
     private String id;
 
+    @Column(name = "client_id")
+    private String clientId;
+
     @PrePersist
     void assignId() {
         if (id == null || id.isBlank()) id = UUID.randomUUID().toString();

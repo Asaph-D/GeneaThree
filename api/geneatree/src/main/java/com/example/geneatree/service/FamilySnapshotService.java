@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class FamilySnapshotService {
@@ -100,8 +101,10 @@ public class FamilySnapshotService {
         Map<String, Person> peopleById = new HashMap<>();
         for (PersonDTO dto : snapshot.persons()) {
             Person person = scalarPerson(dto);
+            person.setId(UUID.randomUUID().toString());
+            person.setClientId(dto.getId());
             person.setTree(tree);
-            peopleById.put(person.getId(), person);
+            peopleById.put(dto.getId(), person);
         }
         peopleById.values().forEach(entityManager::persist);
         entityManager.flush();
@@ -114,6 +117,8 @@ public class FamilySnapshotService {
         entityManager.flush();
         snapshot.marriages().stream().map(dto -> {
             Marriage marriage = marriage(dto, peopleById);
+            marriage.setId(UUID.randomUUID().toString());
+            marriage.setClientId(dto.getId());
             marriage.setTree(tree);
             return marriage;
         }).forEach(entityManager::persist);

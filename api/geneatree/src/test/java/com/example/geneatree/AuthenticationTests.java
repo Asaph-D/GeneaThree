@@ -125,6 +125,14 @@ class AuthenticationTests {
                         .content(singlePersonSnapshot()))
                 .andExpect(status().isOk());
 
+        String secondTreeId = register("second@example.com", "second-passphrase", "Deuxième arbre");
+        mockMvc.perform(put("/api/trees/{treeId}/family", secondTreeId)
+                        .header("Authorization", basic("second@example.com", "second-passphrase"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(singlePersonSnapshot()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.persons[0].id").value("owner-person"));
+
         String linkResponse = mockMvc.perform(post("/api/trees/{treeId}/share-link", treeId)
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
@@ -290,6 +298,7 @@ class AuthenticationTests {
                     "lastName": "Owner",
                     "gender": "female",
                     "deceased": false,
+                    "photoUrl": "%s",
                     "parentIds": [],
                     "childrenIds": [],
                     "spouseIds": [],
@@ -298,7 +307,7 @@ class AuthenticationTests {
                   }],
                   "marriages": []
                 }
-                """;
+                """.formatted("data:image/png;base64," + "A".repeat(600));
     }
 
     private record Registration(String email, String password, String treeName, boolean privacyConsent) {}

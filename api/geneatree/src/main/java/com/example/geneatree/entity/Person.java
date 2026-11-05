@@ -21,6 +21,9 @@ public class Person {
     @Id
     private String id;
 
+    @Column(name = "client_id")
+    private String clientId;
+
     @PrePersist
     void assignId() {
         if (id == null || id.isBlank()) id = UUID.randomUUID().toString();
@@ -35,8 +38,11 @@ public class Person {
     private String gender;
     private String occupation;
     private boolean deceased;
+    @Column(columnDefinition = "text")
     private String photoUrl;
+    @Column(columnDefinition = "text")
     private String biography;
+    @Column(columnDefinition = "text")
     private String notes;
     private String email;
     private String phone;

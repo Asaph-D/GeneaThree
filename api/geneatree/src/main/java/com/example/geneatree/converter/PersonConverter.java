@@ -22,7 +22,7 @@ public class PersonConverter {
 
     public PersonDTO convertToDTO(Person person) {
         PersonDTO dto = new PersonDTO();
-        dto.setId(person.getId());
+        dto.setId(person.getClientId() == null ? person.getId() : person.getClientId());
         dto.setFirstName(person.getFirstName());
         dto.setLastName(person.getLastName());
         dto.setBirthDate(person.getBirthDate());
@@ -38,10 +38,10 @@ public class PersonConverter {
         dto.setEmail(person.getEmail());
         dto.setPhone(person.getPhone());
 
-        dto.setParentIds(person.getParents().stream().map(Person::getId).collect(Collectors.toList()));
-        dto.setChildrenIds(person.getChildren().stream().map(Person::getId).collect(Collectors.toList()));
-        dto.setSpouseIds(person.getSpouses().stream().map(Person::getId).collect(Collectors.toList()));
-        dto.setSiblingIds(person.getSiblings().stream().map(Person::getId).collect(Collectors.toList()));
+        dto.setParentIds(person.getParents().stream().map(this::clientId).collect(Collectors.toList()));
+        dto.setChildrenIds(person.getChildren().stream().map(this::clientId).collect(Collectors.toList()));
+        dto.setSpouseIds(person.getSpouses().stream().map(this::clientId).collect(Collectors.toList()));
+        dto.setSiblingIds(person.getSiblings().stream().map(this::clientId).collect(Collectors.toList()));
         dto.setEventIds(person.getEvents().stream().map(e -> e.getId()).collect(Collectors.toList()));
 
         return dto;
@@ -50,6 +50,7 @@ public class PersonConverter {
     public Person convertToEntity(PersonDTO dto) {
         Person person = new Person();
         person.setId(dto.getId());
+        person.setClientId(dto.getId());
         person.setFirstName(dto.getFirstName());
         person.setLastName(dto.getLastName());
         person.setBirthDate(dto.getBirthDate());
@@ -72,5 +73,9 @@ public class PersonConverter {
         person.setEvents(dto.getEventIds() == null ? List.of() : lifeEventRepository.findAllById(dto.getEventIds()));
 
         return person;
+    }
+
+    private String clientId(Person person) {
+        return person.getClientId() == null ? person.getId() : person.getClientId();
     }
 }
