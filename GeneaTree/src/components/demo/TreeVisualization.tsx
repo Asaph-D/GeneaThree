@@ -84,7 +84,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
       .attr('height', svgH)
       .attr('viewBox', [0, 0, svgW, svgH]);
     const fit = Math.min((svgW - 48) / box.width, (svgH - 48) / box.height);
-    const safeScale = Math.max(0.32, Math.min(0.8, fit));
+    const safeScale = Math.max(0.05, Math.min(0.8, fit));
     const tx = (svgW - box.width * safeScale) / 2 - box.x * safeScale;
     const ty = (svgH - box.height * safeScale) / 2 - box.y * safeScale;
     d3.select(host)
@@ -111,7 +111,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
     fitKeyRef.current = '';
 
     const zoom = d3.zoom<SVGSVGElement, unknown>()
-      .scaleExtent([0.2, 4])
+      .scaleExtent([0.05, 4])
       .clickDistance(8)
       .filter((event) => {
         const pointer = event as MouseEvent;

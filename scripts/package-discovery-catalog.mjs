@@ -1,17 +1,23 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { normalizeDiscoveryDates } from './discovery-dates.mjs';
 
 const root = process.cwd();
 const sourceRoot = path.join(root, 'tmp-saints-genealogy', 'catalogue');
 const output = path.join(root, 'api', 'geneatree', 'src', 'main', 'resources', 'discovery', 'popular-trees.json');
 const catalog = JSON.parse(await fs.readFile(path.join(sourceRoot, 'catalog.json'), 'utf8'));
+const subjects = JSON.parse(await fs.readFile(path.join(root, 'scripts', 'discovery-subjects.json'), 'utf8'));
 const entries = [];
 
 for (const item of catalog.entries.filter((entry) => entry.kind === 'saint')) {
   const metadataPath = path.join(sourceRoot, item.metadata);
   const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf8'));
   const tree = JSON.parse(await fs.readFile(path.join(path.dirname(metadataPath), metadata.archive), 'utf8'));
-  const focus = tree.persons.find((person) => person.id === tree.view.focusPersonId) ?? tree.persons[0];
+  normalizeDiscoveryDates(tree);
+  const focus = tree.persons.find((person) => person.id === tree.view.focusPersonId);
+  if (!focus || focus.id !== `wd-${subjects[item.id]?.entityId}`) {
+    throw new Error(`${item.id}: l'identité de l'arbre ne correspond pas au sujet du catalogue`);
+  }
   entries.push({
     id: item.id,
     title: item.title,

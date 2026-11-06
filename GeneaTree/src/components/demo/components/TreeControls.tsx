@@ -68,6 +68,7 @@ const TreeControls: React.FC<TreeControlsProps> = ({
         </button>
       </div>
 
+      <a href="/portraits/credits.html" target="_blank" rel="noreferrer" className="self-center rounded-lg bg-white/80 px-2 py-1 text-[11px] text-zinc-600 hover:underline dark:bg-zinc-950/80 dark:text-zinc-400">Crédits images</a>
       {onRelationshipSelect && (
         <div ref={rootRef} className="relative">
           <button

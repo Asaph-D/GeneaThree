@@ -9,12 +9,13 @@ interface FamilyStatsProps {
 
 const FamilyStats: React.FC<FamilyStatsProps> = ({ familyData, compact = false }) => {
   // Calculate family statistics directly in the component
-  const calculateStats = (): FamilyStatsType => {
+  const calculateStats = (): FamilyStatsType & { hasKnownAges: boolean } => {
     if (!familyData || familyData.length === 0) {
       return {
         totalPeople: 0,
         generations: 0,
         averageAge: 0,
+        hasKnownAges: false,
         maxAge: { age: 0, person: {} as Person },
         countries: []
       };
@@ -60,12 +61,12 @@ const FamilyStats: React.FC<FamilyStatsProps> = ({ familyData, compact = false }
 
     familyData.forEach(person => {
       const birthYear = person.birthDate ? new Date(person.birthDate).getFullYear() : null;
-      if (birthYear) {
+      if (birthYear !== null && Number.isFinite(birthYear)) {
         const deathYear = person.deathDate 
           ? new Date(person.deathDate).getFullYear() 
           : person.deceased ? null : new Date().getFullYear();
         
-        if (deathYear) {
+        if (deathYear !== null && Number.isFinite(deathYear) && deathYear >= birthYear) {
           const age = deathYear - birthYear;
           totalAge += age;
           totalWithValidAge++;
@@ -85,6 +86,7 @@ const FamilyStats: React.FC<FamilyStatsProps> = ({ familyData, compact = false }
       familyData
         .map(p => {
           const birthPlace = p.birthPlace || '';
+          if (typeof birthPlace === 'object') return birthPlace.country?.trim() || '';
           const parts = String(birthPlace).split(',');
           // Try to extract country from birth place (assuming format "City, Country")
           return parts.length > 1 ? parts[parts.length - 1].trim() : '';
@@ -96,6 +98,7 @@ const FamilyStats: React.FC<FamilyStatsProps> = ({ familyData, compact = false }
       totalPeople,
       generations: maxGenerations,
       averageAge,
+      hasKnownAges: totalWithValidAge > 0,
       maxAge: { age: maxAgeValue, person: maxAgePerson },
       countries
     };
@@ -121,7 +124,7 @@ const FamilyStats: React.FC<FamilyStatsProps> = ({ familyData, compact = false }
             </li>
             <li className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">Âge moyen:</span>
-              <span className="font-medium dark:text-gray-300">{stats.averageAge} ans</span>
+              <span className="font-medium dark:text-gray-300">{stats.hasKnownAges ? `${stats.averageAge} ans` : 'N/A'}</span>
             </li>
             <li className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">Longévité maximale:</span>
@@ -138,7 +141,7 @@ const FamilyStats: React.FC<FamilyStatsProps> = ({ familyData, compact = false }
             <li className="flex justify-between">
               <span className="text-gray-600 dark:text-gray-400">Pays d'origine:</span>
               <span className="font-medium dark:text-gray-300">
-                {stats.countries.length} {stats.countries.length === 1 ? 'pays' : 'pays'}
+                {stats.countries.length ? `${stats.countries.length} pays` : 'N/A'}
                 {stats.countries.length > 0 && (
                   <span className="block mt-1 text-sm text-gray-500 dark:text-gray-400">
                     {stats.countries.join(', ')}

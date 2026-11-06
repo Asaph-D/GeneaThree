@@ -1,0 +1,28 @@
+RELANCER LE TELECHARGEMENT DES IMAGES
+
+Ouvrir PowerShell et copier ces deux commandes :
+
+cd "C:\Users\Asaph\Documents\Programs\Vite\GeneaThree"
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File ".\scripts\Start-ImageDownload.ps1" -MaxAttempts 60
+
+Le téléchargement et son watcher démarrent en arrière-plan, sans fenêtre.
+Les images déjà conservées sont réutilisées. Les délais Retry-After du
+serveur sont respectés ; les autres erreurs temporaires ont des délais
+progressifs. Maximum : 60 tentatives par requête.
+Garder Windows allumé et connecté ; la veille suspend le travail.
+
+CONSULTER LA PROGRESSION
+
+Get-Content ".\GeneaTree\test-artifacts\image-review\download-status.json"
+Get-Content ".\GeneaTree\test-artifacts\image-review\download-output.log" -Tail 20 -Wait
+
+Ctrl+C quitte le suivi du journal sans arrêter le téléchargement.
+
+FIN DU TRAITEMENT
+
+Le watcher affiche une notification Windows (si elles sont autorisées) et
+écrit GeneaTree\test-artifacts\image-review\download-finished.json.
+complete = terminé ; needs-review = des fichiers restent à examiner ;
+failed ou interrupted = erreur ou interruption.
+Les détails des fichiers non récupérés sont dans archive-failures.json.
+Ce signal ne réactive pas automatiquement la conversation avec l'assistant.

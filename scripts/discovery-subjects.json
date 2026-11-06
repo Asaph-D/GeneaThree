@@ -1,0 +1,294 @@
+{
+  "vierge-marie": {
+    "title": "La Vierge Marie",
+    "entityId": "Q345"
+  },
+  "saint-joseph": {
+    "title": "Saint Joseph",
+    "entityId": "Q128267"
+  },
+  "saint-pierre": {
+    "title": "Saint Pierre",
+    "entityId": "Q33923"
+  },
+  "saint-paul": {
+    "title": "Saint Paul",
+    "entityId": "Q9200"
+  },
+  "saint-jean-baptiste": {
+    "title": "Saint Jean-Baptiste",
+    "entityId": "Q40662"
+  },
+  "saint-antoine-de-padoue": {
+    "title": "Saint Antoine de Padoue",
+    "entityId": "Q167477"
+  },
+  "saint-jude": {
+    "title": "Saint Jude",
+    "entityId": "Q43945"
+  },
+  "sainte-rita-de-cascia": {
+    "title": "Sainte Rita de Cascia",
+    "entityId": "Q153024"
+  },
+  "saint-expedit": {
+    "title": "Saint Expédit",
+    "entityId": "Q739082"
+  },
+  "saint-padre-pio": {
+    "title": "Saint Padre Pio",
+    "entityId": "Q193754"
+  },
+  "saint-francois-assise": {
+    "title": "Saint François d’Assise",
+    "entityId": "Q676555"
+  },
+  "sainte-therese-lisieux": {
+    "title": "Sainte Thérèse de Lisieux",
+    "entityId": "Q181715"
+  },
+  "sainte-therese-avila": {
+    "title": "Sainte Thérèse d’Avila",
+    "entityId": "Q174880"
+  },
+  "saint-benoit-nursie": {
+    "title": "Saint Benoît de Nursie",
+    "entityId": "Q44265"
+  },
+  "saint-nicolas": {
+    "title": "Saint Nicolas",
+    "entityId": "Q44269"
+  },
+  "saint-valentin": {
+    "title": "Saint Valentin",
+    "entityId": "Q192151"
+  },
+  "saint-christophe": {
+    "title": "Saint Christophe",
+    "entityId": "Q193507"
+  },
+  "saint-georges": {
+    "title": "Saint Georges",
+    "entityId": "Q48438"
+  },
+  "sainte-jeanne-arc": {
+    "title": "Sainte Jeanne d’Arc",
+    "entityId": "Q7226"
+  },
+  "sainte-mere-teresa": {
+    "title": "Sainte Mère Teresa de Calcutta",
+    "entityId": "Q30547"
+  },
+  "saint-jean-paul-ii": {
+    "title": "Saint Jean-Paul II",
+    "entityId": "Q989"
+  },
+  "saint-maximilien-kolbe": {
+    "title": "Saint Maximilien Kolbe",
+    "entityId": "Q153850"
+  },
+  "saint-carlo-acutis": {
+    "title": "Saint Carlo Acutis",
+    "entityId": "Q2939142"
+  },
+  "saint-louis-ix": {
+    "title": "Saint Louis IX",
+    "entityId": "Q346"
+  },
+  "sainte-elisabeth-de-hongrie": {
+    "title": "Sainte Élisabeth de Hongrie",
+    "entityId": "Q159862"
+  },
+  "sainte-marguerite-ecosse": {
+    "title": "Sainte Marguerite d’Écosse",
+    "entityId": "Q230507"
+  },
+  "saint-andre": {
+    "title": "Saint André",
+    "entityId": "Q43399"
+  },
+  "saint-jacques-majeur": {
+    "title": "Saint Jacques le Majeur",
+    "entityId": "Q43999"
+  },
+  "saint-jean-evangeliste": {
+    "title": "Saint Jean l’Évangéliste",
+    "entityId": "Q328804"
+  },
+  "saint-matthieu": {
+    "title": "Saint Matthieu",
+    "entityId": "Q43600"
+  },
+  "saint-marc": {
+    "title": "Saint Marc",
+    "entityId": "Q31966"
+  },
+  "saint-luc": {
+    "title": "Saint Luc",
+    "entityId": "Q128538"
+  },
+  "sainte-marie-madeleine": {
+    "title": "Sainte Marie Madeleine",
+    "entityId": "Q63070"
+  },
+  "saint-augustin-hippone": {
+    "title": "Saint Augustin d’Hippone",
+    "entityId": "Q8018"
+  },
+  "sainte-monique": {
+    "title": "Sainte Monique",
+    "entityId": "Q234689"
+  },
+  "saint-ambroise": {
+    "title": "Saint Ambroise de Milan",
+    "entityId": "Q43689"
+  },
+  "saint-jerome": {
+    "title": "Saint Jérôme",
+    "entityId": "Q44248"
+  },
+  "saint-gregoire-grand": {
+    "title": "Saint Grégoire le Grand",
+    "entityId": "Q42827"
+  },
+  "saint-thomas-aquin": {
+    "title": "Saint Thomas d’Aquin",
+    "entityId": "Q9438"
+  },
+  "sainte-catherine-sienne": {
+    "title": "Sainte Catherine de Sienne",
+    "entityId": "Q229190"
+  },
+  "saint-etienne": {
+    "title": "Saint Étienne",
+    "entityId": "Q161775"
+  },
+  "sainte-perpetue": {
+    "title": "Sainte Perpétue",
+    "entityId": "Q12871157"
+  },
+  "sainte-felicite": {
+    "title": "Sainte Félicité",
+    "entityId": "Q11697793"
+  },
+  "sainte-agnes": {
+    "title": "Sainte Agnès de Rome",
+    "entityId": "Q210096"
+  },
+  "sainte-lucie": {
+    "title": "Sainte Lucie de Syracuse",
+    "entityId": "Q183240"
+  },
+  "saint-laurent": {
+    "title": "Saint Laurent de Rome",
+    "entityId": "Q17590"
+  },
+  "sainte-anne": {
+    "title": "Sainte Anne",
+    "entityId": "Q164294"
+  },
+  "sainte-claire-assise": {
+    "title": "Sainte Claire d’Assise",
+    "entityId": "Q191107"
+  },
+  "sainte-hildegarde-bingen": {
+    "title": "Sainte Hildegarde de Bingen",
+    "entityId": "Q70991"
+  },
+  "sainte-brigitte-suede": {
+    "title": "Sainte Brigitte de Suède",
+    "entityId": "Q204996"
+  },
+  "sainte-josephine-bakhita": {
+    "title": "Sainte Joséphine Bakhita",
+    "entityId": "Q236030"
+  },
+  "saint-patrice": {
+    "title": "Saint Patrick",
+    "entityId": "Q165479"
+  },
+  "saint-boniface": {
+    "title": "Saint Boniface",
+    "entityId": "Q160445"
+  },
+  "saint-francois-xavier": {
+    "title": "Saint François Xavier",
+    "entityId": "Q163900"
+  },
+  "saints-cyrille-methode": {
+    "title": "Saints Cyrille et Méthode",
+    "entityId": "Q239925"
+  },
+  "sainte-therese-benedicte-croix": {
+    "title": "Sainte Thérèse-Bénédicte de la Croix",
+    "entityId": "Q76749"
+  },
+  "saint-cyprien-carthage": {
+    "title": "Saint Cyprien de Carthage",
+    "entityId": "Q190240"
+  },
+  "saint-charles-lwanga": {
+    "title": "Saint Charles Lwanga",
+    "entityId": "Q560121"
+  },
+  "saint-kizito": {
+    "title": "Saint Kizito",
+    "entityId": "Q3463928"
+  },
+  "bienheureuse-anwarite": {
+    "title": "Bienheureuse Anuarite Nengapeta",
+    "entityId": "Q466996"
+  },
+  "saint-jean-bosco": {
+    "title": "Saint Jean Bosco",
+    "entityId": "Q146183"
+  },
+  "saint-dominique-savio": {
+    "title": "Saint Dominique Savio",
+    "entityId": "Q318502"
+  },
+  "saint-jean-baptiste-salle": {
+    "title": "Saint Jean-Baptiste de La Salle",
+    "entityId": "Q312758"
+  },
+  "sainte-angela-merici": {
+    "title": "Sainte Angèle Merici",
+    "entityId": "Q236216"
+  },
+  "saint-vincent-paul": {
+    "title": "Saint Vincent de Paul",
+    "entityId": "Q244413"
+  },
+  "sainte-louise-marillac": {
+    "title": "Sainte Louise de Marillac",
+    "entityId": "Q242072"
+  },
+  "saint-damien-molokai": {
+    "title": "Saint Damien de Molokaï",
+    "entityId": "Q232785"
+  },
+  "sainte-katharine-drexel": {
+    "title": "Sainte Katharine Drexel",
+    "entityId": "Q254227"
+  },
+  "saint-antoine-grand": {
+    "title": "Saint Antoine le Grand",
+    "entityId": "Q170547"
+  },
+  "saint-pacome": {
+    "title": "Saint Pacôme",
+    "entityId": "Q298698"
+  },
+  "sainte-scolastique": {
+    "title": "Sainte Scholastique",
+    "entityId": "Q231300"
+  },
+  "saint-bruno": {
+    "title": "Saint Bruno",
+    "entityId": "Q312314"
+  },
+  "saint-bernard-clairvaux": {
+    "title": "Saint Bernard de Clairvaux",
+    "entityId": "Q188411"
+  }
+}

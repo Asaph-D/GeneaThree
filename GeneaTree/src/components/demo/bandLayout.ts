@@ -337,6 +337,10 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
   };
 }
 
+export function familyGenerationCount(people: Person[], marriages: Marriage[]): number {
+  return Math.max(0, ...calculateGenerations(people, marriages).values()) + 1;
+}
+
 function calculateGenerations(people: Person[], marriages: Marriage[]): Map<string, number> {
   const generations = new Map(people.map((person) => [person.id, 0]));
   const known = new Set(generations.keys());

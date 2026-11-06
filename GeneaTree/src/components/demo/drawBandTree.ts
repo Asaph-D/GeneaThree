@@ -247,6 +247,15 @@ export function drawBandTree(
   cards.each(function bindPortrait(node) {
     const card = d3.select(this);
     const person = node.person;
+    // Remain identifiable while a remote portrait is loading or unavailable.
+    card.append('text')
+      .attr('text-anchor', 'middle')
+      .attr('dominant-baseline', 'central')
+      .attr('fill', '#ffffff')
+      .attr('font-size', 18)
+      .attr('font-weight', 600)
+      .attr('font-family', 'Inter, sans-serif')
+      .text(letter(person));
     if (usablePhoto(person.photoUrl)) {
       card.append('clipPath')
         .attr('id', `clip-${person.id}`)
@@ -262,24 +271,9 @@ export function drawBandTree(
         .attr('clip-path', `url(#clip-${person.id})`)
         .on('error', function onPhotoError() {
           d3.select(this).remove();
-          card.append('text')
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'central')
-            .attr('fill', '#ffffff')
-            .attr('font-size', 18)
-            .attr('font-family', 'Inter, sans-serif')
-            .text(letter(person));
         });
       return;
     }
-    card.append('text')
-      .attr('text-anchor', 'middle')
-      .attr('dominant-baseline', 'central')
-      .attr('fill', '#ffffff')
-      .attr('font-size', 18)
-      .attr('font-weight', 600)
-      .attr('font-family', 'Inter, sans-serif')
-      .text(letter(person));
   });
 
   cards.append('text')

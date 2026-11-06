@@ -1,9 +1,25 @@
 import { API_BASE_URL } from '../config/api';
 import { Marriage, Person, TreeViewOptions } from '../types/family';
+import { createLocalTree } from './localFamilyService';
+import { familyGenerationCount } from '../components/demo/bandLayout';
 
 export interface DiscoveryCategory { id: string; label: string; description: string; }
 export interface DiscoveryTreeSummary { id: string; title: string; description: string; category: string; aliases: string[]; imageUrl?: string; personCount: number; generations: number; featured: boolean; }
 export interface DiscoveryTree extends DiscoveryTreeSummary { tree: { version: number; persons: Person[]; marriages: Marriage[]; view: TreeViewOptions }; }
+
+export async function openDiscoveryTree(record: DiscoveryTree): Promise<void> {
+  const { persons, marriages, view } = record.tree;
+  if (!persons.some((person) => person.id === view.focusPersonId)) {
+    throw new Error('La personne de cette fiche est absente de son arbre.');
+  }
+  await createLocalTree(record.title, { persons, marriages }, 'imported');
+  localStorage.setItem('geneatree.example', 'imported');
+  localStorage.setItem('geneatree.demo.view', JSON.stringify({
+    ...view,
+    generations: Math.max(view.generations, familyGenerationCount(persons, marriages)),
+  }));
+  localStorage.setItem('focusPerson', view.focusPersonId);
+}
 async function parse<T>(request: Promise<Response>): Promise<T> {
   const response = await request;
   if (!response.ok) throw new Error(`Le catalogue est momentanément indisponible (${response.status}).`);

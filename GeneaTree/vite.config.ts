@@ -5,6 +5,9 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   plugins: [react()],
+  server: {
+    watch: { ignored: ['**/test-artifacts/**'] },
+  },
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
