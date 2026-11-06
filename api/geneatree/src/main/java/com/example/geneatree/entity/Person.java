@@ -64,6 +64,7 @@ public class Person {
     private List<Person> parents;
 
     @ManyToMany(mappedBy = "parents")
+    @OrderBy("snapshotOrder ASC, id ASC")
     @JsonIgnore
     private List<Person> children;
 

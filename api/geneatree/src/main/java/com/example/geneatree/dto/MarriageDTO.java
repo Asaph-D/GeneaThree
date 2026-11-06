@@ -15,6 +15,7 @@ public class MarriageDTO {
     private String marriageDate;
     private String divorceDate;
     private String location;
+    private Integer rank;
     private List<String> childrenIds;
     private String eventId;
 

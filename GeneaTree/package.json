@@ -8,7 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "test:assistant": "node scripts/test-assistant-flow.mjs",
-    "test:visual-logic": "node scripts/test-tree-layout.mjs",
+    "test:discovery": "node scripts/test-discovery-service.mjs",
+    "test:visual-logic": "node scripts/test-tree-layout.mjs && node scripts/audit-positions.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

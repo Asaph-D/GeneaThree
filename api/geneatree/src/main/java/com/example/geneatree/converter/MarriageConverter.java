@@ -28,6 +28,7 @@ public class MarriageConverter {
         dto.setMarriageDate(marriage.getMarriageDate());
         dto.setDivorceDate(marriage.getDivorceDate());
         dto.setLocation(marriage.getLocation());
+        dto.setRank(marriage.getRank());
         dto.setChildrenIds(marriage.getChildren().stream().map(this::clientId).toList());
         dto.setEventId(marriage.getEvent() != null ? marriage.getEvent().getId() : null);
         return dto;
@@ -42,6 +43,7 @@ public class MarriageConverter {
         marriage.setMarriageDate(dto.getMarriageDate());
         marriage.setDivorceDate(dto.getDivorceDate());
         marriage.setLocation(dto.getLocation());
+        marriage.setRank(dto.getRank());
         marriage.setChildren(dto.getChildrenIds() != null ? personRepository.findAllById(dto.getChildrenIds()) : List.of());
         marriage.setEvent(dto.getEventId() != null ? lifeEventRepository.findById(dto.getEventId()).orElse(null) : null);
         return marriage;

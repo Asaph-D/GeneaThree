@@ -44,6 +44,8 @@ public class Marriage {
     private String divorceDate;
     private String location;
 
+    private Integer rank;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tree_id")
     @JsonIgnore
@@ -60,5 +62,6 @@ public class Marriage {
         inverseJoinColumns = @JoinColumn(name = "children_ids")
     )
     @JsonIgnore
+    @OrderColumn(name = "child_order")
     private List<Person> children;
 }

@@ -332,6 +332,7 @@ public class FamilySnapshotService {
         marriage.setMarriageDate(dto.getMarriageDate());
         marriage.setDivorceDate(dto.getDivorceDate());
         marriage.setLocation(dto.getLocation());
+        marriage.setRank(dto.getRank());
         marriage.setChildren(resolvePeople(dto.getChildrenIds(), peopleById));
         return marriage;
     }

@@ -146,7 +146,13 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
       const others = children.filter((id) => id !== hint.childId);
       return hint.side === 1 ? [hint.childId, ...others] : [...others, hint.childId];
     }
-    const bridge = children.find((childId) => marriages.some((union) => union.spouse1Id === childId || union.spouse2Id === childId));
+    // A couple joining two ancestries belongs at the boundary of those families.
+    // A sibling married to someone without visible parents must not take its place.
+    const externalBridge = children.find((childId) => marriages.some((union) => {
+      const partnerId = union.spouse1Id === childId ? union.spouse2Id : union.spouse2Id === childId ? union.spouse1Id : null;
+      return partnerId && !children.includes(partnerId) && (byId.get(partnerId)?.parentIds.length ?? 0) > 0;
+    }));
+    const bridge = externalBridge ?? children.find((childId) => marriages.some((union) => union.spouse1Id === childId || union.spouse2Id === childId));
     if (!bridge) return children;
     const ownUnion = marriages.find((union) => union.spouse1Id === bridge || union.spouse2Id === bridge);
     const others = children.filter((id) => id !== bridge);
@@ -169,8 +175,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
       const x = left + width / 2;
       nodes.push({ person, x, y, depth: generation });
       placed.add(id);
-      const centers = placeChildren(looseKids(id), left, width, depth + 1);
-      if (centers.length) drops.push(childStem(x, y + 36, centers));
+      placeChildren(looseKids(id), left, width, depth + 1);
       return { x, y };
     }
 
@@ -187,11 +192,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
         nodes.push({ person: spouse, x: spouseX, y, depth: generationById.get(spouse.id) ?? generation });
         placed.add(spouse.id);
       }
-      unions.push({ x1: anchorX + 28, x2: spouseX - 28, y, rail: false, ticks: [] });
-      const childCenters = placeChildren(familyOrderedChildren(id, marriage), left, width, depth + 1);
-      if (childCenters.length) {
-        drops.push(childStem((anchorX + spouseX) / 2, y, childCenters));
-      }
+      placeChildren(familyOrderedChildren(id, marriage), left, width, depth + 1);
       return { x: anchorX, y };
     }
 
@@ -217,31 +218,16 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
     nodes.push({ person, x: anchorX, y, depth: generation });
     placed.add(id);
 
-    const wifeCenters: number[] = [];
     wifeSlots.forEach((slot) => {
       const spouse = byId.get(slot.marriage.spouse2Id);
       if (!spouse) return;
       const spouseX = slot.left + CARD_W / 2;
-      wifeCenters.push(spouseX);
       if (!placed.has(spouse.id)) {
         nodes.push({ person: spouse, x: spouseX, y, depth: generationById.get(spouse.id) ?? generation });
         placed.add(spouse.id);
       }
-      const childCenters = placeChildren(familyOrderedChildren(id, slot.marriage), slot.left, slot.width, depth + 1);
-      if (childCenters.length) {
-        drops.push(childStem(spouseX, y + 100, childCenters));
-      }
+      placeChildren(familyOrderedChildren(id, slot.marriage), slot.left, slot.width, depth + 1);
     });
-    if (wifeCenters.length) {
-      const railY = y + 100;
-      unions.push({
-        x1: Math.min(anchorX, ...wifeCenters),
-        x2: Math.max(anchorX, ...wifeCenters),
-        y: railY,
-        rail: true,
-        ticks: [{ x: anchorX }, ...wifeCenters.map((x) => ({ x }))],
-      });
-    }
 
     return { x: anchorX, y };
   }
@@ -284,11 +270,53 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
   people.forEach((person) => {
     if (!placed.has(person.id) && !childIds.has(person.id)) {
       const depth = generationById.get(person.id) ?? 0;
+      if (depth > maxDepth) return;
       const y = 56 + depth * ROW;
       nodes.push({ person, x: cursor + CARD_W / 2, y, depth });
       placed.add(person.id);
       cursor += CARD_W + GAP;
     }
+  });
+
+  // Converging ancestries can reserve the same space on a generation. Keep the
+  // family order but expand the row before deriving any connection coordinates.
+  const rows = new Map<number, BandNode[]>();
+  nodes.forEach((node) => {
+    const row = rows.get(node.depth) ?? [];
+    row.push(node);
+    rows.set(node.depth, row);
+  });
+  rows.forEach((row) => {
+    row.sort((a, b) => a.x - b.x);
+    const originalCenter = row.reduce((sum, node) => sum + node.x, 0) / row.length;
+    for (let index = 1; index < row.length; index += 1) {
+      row[index].x = Math.max(row[index].x, row[index - 1].x + CARD_W);
+    }
+    const offset = row.reduce((sum, node) => sum + node.x, 0) / row.length - originalCenter;
+    row.forEach((node) => { node.x -= offset; });
+  });
+
+  // A spouse may already have been placed by their own ancestry. Rebuild links
+  // from the final nodes instead of the unused slot reserved by another branch.
+  const positioned = new Map(nodes.map((node) => [node.person.id, node]));
+  people.forEach((person) => {
+    const anchor = positioned.get(person.id);
+    if (!anchor) return;
+    const households = householdsOf(person.id).filter((union) => positioned.has(union.spouse2Id));
+    if (households.length > 1) {
+      const xs = [anchor.x, ...households.map((union) => positioned.get(union.spouse2Id)!.x)];
+      unions.push({ x1: Math.min(...xs), x2: Math.max(...xs), y: anchor.y + 100, rail: true, ticks: xs.map((x) => ({ x })) });
+    }
+    households.forEach((union) => {
+      const spouse = positioned.get(union.spouse2Id)!;
+      if (households.length === 1) {
+        unions.push({ x1: Math.min(anchor.x, spouse.x) + 28, x2: Math.max(anchor.x, spouse.x) - 28, y: anchor.y, rail: false, ticks: [] });
+      }
+      const children = kidsOf(union).map((id) => positioned.get(id)).filter((node): node is BandNode => Boolean(node));
+      if (children.length) drops.push(childStem(households.length > 1 ? spouse.x : (anchor.x + spouse.x) / 2, anchor.y + (households.length > 1 ? 100 : 0), children));
+    });
+    const loose = looseKids(person.id).map((id) => positioned.get(id)).filter((node): node is BandNode => Boolean(node));
+    if (loose.length) drops.push(childStem(anchor.x, anchor.y + 36, loose));
   });
 
   const xs = nodes.map((node) => node.x);

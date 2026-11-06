@@ -4,7 +4,11 @@ import { Marriage, Person, TreeViewOptions } from '../types/family';
 export interface DiscoveryCategory { id: string; label: string; description: string; }
 export interface DiscoveryTreeSummary { id: string; title: string; description: string; category: string; aliases: string[]; imageUrl?: string; personCount: number; generations: number; featured: boolean; }
 export interface DiscoveryTree extends DiscoveryTreeSummary { tree: { version: number; persons: Person[]; marriages: Marriage[]; view: TreeViewOptions }; }
-async function parse<T>(response: Response): Promise<T> { if (!response.ok) throw new Error(`Le catalogue est momentanément indisponible (${response.status}).`); return response.json() as Promise<T>; }
+async function parse<T>(request: Promise<Response>): Promise<T> {
+  const response = await request;
+  if (!response.ok) throw new Error(`Le catalogue est momentanément indisponible (${response.status}).`);
+  return response.json() as Promise<T>;
+}
 export const getDiscoveryCategories = () => parse<DiscoveryCategory[]>(fetch(`${API_BASE_URL}/discovery/categories`));
 export const searchDiscoveryTrees = (query = '', category = '', featured = false, limit = 24) => { const params = new URLSearchParams({ q: query, featured: String(featured), limit: String(limit) }); if (category) params.set('category', category); return parse<DiscoveryTreeSummary[]>(fetch(`${API_BASE_URL}/discovery/trees?${params}`)); };
 export const suggestDiscoveryTrees = (query: string) => parse<DiscoveryTreeSummary[]>(fetch(`${API_BASE_URL}/discovery/suggestions?q=${encodeURIComponent(query)}`));

@@ -24,6 +24,30 @@ class FamilySnapshotControllerTests {
     @Autowired
     private MockMvc mockMvc;
 
+    @Test
+    void preservesUnionRankAndSiblingOrderAfterReload() throws Exception {
+        var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+        var snapshot = mapper.readTree(validSnapshot());
+        var people = (com.fasterxml.jackson.databind.node.ArrayNode) snapshot.get("persons");
+        var sibling = people.get(2).deepCopy();
+        ((com.fasterxml.jackson.databind.node.ObjectNode) sibling).put("id", "a-sibling");
+        people.add(sibling);
+        for (int index = 0; index < 2; index++) {
+            ((com.fasterxml.jackson.databind.node.ArrayNode) people.get(index).get("childrenIds")).add("a-sibling");
+        }
+        var union = (com.fasterxml.jackson.databind.node.ObjectNode) snapshot.get("marriages").get(0);
+        union.put("rank", 2);
+        ((com.fasterxml.jackson.databind.node.ArrayNode) union.get("childrenIds")).add("a-sibling");
+        mockMvc.perform(put("/api/family").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(snapshot)))
+                .andExpect(status().isOk());
+        // A separate request reloads the collections from the database.
+        mockMvc.perform(get("/api/family"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.marriages[0].rank").value(2))
+                .andExpect(jsonPath("$.marriages[0].childrenIds[0]").value("child"))
+                .andExpect(jsonPath("$.marriages[0].childrenIds[1]").value("a-sibling"));
+    }
+
     @BeforeEach
     void clearFamily() throws Exception {
         mockMvc.perform(delete("/api/family")).andExpect(status().isNoContent());
