@@ -140,7 +140,7 @@ public class FamilySnapshotService {
         clearStoredTree(treeId);
     }
 
-    private void validate(FamilySnapshotDTO snapshot) {
+    public void validate(FamilySnapshotDTO snapshot) {
         if (snapshot.version() != CURRENT_VERSION) {
             throw new IllegalArgumentException("Unsupported family snapshot version: " + snapshot.version());
         }

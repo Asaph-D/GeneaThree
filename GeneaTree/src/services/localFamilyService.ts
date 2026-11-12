@@ -1,4 +1,6 @@
 import { Marriage, Person } from '../types/family';
+import { assertTreeEditable } from './treePermissions';
+import { predefinedCatalogIndex } from './predefinedCatalogIndex';
 
 const LEGACY_SNAPSHOT_KEY = 'geneatree.family.snapshot';
 const REGISTRY_KEY = 'geneatree.trees.v1';
@@ -11,7 +13,7 @@ const STORE_NAME = 'snapshots';
 
 export interface FamilySnapshot { persons: Person[]; marriages: Marriage[]; }
 export type LocalTreeRole = 'OWNER' | 'COLLABORATOR' | 'READER';
-export interface LocalTreeRecord { id: string; name: string; role: LocalTreeRole; source: 'created' | 'imported' | 'shared'; createdAt: string; updatedAt: string; }
+export interface LocalTreeRecord { id: string; name: string; role: LocalTreeRole; source: 'created' | 'imported' | 'shared'; predefinedId?: string; predefinedFocusId?: string; createdAt: string; updatedAt: string; }
 export interface FamilyRevision { id: string; treeId: string; savedAt: string; personCount: number; }
 export type FamilySaveState = 'saving' | 'saved' | 'error';
 
@@ -25,7 +27,13 @@ function parseSnapshot(raw: string | null): FamilySnapshot {
 }
 
 function readRegistry(): LocalTreeRecord[] {
-  try { const value = JSON.parse(localStorage.getItem(REGISTRY_KEY) || '[]'); return Array.isArray(value) ? value : []; }
+  try {
+    const value = JSON.parse(localStorage.getItem(REGISTRY_KEY) || '[]');
+    return Array.isArray(value) ? value.map((tree: LocalTreeRecord) => {
+      const origin = tree.source === 'imported' && !tree.predefinedId ? predefinedCatalogIndex[tree.name] : null;
+      return origin ? { ...tree, role: 'READER' as const, predefinedId: origin.id, predefinedFocusId: origin.focusId } : tree;
+    }) : [];
+  }
   catch { return []; }
 }
 
@@ -97,9 +105,9 @@ export function selectLocalTree(treeId: string): FamilySnapshot {
   return loadLocalFamily();
 }
 
-export async function createLocalTree(name: string, snapshot: FamilySnapshot = emptySnapshot(), source: LocalTreeRecord['source'] = 'created'): Promise<LocalTreeRecord> {
+export async function createLocalTree(name: string, snapshot: FamilySnapshot = emptySnapshot(), source: LocalTreeRecord['source'] = 'created', predefined?: { id: string; focusId: string }): Promise<LocalTreeRecord> {
   const now = new Date().toISOString();
-  const tree: LocalTreeRecord = { id: crypto.randomUUID(), name: name.trim() || 'Arbre sans titre', role: 'OWNER', source, createdAt: now, updatedAt: now };
+  const tree: LocalTreeRecord = { id: crypto.randomUUID(), name: name.trim() || 'Arbre sans titre', role: predefined ? 'READER' : 'OWNER', source, ...(predefined ? { predefinedId: predefined.id, predefinedFocusId: predefined.focusId } : {}), createdAt: now, updatedAt: now };
   await writeIndexedSnapshot(tree.id, snapshot);
   purgeDuplicatedSnapshots();
   writeRegistry([tree, ...ensureRegistry()]);
@@ -126,7 +134,7 @@ export async function loadPersistentLocalFamily(): Promise<FamilySnapshot> {
 
 export async function saveLocalFamily(persons: Person[], marriages: Marriage[]): Promise<void> {
   const tree = getCurrentLocalTree();
-  if (tree.role === 'READER') throw new Error('Cet arbre est accessible en lecture seule.');
+  assertTreeEditable(tree);
   window.dispatchEvent(new CustomEvent('geneatree:save-state', { detail: 'saving' satisfies FamilySaveState }));
   try {
     await writeIndexedSnapshot(tree.id, { persons, marriages });

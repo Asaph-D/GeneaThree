@@ -68,6 +68,14 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
     return (person.childrenIds ?? []).filter((childId) => byId.has(childId) && !marriedChildren.has(childId));
   }
 
+  function mixedHouseholds(id: string, households: Marriage[]): boolean {
+    return looseKids(id).length > 0 || households.some(union => looseKids(union.spouse2Id).length > 0);
+  }
+
+  function childrenWidth(children: string[], depth: number): number {
+    return Math.max(CARD_W, children.reduce((sum, childId, index) => sum + measure(childId, depth) + (index ? GAP : 0), 0));
+  }
+
   function measure(id: string, depth: number): number {
     if (!byId.has(id) || depth > maxDepth || measuring.has(id)) return CARD_W;
     if (placed.has(id)) return CARD_W;
@@ -87,7 +95,10 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
     }
     measuring.add(id);
     let width = CARD_W;
-    if (households.length === 1) {
+    const loose = looseKids(id);
+    if (mixedHouseholds(id, households)) {
+      width = childrenWidth(loose, depth + 1) + households.reduce((sum, household) => sum + GAP + measureColumn(household, depth), 0);
+    } else if (households.length === 1) {
       width = measurePair(households[0], depth);
     } else if (households.length === 2) {
       width = measureColumn(households[0], depth) + GAP + CARD_W + GAP + measureColumn(households[1], depth);
@@ -103,7 +114,10 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
 
   function measureColumn(marriage: Marriage, depth: number): number {
     const children = kidsOf(marriage);
-    if (depth + 1 > maxDepth || children.length === 0) return CARD_W;
+    const spouseChildren = looseKids(marriage.spouse2Id);
+    if (depth + 1 > maxDepth) return CARD_W;
+    if (spouseChildren.length) return childrenWidth(children, depth + 1) + GAP + childrenWidth(spouseChildren, depth + 1);
+    if (children.length === 0) return CARD_W;
     let width = 0;
     children.forEach((id, index) => {
       width += measure(id, depth + 1);
@@ -177,6 +191,35 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
       placed.add(id);
       placeChildren(looseKids(id), left, width, depth + 1);
       return { x, y };
+    }
+
+    // A person can have children whose other parent is unknown as well as
+    // children assigned to unions. Reserve an independent column for each;
+    // previously the unassigned branch disappeared as soon as a union existed.
+    const loose = looseKids(id);
+    if (mixedHouseholds(id, households)) {
+      const ownWidth = childrenWidth(loose, depth + 1);
+      const columns = households.map(household => measureColumn(household, depth));
+      const ownLeft = households.length === 2 ? left + columns[0] + GAP : left;
+      const anchorX = ownLeft + ownWidth / 2;
+      nodes.push({ person, x: anchorX, y, depth: generation });
+      placed.add(id);
+      let columnLeft = households.length === 2 ? left : ownLeft + ownWidth + GAP;
+      households.forEach((marriage, index) => {
+        if (households.length === 2 && index === 1) columnLeft = ownLeft + ownWidth + GAP;
+        const spouse = byId.get(marriage.spouse2Id)!;
+        if (!placed.has(spouse.id)) {
+          nodes.push({ person: spouse, x: columnLeft + columns[index] / 2, y, depth: generationById.get(spouse.id) ?? generation });
+          placed.add(spouse.id);
+        }
+        const spouseChildren = looseKids(spouse.id);
+        const unionWidth = spouseChildren.length ? childrenWidth(kidsOf(marriage), depth + 1) : columns[index];
+        placeChildren(familyOrderedChildren(id, marriage), columnLeft, unionWidth, depth + 1);
+        if (spouseChildren.length) placeChildren(spouseChildren, columnLeft + unionWidth + GAP, childrenWidth(spouseChildren, depth + 1), depth + 1);
+        columnLeft += columns[index] + GAP;
+      });
+      placeChildren(loose, ownLeft, ownWidth, depth + 1);
+      return { x: anchorX, y };
     }
 
     if (households.length === 1) {
@@ -303,17 +346,18 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
     const anchor = positioned.get(person.id);
     if (!anchor) return;
     const households = householdsOf(person.id).filter((union) => positioned.has(union.spouse2Id));
-    if (households.length > 1) {
+    const rail = households.length > 1 || (households.length > 0 && mixedHouseholds(person.id, households));
+    if (rail) {
       const xs = [anchor.x, ...households.map((union) => positioned.get(union.spouse2Id)!.x)];
       unions.push({ x1: Math.min(...xs), x2: Math.max(...xs), y: anchor.y + 100, rail: true, ticks: xs.map((x) => ({ x })) });
     }
     households.forEach((union) => {
       const spouse = positioned.get(union.spouse2Id)!;
-      if (households.length === 1) {
+      if (!rail) {
         unions.push({ x1: Math.min(anchor.x, spouse.x) + 28, x2: Math.max(anchor.x, spouse.x) - 28, y: anchor.y, rail: false, ticks: [] });
       }
       const children = kidsOf(union).map((id) => positioned.get(id)).filter((node): node is BandNode => Boolean(node));
-      if (children.length) drops.push(childStem(households.length > 1 ? spouse.x : (anchor.x + spouse.x) / 2, anchor.y + (households.length > 1 ? 100 : 0), children));
+      if (children.length) drops.push(childStem(rail ? spouse.x : (anchor.x + spouse.x) / 2, anchor.y + (rail ? 100 : 0), children));
     });
     const loose = looseKids(person.id).map((id) => positioned.get(id)).filter((node): node is BandNode => Boolean(node));
     if (loose.length) drops.push(childStem(anchor.x, anchor.y + 36, loose));

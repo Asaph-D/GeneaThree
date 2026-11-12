@@ -1,5 +1,6 @@
 import { createClient, Session, User } from '@supabase/supabase-js';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { setTreeEditorSession } from '../services/treePermissions';
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const anonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) as string | undefined;
@@ -29,6 +30,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(Boolean(supabase));
   const [authError, setAuthError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setTreeEditorSession(session?.user.email ?? null, session?.access_token ?? null);
+    return () => setTreeEditorSession(null, null);
+  }, [session]);
 
   useEffect(() => {
     const query = new URLSearchParams(window.location.search);

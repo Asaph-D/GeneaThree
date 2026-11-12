@@ -19,6 +19,7 @@ interface PersonProfileCardProps {
   onEnter: () => void;
   onLeave: () => void;
   leaving?: boolean;
+  canEdit?: boolean;
   onPersonUpdate: (person: Person) => Promise<void>;
   onEdit: (person: Person) => void;
   onAddPerson: (relatedPersonId: string, relationshipType: 'child' | 'parent' | 'spouse') => void;
@@ -26,6 +27,7 @@ interface PersonProfileCardProps {
 }
 
 const PersonProfileCard: React.FC<PersonProfileCardProps> = ({
+  canEdit = true,
   person,
   anchor,
   familyData,
@@ -98,6 +100,7 @@ const PersonProfileCard: React.FC<PersonProfileCardProps> = ({
       </div>
       <div className="max-h-[calc(min(72vh,620px)-3rem)] overflow-y-auto overscroll-contain px-3 py-2">
         <PersonInfoPanel
+          canEdit={canEdit}
           selectedPerson={person}
           familyData={familyData}
           onPersonUpdate={onPersonUpdate}

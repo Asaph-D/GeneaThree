@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Clock3, HelpCircle, Mic, RotateCcw, Send, SkipForward, Undo2 } from 'lucide-react';
 import TreeVisualization from '../components/demo/TreeVisualization';
 import { loadFamily, saveFamily } from '../services/familyGateway';
 import { GenderType, Location, Marriage, Person } from '../types/family';
-import { getCurrentLocalTree, listFamilyRevisions, listLocalTrees, selectLocalTree } from '../services/localFamilyService';
+import { createLocalTree, getCurrentLocalTree, listFamilyRevisions, listLocalTrees, selectLocalTree } from '../services/localFamilyService';
 import HelpExperience from '../components/help/HelpExperience';
+import { useAuth } from '../auth/AuthContext';
+import { canEditTree } from '../services/treePermissions';
+import { familyGenerationCount } from '../components/demo/bandLayout';
 
 type Phase =
   | 'anchor-first' | 'anchor-last' | 'anchor-gender' | 'anchor-birth' | 'anchor-city'
@@ -22,7 +25,8 @@ type KinKind =
   | 'cousin' | 'cousine'
   | 'collateral-spouse'
   | 'node-spouse'
-  | 'node-child';
+  | 'node-child'
+  | 'node-parent';
 
 interface Bits {
   id: string;
@@ -67,6 +71,8 @@ interface Draft {
   branches: Branch[];
   extraSpouses: AttachedSpouse[];
   extraChildren: AttachedChild[];
+  extraParents?: { childId: string; parent: Bits }[];
+  linkedPeople?: Bits[];
 }
 
 interface Pending {
@@ -83,6 +89,8 @@ interface Pending {
 }
 
 interface AssistantSession {
+  treeId?: string;
+  editingSavedTree?: boolean;
   phase: Phase;
   draft: Draft;
   pending: Pending;
@@ -98,6 +106,7 @@ function readAssistantSession(): AssistantSession | null {
   }
   try {
     const parsed = JSON.parse(localStorage.getItem(ASSISTANT_SESSION_KEY) || 'null') as AssistantSession | null;
+    if (parsed?.editingSavedTree && parsed.treeId !== getCurrentLocalTree().id) return null;
     return parsed?.draft?.anchor?.id ? parsed : null;
   } catch {
     return null;
@@ -371,6 +380,10 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
     });
   };
 
+  for (const person of [...(draft.linkedPeople ?? []), ...(draft.extraParents ?? []).map(item => item.parent)]) {
+    ensure(person, { parentIds: [], childrenIds: [], spouseIds: [], siblingIds: [] });
+  }
+
   const siblingIds = draft.siblings.map((sibling) => sibling.id);
   const anchorParents = orderedParents(draft);
   const anchorParentIds = anchorParents.map((parent) => parent.id);
@@ -489,11 +502,12 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
   });
 
   draft.extraSpouses.forEach((item) => {
-    if (people.has(item.spouse.id)) return;
     const host = people.get(item.hostId);
     if (host) host.spouseIds = uniq([...host.spouseIds, item.spouse.id]);
     ensure(item.spouse, { parentIds: [], childrenIds: [], spouseIds: [item.hostId], siblingIds: [] });
-    addMarriage(item.hostId, item.spouse.id, item.spouse.rank, []);
+    const exists = marriages.some(union => (union.spouse1Id === item.hostId && union.spouse2Id === item.spouse.id)
+      || (union.spouse2Id === item.hostId && union.spouse1Id === item.spouse.id));
+    if (!exists) addMarriage(item.hostId, item.spouse.id, item.spouse.rank, []);
   });
 
   draft.extraChildren.forEach((item) => {
@@ -508,6 +522,14 @@ function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] }
     }
   });
 
+  for (const item of draft.extraParents ?? []) {
+    const child = people.get(item.childId);
+    const parent = people.get(item.parent.id);
+    if (child && parent) {
+      child.parentIds = uniq([...child.parentIds, parent.id]);
+      parent.childrenIds = uniq([...parent.childrenIds, child.id]);
+    }
+  }
   return { persons: [...people.values()], marriages };
 }
 
@@ -673,6 +695,8 @@ function hostPerson(draft: Draft, id: string): Bits | undefined {
     ...draft.children,
     ...draft.extraSpouses.map((item) => item.spouse),
     ...draft.extraChildren.map((item) => item.child),
+    ...(draft.extraParents ?? []).map((item) => item.parent),
+    ...(draft.linkedPeople ?? []),
   ];
   draft.branches.forEach((branch) => {
     if (branch.grandfather) pools.push(branch.grandfather);
@@ -748,6 +772,14 @@ function finishKin(draft: Draft, source: Pending): { draft: Draft; phase: Phase;
     };
   }
 
+  if (source.kin === 'node-parent' && source.hostId) {
+    const parent = { ...emptyBits(uid('pa')), ...bits };
+    if (source.hostId === draft.anchor.id && draft.parents.length < 2) {
+      return { ...done, draft: { ...draft, parents: [...draft.parents, parent] } };
+    }
+    return { ...done, draft: { ...draft, extraParents: [...(draft.extraParents ?? []), { childId: source.hostId, parent }] } };
+  }
+
   if (source.kin === 'node-spouse' && source.hostId) {
     const spouse = { ...emptyBits(uid('sp')), ...bits, rank: hostSpouses(draft, source.hostId).length + 1 };
     if (source.hostId === draft.anchor.id) {
@@ -802,7 +834,12 @@ function finishKin(draft: Draft, source: Pending): { draft: Draft; phase: Phase;
 }
 const AssistantPage: React.FC = () => {
   const navigate = useNavigate();
-  const [openedFromDemo] = useState(() => new URLSearchParams(window.location.search).get('from') === 'demo');
+  const location = useLocation();
+  const openedFromDemo = new URLSearchParams(location.search).get('from') === 'demo';
+  const { user } = useAuth();
+  const currentTreeEditable = canEditTree(getCurrentLocalTree(), user?.email ?? null);
+  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null);
+  const [showTree, setShowTree] = useState(false);
   const [initialSession] = useState(readAssistantSession);
   const [anchorId] = useState(() => initialSession?.draft.anchor.id ?? uid('as'));
   const [phase, setPhase] = useState<Phase>(initialSession?.phase ?? 'anchor-first');
@@ -829,7 +866,7 @@ const AssistantPage: React.FC = () => {
   const [savedTreeSize, setSavedTreeSize] = useState(0);
   const [baseFamily, setBaseFamily] = useState<{ persons: Person[]; marriages: Marriage[] }>({ persons: [], marriages: [] });
   const [savedFamily, setSavedFamily] = useState<{ persons: Person[]; marriages: Marriage[] } | null>(null);
-  const [editingSavedTree, setEditingSavedTree] = useState(openedFromDemo);
+  const [editingSavedTree, setEditingSavedTree] = useState(openedFromDemo || Boolean(initialSession?.editingSavedTree));
   const spokenRef = useRef('');
   const threadRef = useRef<HTMLDivElement>(null);
 
@@ -840,6 +877,7 @@ const AssistantPage: React.FC = () => {
     if (!loadedDraft) return;
     setBaseFamily(snapshot);
     setDraft(loadedDraft);
+    setSelectedNodeId(loadedDraft.anchor.id);
     setPhase('grow');
     setPending(freshPending());
     setHistory([]);
@@ -862,18 +900,23 @@ const AssistantPage: React.FC = () => {
   }, [messages]);
 
   useEffect(() => {
+    let cancelled = false;
     void loadFamily()
       .then((snapshot) => {
+        if (cancelled) return;
         setSavedTreeSize(snapshot.persons.length);
         setSavedFamily(snapshot);
-        if (openedFromDemo) hydrateSavedFamily(snapshot);
+        if (initialSession?.editingSavedTree && initialSession.treeId === getCurrentLocalTree().id) {
+          setBaseFamily(snapshot);
+        } else if (openedFromDemo) hydrateSavedFamily(snapshot);
       })
       .catch(() => setSavedTreeSize(0));
-  }, [hydrateSavedFamily, openedFromDemo]);
+    return () => { cancelled = true; };
+  }, [hydrateSavedFamily, openedFromDemo, initialSession]);
 
   useEffect(() => {
-    localStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify({ phase, draft, pending, messages } satisfies AssistantSession));
-  }, [phase, draft, pending, messages]);
+    localStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify({ phase, draft, pending, messages, treeId: getCurrentLocalTree().id, editingSavedTree } satisfies AssistantSession));
+  }, [phase, draft, pending, messages, editingSavedTree]);
 
   const family = useMemo(() => buildFamily(draft), [draft]);
   const workingFamily = useMemo(() => mergeFamilies(baseFamily, family), [baseFamily, family]);
@@ -885,6 +928,7 @@ const AssistantPage: React.FC = () => {
   };
 
   const go = (next: Phase, nextDraft = draft, nextPending = pending, keep = '') => {
+    if (editingSavedTree && !currentTreeEditable) return;
     const said = spokenRef.current;
     spokenRef.current = '';
     remember();
@@ -893,10 +937,10 @@ const AssistantPage: React.FC = () => {
     setPhase(next);
     setText('');
     setNotice(keep);
-    setHelpOpen(false);
+    setHelpExperienceOpen(false);
     if (said) {
       let follow = promptFor(next, nextDraft, nextPending);
-      if (next === 'grow') follow = 'L’arbre peut s’ouvrir. Les liens sont rangés en dessous.';
+      if (next === 'grow') follow = 'Sélectionnez une personne dans l’arbre, puis ajoutez son parent, son enfant ou son conjoint.';
       if (next === 'parent-first' && nextPending.kin) follow = 'Pour le placer dans l’arbre, un parent d’abord. Quel est son prénom ?';
       setMessages((items) => [...items, { role: 'user', text: said }, { role: 'assistant', text: follow }]);
     }
@@ -908,7 +952,7 @@ const AssistantPage: React.FC = () => {
         beginKin(value.slice(4) as KinKind);
         return;
       }
-      setNotice('Choisissez un lien sous le message, ou ouvrez l’arbre.');
+      setNotice('Sélectionnez une personne, puis choisissez le lien à ajouter.');
       return;
     }
     const read = interpret(phase, value, optional, draft, pending);
@@ -940,7 +984,7 @@ const AssistantPage: React.FC = () => {
         go('anchor-city', { ...draft, anchor: { ...anchor, birthDate: clean } });
         return;
       case 'anchor-city':
-        go('spouse-ask', { ...draft, anchor: { ...anchor, city: clean } });
+        go('grow', { ...draft, anchor: { ...anchor, city: clean } });
         return;
       case 'spouse-ask':
         go(value === 'oui' ? 'spouse-first' : 'child-ask', draft, freshPending());
@@ -1167,6 +1211,31 @@ const AssistantPage: React.FC = () => {
     go('kin-side', draft, base);
   };
 
+  const beginNodeRelation = (hostId: string, relation: 'child' | 'parent' | 'spouse') => {
+    if (phase !== 'grow' || (editingSavedTree && !currentTreeEditable)) return;
+    const host = workingFamily.persons.find(person => person.id === hostId);
+    if (!host) return;
+    if (relation === 'parent' && host.parentIds.length >= 2) {
+      setNotice('Deux parents sont déjà renseignés pour cette personne.');
+      return;
+    }
+    const knownSpouses = workingFamily.marriages.filter(m => m.spouse1Id === hostId || m.spouse2Id === hostId)
+      .flatMap(m => {
+        const person = workingFamily.persons.find(p => p.id === (m.spouse1Id === hostId ? m.spouse2Id : m.spouse1Id));
+        return person ? [{ ...bitsFromPerson(person), rank: m.rank ?? 1 }] : [];
+      });
+    const knownIds = new Set(hostSpouses(draft, hostId).map(p => p.id));
+    const nextDraft = { ...draft,
+      linkedPeople: [...(draft.linkedPeople ?? []), bitsFromPerson(host)],
+      extraSpouses: [...draft.extraSpouses, ...knownSpouses.filter(p => !knownIds.has(p.id)).map(spouse => ({ hostId, spouse }))],
+    };
+    const nextPending = { ...freshPending(), kin: `node-${relation}` as KinKind, hostId };
+    setSelectedNodeId(hostId);
+    setShowTree(false);
+    spokenRef.current = `Ajouter un ${relation === 'child' ? 'enfant' : relation === 'parent' ? 'parent' : 'conjoint'} de ${fullName(host)}`;
+    go(relation === 'child' && knownSpouses.length ? 'kin-union' : 'kin-first', nextDraft, nextPending);
+  };
+
   const back = () => {
     const previous = history[history.length - 1];
     if (!previous) return;
@@ -1188,7 +1257,7 @@ const AssistantPage: React.FC = () => {
     setHistory([]);
     setText('');
     setNotice('');
-    setHelpOpen(false);
+    setHelpExperienceOpen(false);
     setMessages([{ role: 'assistant', text: 'Quel est le prénom qui ouvre l’arbre ?' }]);
   };
 
@@ -1214,7 +1283,13 @@ const AssistantPage: React.FC = () => {
     try {
       localStorage.setItem('geneatree.example', 'custom');
       localStorage.setItem('focusPerson', draft.anchor.id);
-      await saveFamily(workingFamily.persons, workingFamily.marriages);
+      if (editingSavedTree) {
+        if (!currentTreeEditable) throw new Error('Cet arbre est en lecture seule.');
+        await saveFamily(workingFamily.persons, workingFamily.marriages);
+      } else {
+        await createLocalTree(`Arbre de ${fullName(draft.anchor)}`, workingFamily);
+      }
+      localStorage.setItem('geneatree.demo.view', JSON.stringify({ viewType: 'tree', generations: Math.max(4, familyGenerationCount(workingFamily.persons, workingFamily.marriages)), focusPersonId: draft.anchor.id }));
       localStorage.removeItem(ASSISTANT_SESSION_KEY);
       navigate('/demo');
     } catch (error) {
@@ -1223,11 +1298,23 @@ const AssistantPage: React.FC = () => {
     }
   };
 
-  const chips = chipsFor(phase, draft, optional, pending);
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get('new') === '1') {
+      resetDraft();
+      navigate('/assistant', { replace: true });
+    }
+    // A new-tree request is consumed once; subsequent reloads resume the draft.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, navigate]);
+
+  const selectedNode = workingFamily.persons.find(person => person.id === selectedNodeId) ?? workingFamily.persons.find(person => person.id === draft.anchor.id);
+  const readOnly = editingSavedTree && !currentTreeEditable;
+  const chips = readOnly ? [] : chipsFor(phase, draft, optional, pending);
+
 
   return (
     <div className="flex h-full overflow-hidden bg-[#f4f1ea] dark:bg-[#09090b]">
-      <section className="relative flex h-full w-full shrink-0 flex-col border-zinc-200/80 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85 md:max-w-md md:border-r">
+      <section className={`${showTree ? 'hidden md:flex' : 'flex'} relative h-full w-full shrink-0 flex-col border-zinc-200/80 bg-white/80 backdrop-blur-xl dark:border-white/10 dark:bg-zinc-950/85 md:max-w-md md:border-r`}>
         <div className="pointer-events-none absolute h-28 w-full bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.22),transparent_70%)]" />
         <div data-tour="assistant-history" className="relative flex items-center justify-between border-b border-zinc-200/80 px-4 py-3 dark:border-white/10">
           <span className="sr-only">{labelFor(kind)}</span>
@@ -1244,6 +1331,7 @@ const AssistantPage: React.FC = () => {
             </button>
           </div>
         )}
+        {readOnly && <p role="status" className="p-4 text-sm">Cet arbre prédéfini est en lecture seule. <button className="underline" onClick={() => navigate('/demo')}>Revenir à l’arbre</button> ou <button className="underline" onClick={() => navigate('/assistant?new=1')}>créer un nouvel arbre</button>.</p>}
         <div ref={threadRef} data-tour="assistant-thread" className="relative flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
           {messages.map((message, index) => (
             <div key={`${message.role}-${index}`} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -1261,31 +1349,36 @@ const AssistantPage: React.FC = () => {
                 {chip.label}
               </button>
             ))}
-            {phase === 'grow' && (
+            {phase === 'grow' && !readOnly && (
               <div className="mb-2 w-full space-y-1.5">
                 <button type="button" disabled={saving || workingFamily.persons.length === 0} onClick={openDemo} className="rounded-full bg-zinc-950 px-3 py-1.5 text-xs text-white disabled:opacity-50 dark:bg-white dark:text-zinc-950">
                   {saving ? 'Ouverture…' : 'Ouvrir l’arbre'}
                 </button>
-                <div className="flex w-full snap-x snap-mandatory gap-1.5 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-color:rgb(161_161_170)_transparent] [scrollbar-width:thin]">
-                  {([['brother', 'Frère'], ['sister', 'Sœur'], ['grandfather', 'Grand-père'], ['grandmother', 'Grand-mère'], ['uncle', 'Oncle'], ['aunt', 'Tante'], ['collateral-spouse', 'Conjoint'], ['cousin', 'Cousin'], ['cousine', 'Cousine'], ['node-spouse', 'Ajouter un conjoint'], ['node-child', 'Ajouter un enfant']] as const).map(([kin, label]) => (
-                    <button key={kin} type="button" onClick={() => beginKin(kin)} className="shrink-0 snap-start rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs text-zinc-800 shadow-sm hover:border-primary-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100">
-                      {label}
-                    </button>
-                  ))}
+                <label className="block text-xs text-zinc-500" htmlFor="assistant-selected-person">Personne sélectionnée</label>
+                <select id="assistant-selected-person" value={selectedNode?.id ?? ''} onChange={event => setSelectedNodeId(event.target.value)} className="w-full rounded-xl border border-zinc-300 bg-white p-2 text-sm dark:border-zinc-700 dark:bg-zinc-900">
+                  {workingFamily.persons.map(person => <option key={person.id} value={person.id}>{fullName(person)}</option>)}
+                </select>
+                <button type="button" className="text-xs underline md:hidden" onClick={() => setShowTree(true)}>Choisir dans l’arbre</button>
+                <div className="flex flex-wrap gap-2">
+                  {(['parent', 'child', 'spouse'] as const).map(relation => <button key={relation} type="button" disabled={!selectedNode || (relation === 'parent' && selectedNode.parentIds.length >= 2)} onClick={() => selectedNode && beginNodeRelation(selectedNode.id, relation)} className="rounded-xl border border-zinc-300 px-3 py-2 text-xs disabled:opacity-40 dark:border-zinc-700">
+                    Ajouter un {relation === 'child' ? 'enfant' : relation === 'parent' ? 'parent' : 'conjoint'}
+                  </button>)}
                 </div>
+                <p className="text-xs text-zinc-500">Pour ajouter un cousin, sélectionnez son parent, puis « Ajouter un enfant ».</p>
               </div>
             )}
           </div>
           <form className="flex items-center gap-2" onSubmit={(event) => { event.preventDefault(); answer(text); }}>
             <input
               autoFocus
+              disabled={readOnly || phase === 'grow'}
               type={kind === 'date' ? 'date' : 'text'}
               value={text}
               onChange={(event) => setText(event.target.value)}
-              placeholder={phase === 'grow' ? 'Ou choisissez un lien' : 'Écrire la réponse'}
+              placeholder={phase === 'grow' ? 'Sélectionnez une personne et un lien' : 'Écrire la réponse'}
               className="min-w-0 flex-1 rounded-full border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-900 outline-none focus:border-primary-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
             />
-            <button type="submit" aria-label="Envoyer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
+            <button type="submit" disabled={readOnly || phase === 'grow'} aria-label="Envoyer" className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-zinc-950 text-white dark:bg-white dark:text-zinc-950">
               <Send className="h-4 w-4" />
             </button>
           </form>
@@ -1294,11 +1387,12 @@ const AssistantPage: React.FC = () => {
             <ToolButton label="Passer" disabled={!optional} onClick={() => answer('')}><SkipForward className="h-3.5 w-3.5" /></ToolButton>
             <ToolButton label="Dicter" onClick={listen}><Mic className="h-3.5 w-3.5" /></ToolButton>
             <ToolButton label="Aide" onClick={() => setHelpExperienceOpen(true)}><HelpCircle className="h-3.5 w-3.5" /></ToolButton>
-            <ToolButton label="Recommencer" onClick={resetDraft}><RotateCcw className="h-3.5 w-3.5" /></ToolButton>
+            <ToolButton label="Recommencer" onClick={() => navigate('/assistant?new=1')}><RotateCcw className="h-3.5 w-3.5" /></ToolButton>
           </div>
         </div>
       </section>
-      <div data-tour="assistant-preview" className="relative hidden min-w-0 flex-1 md:block">
+      <div data-tour="assistant-preview" className={`${showTree ? 'block' : 'hidden'} relative min-w-0 flex-1 md:block`}>
+        <button type="button" onClick={() => setShowTree(false)} className="absolute bottom-20 left-4 z-40 rounded-xl bg-primary-600 px-3 py-2 text-sm text-white md:hidden">Revenir aux questions</button>
         <div className="pointer-events-none absolute left-4 top-4 z-30 flex flex-col gap-2">
           <span className="pointer-events-auto rounded-full border border-white/70 bg-white/85 px-3 py-1 text-xs text-zinc-700 shadow-sm backdrop-blur dark:border-white/10 dark:bg-zinc-950/80 dark:text-zinc-200">
             {workingFamily.persons.length} personne{workingFamily.persons.length > 1 ? 's' : ''}
@@ -1316,13 +1410,14 @@ const AssistantPage: React.FC = () => {
         </button>
         {workingFamily.persons.length > 0 ? (
           <TreeVisualization
+            key={showTree ? 'visible-tree' : 'preview-tree'}
             viewType="tree"
-            generations={5}
-            focusPerson={draft.anchor.id}
+            generations={Math.max(5, familyGenerationCount(workingFamily.persons, workingFamily.marriages))}
+            focusPerson={selectedNode?.id ?? draft.anchor.id}
             familyData={workingFamily.persons}
             marriagesData={workingFamily.marriages}
-            onPersonSelect={() => undefined}
-            onAddPersonClick={() => undefined}
+            onPersonSelect={(person) => { if (phase === 'grow') { setSelectedNodeId(person.id); setShowTree(false); setNotice(`Personne sélectionnée : ${fullName(person)}`); } }}
+            onAddPersonClick={beginNodeRelation}
             onDeletePerson={() => undefined}
           />
         ) : (
@@ -1358,6 +1453,7 @@ function kinLabel(kin: KinKind) {
     'collateral-spouse': 'Conjoint',
     'node-spouse': 'Ajouter un conjoint',
     'node-child': 'Ajouter un enfant',
+    'node-parent': 'Ajouter un parent',
   };
   return labels[kin];
 }
@@ -1418,7 +1514,7 @@ function promptFor(phase: Phase, draft: Draft, pending?: Pending) {
     case 'parent2-first': return 'Quel est le prénom de l’autre parent ?';
     case 'parent2-last': return 'Quel est le nom de l’autre parent ?';
     case 'parent2-gender': return 'Quel genre pour l’autre parent ?';
-    case 'grow': return 'L’arbre peut s’ouvrir. Les liens sont rangés en dessous : fratrie, grands-parents, oncles et tantes, leur conjoint, cousins, ou un conjoint et un enfant pour une personne déjà présente.';
+    case 'grow': return 'Sélectionnez une personne dans l’arbre, puis ajoutez son parent, son enfant ou son conjoint.';
     case 'kin-side': return 'Ce lien est du côté de quel parent ?';
     case 'kin-link-role': return `Qui est le parent commun de ${parent} et de cette personne ?`;
     case 'kin-link': return pending?.linkAs === 'female' ? `Quel est le prénom de la mère de ${parent} ?` : `Quel est le prénom du père de ${parent} ?`;
@@ -1443,6 +1539,7 @@ function promptFor(phase: Phase, draft: Draft, pending?: Pending) {
       if (pending?.kin === 'grandfather') return `Quel est le prénom du père de ${parent} ?`;
       if (pending?.kin === 'collateral-spouse' || pending?.kin === 'node-spouse') return `Quel est le prénom du conjoint de ${namedHost(draft, pending)} ?`;
       if (pending?.kin === 'node-child') return `Quel est le prénom de l’enfant de ${namedHost(draft, pending)} ?`;
+      if (pending?.kin === 'node-parent') return `Quel est le prénom du parent de ${namedHost(draft, pending)} ?`;
       return 'Quel est le prénom ?';
     default: return 'Le lignage est prêt.';
   }

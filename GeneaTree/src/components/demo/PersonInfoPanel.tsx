@@ -4,6 +4,7 @@ import { Location, Person } from '../../types/family';
 
 export interface PersonInfoPanelProps {
   selectedPerson: Person | null;
+  canEdit?: boolean;
   onPersonUpdate: (person: Person) => Promise<void>;
   onEdit: (person: Person) => void;
   onAddPerson: (relatedPersonId: string, relationshipType: "child" | "parent" | "spouse") => void;
@@ -12,6 +13,7 @@ export interface PersonInfoPanelProps {
 }
 
 const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
+  canEdit = true,
   selectedPerson,
   onPersonUpdate,
   onEdit,
@@ -24,7 +26,7 @@ const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = '';
-    if (!file || !selectedPerson) return;
+    if (!canEdit || !file || !selectedPerson) return;
     if (!file.type.startsWith('image/')) return;
     if (file.size > 1_500_000) {
       window.alert('Choisissez une image de moins de 1,5 Mo.');
@@ -136,6 +138,7 @@ const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
             </h4>
           </div>
           <button
+            disabled={!canEdit}
             onClick={() => onAddPerson(selectedPerson.id, 'parent')}
             className="flex items-center px-2 py-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
           >
@@ -186,6 +189,7 @@ const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
             </h4>
           </div>
           <button
+            disabled={!canEdit}
             onClick={() => onAddPerson(selectedPerson.id, 'spouse')}
             className="flex items-center px-2 py-1 text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
           >
@@ -236,6 +240,7 @@ const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
             </h4>
           </div>
           <button
+            disabled={!canEdit}
             onClick={() => onAddPerson(selectedPerson.id, 'child')}
             className="flex items-center px-2 py-1 text-xs text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
           >
@@ -332,9 +337,10 @@ const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
               </div>
             )}
             <button
+            disabled={!canEdit}
               type="button"
               onClick={() => photoInputRef.current?.click()}
-              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white bg-zinc-950 text-white shadow-md hover:bg-zinc-800 dark:border-zinc-800"
+              className="disabled:cursor-not-allowed disabled:opacity-40 absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border border-white bg-zinc-950 text-white shadow-md hover:bg-zinc-800 dark:border-zinc-800"
               title="Mettre à jour la photo"
             >
               <Camera className="h-3.5 w-3.5" />
@@ -368,16 +374,18 @@ const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
               </div>
               <div className="flex space-x-2">
                 <button
+            disabled={!canEdit}
                   onClick={() => onEdit(selectedPerson)}
-                  className="flex items-center px-3 py-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-200 rounded-md hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900"
+                  className="disabled:cursor-not-allowed disabled:opacity-40 flex items-center px-3 py-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-200 rounded-md hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900"
                   title="Modifier cette personne"
                 >
                   <Edit className="w-3 h-3 mr-1" />
                   Modifier
                 </button>
                 <button
+            disabled={!canEdit}
                   onClick={() => onDeletePerson(selectedPerson.id)}
-                  className="flex items-center px-3 py-1 text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 border border-red-200 rounded-md hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900"
+                  className="disabled:cursor-not-allowed disabled:opacity-40 flex items-center px-3 py-1 text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 border border-red-200 rounded-md hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900"
                   title="Supprimer cette personne"
                 >
                   <Trash2 className="w-3 h-3 mr-1" />
@@ -469,22 +477,25 @@ const PersonInfoPanel: React.FC<PersonInfoPanelProps> = ({
           {/* Boutons d'ajout rapide */}
           <div className="flex flex-wrap gap-2 mb-4">
             <button
+            disabled={!canEdit}
               onClick={() => onAddPerson(selectedPerson.id, 'parent')}
-              className="flex items-center px-3 py-2 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-200 rounded-full hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900 transition-colors"
+              className="disabled:cursor-not-allowed disabled:opacity-40 flex items-center px-3 py-2 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 border border-blue-200 rounded-full hover:bg-blue-50 dark:border-blue-700 dark:hover:bg-blue-900 transition-colors"
             >
               <Plus className="w-3 h-3 mr-1" />
               Ajouter un parent
             </button>
             <button
+            disabled={!canEdit}
               onClick={() => onAddPerson(selectedPerson.id, 'spouse')}
-              className="flex items-center px-3 py-2 text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 border border-red-200 rounded-full hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900 transition-colors"
+              className="disabled:cursor-not-allowed disabled:opacity-40 flex items-center px-3 py-2 text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 border border-red-200 rounded-full hover:bg-red-50 dark:border-red-700 dark:hover:bg-red-900 transition-colors"
             >
               <Plus className="w-3 h-3 mr-1" />
               Ajouter un conjoint
             </button>
             <button
+            disabled={!canEdit}
               onClick={() => onAddPerson(selectedPerson.id, 'child')}
-              className="flex items-center px-3 py-2 text-xs text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 border border-green-200 rounded-full hover:bg-green-50 dark:border-green-700 dark:hover:bg-green-900 transition-colors"
+              className="disabled:cursor-not-allowed disabled:opacity-40 flex items-center px-3 py-2 text-xs text-green-600 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300 border border-green-200 rounded-full hover:bg-green-50 dark:border-green-700 dark:hover:bg-green-900 transition-colors"
             >
               <Plus className="w-3 h-3 mr-1" />
               Ajouter un enfant

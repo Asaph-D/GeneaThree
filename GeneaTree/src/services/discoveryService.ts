@@ -12,7 +12,7 @@ export async function openDiscoveryTree(record: DiscoveryTree): Promise<void> {
   if (!persons.some((person) => person.id === view.focusPersonId)) {
     throw new Error('La personne de cette fiche est absente de son arbre.');
   }
-  await createLocalTree(record.title, { persons, marriages }, 'imported');
+  await createLocalTree(record.title, { persons, marriages }, 'imported', { id: record.id, focusId: view.focusPersonId });
   localStorage.setItem('geneatree.example', 'imported');
   localStorage.setItem('geneatree.demo.view', JSON.stringify({
     ...view,

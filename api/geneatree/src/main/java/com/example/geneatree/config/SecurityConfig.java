@@ -47,6 +47,7 @@ public class SecurityConfig {
                     .maxAgeInSeconds(31536000)))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.PUT, "/api/discovery/trees/**").authenticated()
                 .requestMatchers("/api/health", "/api/auth/register", "/api/public/trees/**", "/api/discovery/**", "/api/payments/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/api/family/**", "/api/people/**", "/api/marriages/**", "/api/life-events/**").permitAll()
                 .requestMatchers("/api/**").authenticated()
@@ -73,7 +74,7 @@ public class SecurityConfig {
         try { secret = Base64.getDecoder().decode(encodedSecret); }
         catch (IllegalArgumentException ignored) { secret = encodedSecret.getBytes(java.nio.charset.StandardCharsets.UTF_8); }
 
-        NimbusJwtDecoder legacyDecoder = NimbusJwtDecoder
+        NimbusJwtDecoder legacyDecoder = encodedSecret.isBlank() ? null : NimbusJwtDecoder
                 .withSecretKey(new SecretKeySpec(secret, "HmacSHA256"))
                 .build();
         NimbusJwtDecoder jwksDecoder = NimbusJwtDecoder
@@ -89,13 +90,17 @@ public class SecurityConfig {
                 : OAuth2TokenValidatorResult.failure(new org.springframework.security.oauth2.core.OAuth2Error(
                         "invalid_token", "Supabase audience is not authenticated", null));
         var validator = new DelegatingOAuth2TokenValidator<Jwt>(JwtValidators.createDefaultWithIssuer(issuer), audience);
-        legacyDecoder.setJwtValidator(validator);
+        if (legacyDecoder != null) legacyDecoder.setJwtValidator(validator);
         jwksDecoder.setJwtValidator(validator);
 
         return token -> {
             try {
                 String algorithm = SignedJWT.parse(token).getHeader().getAlgorithm().getName();
-                return algorithm.startsWith("HS") ? legacyDecoder.decode(token) : jwksDecoder.decode(token);
+                if (algorithm.startsWith("HS")) {
+                    if (legacyDecoder == null) throw new org.springframework.security.oauth2.jwt.BadJwtException("Legacy JWT verification is not configured");
+                    return legacyDecoder.decode(token);
+                }
+                return jwksDecoder.decode(token);
             } catch (java.text.ParseException exception) {
                 throw new org.springframework.security.oauth2.jwt.JwtException("Malformed bearer token", exception);
             }

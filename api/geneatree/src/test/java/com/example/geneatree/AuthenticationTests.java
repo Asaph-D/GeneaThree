@@ -258,6 +258,48 @@ class AuthenticationTests {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    void predefinedCatalogueIsPublicButOnlyItsSupabaseOwnerCanPublishChanges() throws Exception {
+        String path = "/api/discovery/trees/saint-paul";
+        JsonNode original = objectMapper.readTree(mockMvc.perform(get(path)).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString()).path("tree");
+        var edited = original.deepCopy();
+        ((com.fasterxml.jackson.databind.node.ObjectNode) edited.path("persons").get(0)).put("biography", "Catalogue owner update");
+        mockMvc.perform(put(path).contentType(MediaType.APPLICATION_JSON).content(edited.toString()))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(put(path).header("Authorization", "Bearer " + supabaseToken("reader@example.com"))
+                        .contentType(MediaType.APPLICATION_JSON).content(edited.toString()))
+                .andExpect(status().isForbidden());
+        // Registering this address with a local password must not impersonate the Supabase owner.
+        register("kouokamasaph142@gmail.com", "strong-passphrase", "Private tree");
+        mockMvc.perform(put(path).header("Authorization", basic("kouokamasaph142@gmail.com", "strong-passphrase"))
+                        .contentType(MediaType.APPLICATION_JSON).content(edited.toString()))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put(path).header("Authorization", "Bearer " + supabaseToken("kouokamasaph142@gmail.com"))
+                        .contentType(MediaType.APPLICATION_JSON).content(edited.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.tree.persons[0].biography").value("Catalogue owner update"));
+        mockMvc.perform(get(path)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.tree.persons[0].biography").value("Catalogue owner update"));
+        mockMvc.perform(put(path).header("Authorization", "Bearer " + supabaseToken("kouokamasaph142@gmail.com"))
+                        .contentType(MediaType.APPLICATION_JSON).content(original.toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void catalogueOwnerCannotPublishDanglingRelationsOrReplaceTheSubject() throws Exception {
+        String path = "/api/discovery/trees/saint-paul";
+        var tree = objectMapper.readTree(mockMvc.perform(get(path)).andReturn().getResponse().getContentAsString()).path("tree").deepCopy();
+        ((com.fasterxml.jackson.databind.node.ArrayNode) tree.path("persons").get(0).path("parentIds")).add("missing-parent");
+        mockMvc.perform(put(path).header("Authorization", "Bearer " + supabaseToken("kouokamasaph142@gmail.com"))
+                        .contentType(MediaType.APPLICATION_JSON).content(tree.toString()))
+                .andExpect(status().isBadRequest());
+        ((com.fasterxml.jackson.databind.node.ObjectNode) tree.path("view")).put("focusPersonId", "someone-else");
+        mockMvc.perform(put(path).header("Authorization", "Bearer " + supabaseToken("kouokamasaph142@gmail.com"))
+                        .contentType(MediaType.APPLICATION_JSON).content(tree.toString()))
+                .andExpect(status().isBadRequest());
+    }
+
     private String register(String email, String password, String treeName) throws Exception {
         String response = mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)

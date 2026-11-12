@@ -47,6 +47,7 @@ try {
     bundle: true,
     platform: 'node',
     format: 'esm',
+    banner: { js: "import { createRequire } from 'node:module'; const require = createRequire(import.meta.url);" },
     treeShaking: true,
     define: { 'import.meta.env': '{}' },
     plugins: [{
@@ -57,6 +58,8 @@ try {
           return {
             contents: source
               .replace('function draftFromFamily(', 'export function draftFromFamily(')
+              .replace('function finishKin(', 'export function finishKin(')
+              .replace('function buildFamily(', 'export function buildFamily(')
               .replace('function routeKin(', 'export function routeKin('),
             loader: 'tsx',
             resolveDir: dirname(path),
@@ -67,7 +70,7 @@ try {
     logLevel: 'silent',
   });
 
-  const { draftFromFamily, routeKin } = await import(`${pathToFileURL(output).href}?v=${Date.now()}`);
+  const { draftFromFamily, routeKin, finishKin, buildFamily } = await import(`${pathToFileURL(output).href}?v=${Date.now()}`);
   const draft = draftFromFamily(people, [], 'david');
   assert.ok(draft, 'Le brouillon de David doit être construit.');
   assert.equal(draft.branches.find((branch) => branch.parentId === 'jean')?.grandfather?.id, 'paul');
@@ -81,7 +84,20 @@ try {
     { id: 'union-paul-anne', spouse1Id: 'paul', spouse2Id: 'anne', rank: 2, childrenIds: [] },
   ], 'david');
   assert.equal(routeKin('uncle', multiUnionDraft, 'jean').phase, 'kin-parent-union', 'Plusieurs unions doivent être proposées.');
-  console.log('Assistant cousin flow: 7 vérifications réussies.');
+  const referencedSpouse = multiUnionDraft.extraSpouses.find(item => item.spouse.id === 'anne').spouse;
+  const preservedUnions = buildFamily({ ...multiUnionDraft, linkedPeople: [referencedSpouse] });
+  assert.ok(preservedUnions.marriages.some(union => [union.spouse1Id, union.spouse2Id].includes('paul') && [union.spouse1Id, union.spouse2Id].includes('anne')),
+    'Sélectionner un conjoint comme parent ne doit pas supprimer son union existante.');
+  const withParent = finishKin(draft, { kin: 'node-parent', hostId: 'aline', firstName: 'Emma', lastName: 'Essomba', gender: 'female' }).draft;
+  const withChild = finishKin(withParent, { kin: 'node-child', hostId: 'aline', firstName: 'Noa', lastName: 'Essomba', gender: 'unknown', unionSpouseId: null }).draft;
+  const rebuilt = buildFamily(withChild);
+  const emma = rebuilt.persons.find(person => person.firstName === 'Emma');
+  const noa = rebuilt.persons.find(person => person.firstName === 'Noa');
+  assert.ok(rebuilt.persons.find(person => person.id === 'aline').parentIds.includes(emma.id));
+  assert.ok(emma.childrenIds.includes('aline'));
+  assert.deepEqual(noa.parentIds, ['aline']);
+  assert.ok(rebuilt.persons.find(person => person.id === 'aline').childrenIds.includes(noa.id));
+  console.log('Assistant : branches existantes et ajout réciproque de parent/enfant depuis un nœud validés.');
 } finally {
   await unlink(output).catch(() => undefined);
 }

@@ -9,6 +9,7 @@ export interface FamilyArchive {
   persons: Person[];
   marriages: Marriage[];
   view: TreeViewOptions;
+  predefined?: { id: string; focusId: string };
 }
 
 export function createFamilyArchive(persons: Person[], marriages: Marriage[], view: TreeViewOptions): FamilyArchive {
@@ -22,8 +23,8 @@ export function createFamilyArchive(persons: Person[], marriages: Marriage[], vi
   };
 }
 
-export function serializeFamilyArchive(persons: Person[], marriages: Marriage[], view: TreeViewOptions) {
-  return JSON.stringify(createFamilyArchive(persons, marriages, view), null, 2);
+export function serializeFamilyArchive(persons: Person[], marriages: Marriage[], view: TreeViewOptions, predefined?: FamilyArchive['predefined']) {
+  return JSON.stringify({ ...createFamilyArchive(persons, marriages, view), ...(predefined ? { predefined } : {}) }, null, 2);
 }
 
 export function parseFamilyArchive(source: string): FamilyArchive {
@@ -67,6 +68,9 @@ export function parseFamilyArchive(source: string): FamilyArchive {
     marriageIds.add(marriage.id);
   });
   const view = value.view as unknown as TreeViewOptions;
+  if (value.predefined !== undefined && (!isRecord(value.predefined) || typeof value.predefined.id !== 'string' || typeof value.predefined.focusId !== 'string')) {
+    throw new Error('La provenance de cet arbre prédéfini est invalide.');
+  }
   if (!['tree', 'radial', 'vertical', 'timeline'].includes(view.viewType) || !Number.isInteger(view.generations) || view.generations < 1 || view.generations > 7) {
     throw new Error('Les paramètres de vue sont invalides.');
   }

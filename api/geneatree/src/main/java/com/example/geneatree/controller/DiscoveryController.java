@@ -18,6 +18,11 @@ public class DiscoveryController {
     @GetMapping("/trees") public List<JsonNode> trees(@RequestParam(defaultValue = "") String q, @RequestParam(required = false) String category, @RequestParam(defaultValue = "false") boolean featured, @RequestParam(defaultValue = "24") int limit) { return catalog.search(q, category, featured, limit); }
     @GetMapping("/suggestions") public List<JsonNode> suggestions(@RequestParam String q) { return catalog.suggestions(q); }
     @GetMapping("/trees/{id}") public JsonNode tree(@PathVariable String id) { return catalog.tree(id); }
+    @PutMapping("/trees/{id}") public JsonNode update(@PathVariable String id, @RequestBody JsonNode tree, org.springframework.security.core.Authentication authentication) {
+        if (!(authentication instanceof org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken))
+            throw new org.springframework.security.access.AccessDeniedException("Sign in with the catalogue owner's verified account");
+        return catalog.updateTree(id, tree, authentication == null ? null : authentication.getName());
+    }
     @PostMapping("/search-misses") public void miss(@Valid @RequestBody SearchMissRequest request) { catalog.recordMiss(request.query(), request.category()); }
     public record SearchMissRequest(@NotBlank String query, String category) {}
 }

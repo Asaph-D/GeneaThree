@@ -1,5 +1,6 @@
 import { Marriage, Person } from '../types/family';
-import { loadPersistentLocalFamily, saveLocalFamily } from './localFamilyService';
+import { getCurrentLocalTree, loadPersistentLocalFamily, saveLocalFamily } from './localFamilyService';
+import { assertTreeEditable, getTreeEditorSession } from './treePermissions';
 import { API_BASE_URL } from '../config/api';
 
 const API_BASE = API_BASE_URL;
@@ -31,6 +32,7 @@ export async function loadFamily(): Promise<{ persons: Person[]; marriages: Marr
 }
 
 export async function clearFamily(): Promise<void> {
+  assertTreeEditable(getCurrentLocalTree());
   if (usesLocalFamilyService()) {
     await saveLocalFamily([], []);
     return;
@@ -44,6 +46,21 @@ export async function clearFamily(): Promise<void> {
 }
 
 export async function saveFamily(persons: Person[], marriages: Marriage[]): Promise<void> {
+  const tree = getCurrentLocalTree();
+  assertTreeEditable(tree);
+  if (tree.predefinedId) {
+    const { accessToken } = getTreeEditorSession();
+    if (!accessToken) throw new Error('Connectez-vous au compte propriétaire pour enregistrer ce catalogue.');
+    let view = { viewType: 'tree', generations: 4, focusPersonId: tree.predefinedFocusId };
+    try { view = { ...view, ...JSON.parse(localStorage.getItem('geneatree.demo.view') || '{}'), focusPersonId: tree.predefinedFocusId }; } catch { /* Use the catalogue subject. */ }
+    const response = await fetch(`${API_BASE}/discovery/trees/${encodeURIComponent(tree.predefinedId)}`, {
+      method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ version: 1, persons, marriages, view }),
+    });
+    if (!response.ok) throw new Error(`Modification du catalogue refusée (${response.status}).`);
+    await saveLocalFamily(persons, marriages);
+    return;
+  }
   if (usesLocalFamilyService()) {
     await saveLocalFamily(persons, marriages);
     return;

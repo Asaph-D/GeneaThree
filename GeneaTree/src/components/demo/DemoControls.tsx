@@ -21,12 +21,13 @@ interface DemoControlsProps {
   exampleId: string;
   onExampleChange: (exampleId: string) => void;
   compact?: boolean;
+  canEdit?: boolean;
 }
 
 const labelClass = 'block text-[10px] font-medium uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400';
 const fieldButton = 'mt-1 flex w-full items-center justify-between rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-left text-[13px] text-zinc-900 outline-none transition hover:border-primary-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100';
 const menuClass = 'absolute z-30 mt-1 max-h-52 w-full overflow-y-auto overscroll-contain rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900';
-const iconBtn = 'flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-800 transition hover:border-primary-400 hover:text-primary-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:text-primary-300';
+const iconBtn = 'disabled:cursor-not-allowed disabled:opacity-40 flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-800 transition hover:border-primary-400 hover:text-primary-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:text-primary-300';
 
 interface MenuOption {
   value: string;
@@ -107,6 +108,7 @@ const DemoControls: React.FC<DemoControlsProps> = ({
   onResetTree,
   exampleId,
   onExampleChange,
+  canEdit = true,
   compact = false
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -146,7 +148,7 @@ const DemoControls: React.FC<DemoControlsProps> = ({
       <input ref={importRef} type="file" accept=".json,.geneatree.json,application/json" className="hidden" onChange={(event) => { const file = event.target.files?.[0]; if (file) onImportTree(file); event.target.value = ''; }} />
       <button data-tour="demo-export" type="button" title="Exporter un PDF haute définition" aria-label="Exporter un PDF haute définition" onClick={onExportPDF} className={iconBtn}><FileDown size={16} /></button>
       <button data-tour="demo-share" type="button" title="Partager" onClick={onShare} className={`${iconBtn} !border-primary-600 !bg-primary-600 !text-white`}><Share size={16} /></button>
-      <button type="button" title={isEditMode ? 'Terminer l\'édition' : 'Modifier l\'arbre'} onClick={onToggleEditMode} className={`${iconBtn} ${isEditMode ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-200' : ''}`}><Edit size={16} /></button>
+      <button type="button" disabled={!canEdit} title={isEditMode ? 'Terminer l\'édition' : 'Modifier l\'arbre'} onClick={onToggleEditMode} className={`${iconBtn} ${isEditMode ? 'border-primary-500 bg-primary-50 text-primary-700 dark:bg-primary-950 dark:text-primary-200' : ''}`}><Edit size={16} /></button>
       <button type="button" title="Réinitialiser" onClick={onResetTree} className={iconBtn}><RefreshCw size={16} /></button>
     </div>
   );

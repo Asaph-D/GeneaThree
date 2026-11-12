@@ -27,7 +27,27 @@ const fixturePeople = [...new Set(fixtureUnions.flatMap((u) => [u.spouse1Id, u.s
   childrenIds: fixtureUnions.filter((u) => [u.spouse1Id, u.spouse2Id].includes(id)).flatMap((u) => u.childrenIds),
   spouseIds: fixtureUnions.flatMap((u) => u.spouse1Id === id ? [u.spouse2Id] : u.spouse2Id === id ? [u.spouse1Id] : []),
 }));
-const families = [...SAMPLE_FAMILIES, ...catalog.entries.map((entry) => ({ id: entry.id, ...entry.tree })), { id: 'brigitte-paul', persons: fixturePeople, marriages: fixtureUnions }];
+const mixedPeople = [
+  { id: 'paul', parentIds: [], childrenIds: ['jean', 'luc'], spouseIds: ['marie', 'anne'] },
+  { id: 'marie', parentIds: [], childrenIds: [], spouseIds: ['paul'] },
+  { id: 'anne', parentIds: [], childrenIds: ['luc'], spouseIds: ['paul'] },
+  { id: 'jean', parentIds: ['paul'], childrenIds: ['amina'], spouseIds: [] },
+  { id: 'luc', parentIds: ['paul', 'anne'], childrenIds: ['aline'], spouseIds: [] },
+  { id: 'amina', parentIds: ['jean'], childrenIds: [], spouseIds: [] },
+  { id: 'aline', parentIds: ['luc'], childrenIds: [], spouseIds: [] },
+].map(person => ({ ...person, firstName: person.id, lastName: '', gender: 'unknown', siblingIds: [] }));
+const mixedUnions = [
+  { id: 'first', spouse1Id: 'paul', spouse2Id: 'marie', childrenIds: [], rank: 1 },
+  { id: 'second', spouse1Id: 'paul', spouse2Id: 'anne', childrenIds: ['luc'], rank: 2 },
+];
+const mixedFamilies = [1, 2].flatMap(count => [false, true].map(secondary => ({
+  id: `known-and-unknown-parent-${count}-${secondary ? 'secondary' : 'primary'}`,
+  persons: secondary ? mixedPeople.map(person => person.id === 'paul' ? { ...person, childrenIds: ['luc'] }
+    : person.id === 'anne' ? { ...person, childrenIds: ['luc', 'jean'] }
+      : person.id === 'jean' ? { ...person, parentIds: ['anne'] } : person) : mixedPeople,
+  marriages: mixedUnions.slice(2 - count),
+})));
+const families = [...SAMPLE_FAMILIES, ...catalog.entries.map((entry) => ({ id: entry.id, ...entry.tree })), { id: 'brigitte-paul', persons: fixturePeople, marriages: fixtureUnions }, ...mixedFamilies];
 let scenarios = 0;
 for (const family of families) {
   const variants = [family, JSON.parse(JSON.stringify(family)), { ...family, persons: [...family.persons].reverse() }];
@@ -49,7 +69,9 @@ for (const family of families) {
         const a = byId.get(union.spouse1Id), b = byId.get(union.spouse2Id);
         if (!a || !b) continue;
         const households = variant.marriages.filter((u) => u.spouse1Id === a.person.id && byId.has(u.spouse2Id));
-        const rail = households.length > 1;
+        const marriedKids = new Set(variant.marriages.flatMap(u => u.childrenIds ?? []));
+        const hasLoose = person => person.childrenIds.some(id => !marriedKids.has(id));
+        const rail = households.length > 1 || hasLoose(a.person) || households.some(u => hasLoose(byId.get(u.spouse2Id).person));
         assert.ok(layout.unions.some((line) => line.rail === rail && (rail
           ? close(line.y, a.y + 100) && [a.x, b.x].every((x) => line.ticks.some((tick) => close(tick.x, x)))
           : close(line.y, a.y) && close(line.x1, Math.min(a.x, b.x) + 28) && close(line.x2, Math.max(a.x, b.x) - 28))), `${label}: couple mal raccordé ${union.id}`);

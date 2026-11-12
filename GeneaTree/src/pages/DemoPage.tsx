@@ -1,9 +1,9 @@
 // src/pages/DemoPage.tsx
-import { Bot, ChevronLeft, ChevronRight, HelpCircle, PanelLeft, X } from 'lucide-react';
+import { Bot, ChevronLeft, ChevronRight, HelpCircle, PanelLeft, Plus, X } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { loadFamily, saveFamily } from '../services/familyGateway';
-import { createLocalTree, loadLocalFamily } from '../services/localFamilyService';
+import { createLocalTree, getCurrentLocalTree, loadLocalFamily } from '../services/localFamilyService';
 import DemoControls from '../components/demo/DemoControls';
 import FamilyStats from '../components/demo/FamilyStats';
 import PersonProfileCard, { ProfileAnchor } from '../components/demo/PersonProfileCard';
@@ -21,9 +21,13 @@ import { FamilyArchive, parseFamilyArchive, serializeFamilyArchive } from '../se
 import { PdfDesignOptions } from '../services/pdfDesign';
 import { useAuth } from '../auth/AuthContext';
 import HelpExperience from '../components/help/HelpExperience';
+import { canEditTree } from '../services/treePermissions';
 
 const DemoPage: React.FC = () => {
-  const { accessToken } = useAuth();
+  const { accessToken, user } = useAuth();
+  const navigate = useNavigate();
+  const currentTree = getCurrentLocalTree();
+  const canEdit = canEditTree(currentTree, user?.email ?? null);
   const initialSnapshot = useRef(loadLocalFamily());
   const [familyData, setFamilyData] = useState<Person[]>(initialSnapshot.current.persons);
   const [marriagesData, setMarriagesData] = useState<Marriage[]>(initialSnapshot.current.marriages);
@@ -64,6 +68,13 @@ const DemoPage: React.FC = () => {
   const profileHideTimer = useRef<number>();
   const treeContainerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (canEdit) return;
+    setIsEditMode(false);
+    setIsPersonFormModalOpen(false);
+    setDeletePersonId(null);
+  }, [canEdit]);
+
   const applySnapshot = useCallback((persons: Person[], marriages: Marriage[], focusId?: string) => {
     const savedFocus = focusId || localStorage.getItem('focusPerson');
     const initialFocusId =
@@ -81,6 +92,7 @@ const DemoPage: React.FC = () => {
 
   const applyExample = useCallback(async (id: string) => {
     const sample = getSampleFamily(id);
+    if (getCurrentLocalTree().predefinedId) await createLocalTree(sample.label ?? sample.id, { persons: sample.persons, marriages: sample.marriages });
     setExampleId(sample.id);
     localStorage.setItem('geneatree.example', sample.id);
     await saveFamily(sample.persons, sample.marriages);
@@ -97,6 +109,7 @@ const DemoPage: React.FC = () => {
       const knownSample = persons.some((person) => /^(mo|po|re)-/.test(person.id));
       if (fromUrl && SAMPLE_FAMILIES.some((family) => family.id === fromUrl)) {
         const sample = getSampleFamily(fromUrl);
+        if (getCurrentLocalTree().predefinedId) await createLocalTree(sample.label, { persons: sample.persons, marriages: sample.marriages });
         localStorage.setItem('geneatree.example', sample.id);
         await saveFamily(sample.persons, sample.marriages);
         setExampleId(sample.id);
@@ -296,7 +309,7 @@ const DemoPage: React.FC = () => {
   };
 
   const handlePersonSelect = (person: Person, rect?: DOMRect) => {
-    if (isEditMode) {
+    if (isEditMode && canEdit) {
       setSelectedPersonForEdit(person);
       setRelatedPersonForAdd(null);
       setAddRelationshipType(null);
@@ -314,6 +327,7 @@ const DemoPage: React.FC = () => {
   };
 
   const handleAddPersonClick = (relatedPersonId: string, relationshipType: 'child' | 'parent' | 'spouse') => {
+    if (!canEdit) return;
     setSelectedPersonForEdit(null);
     setRelatedPersonForAdd(relatedPersonId);
     setAddRelationshipType(relationshipType);
@@ -321,6 +335,7 @@ const DemoPage: React.FC = () => {
   };
 
   const handleEditPerson = (person: Person) => {
+    if (!canEdit) return;
     setSelectedPersonForEdit(person);
     setRelatedPersonForAdd(null);
     setAddRelationshipType(null);
@@ -328,6 +343,7 @@ const DemoPage: React.FC = () => {
   };
 
   const handleSavePerson = async (personData: PartialPerson & { unionSpouseId?: string; marriageDate?: string; parentExistingChildren?: boolean }) => {
+    if (!canEdit) return;
     const blankPlace = { city: '', region: '', country: '' };
     const persist = async (persons: Person[], marriages: Marriage[]) => {
       setFamilyData(persons);
@@ -482,11 +498,13 @@ const DemoPage: React.FC = () => {
   };
 
   const handleDeletePerson = (personId: string) => {
+    if (!canEdit) return;
     setDeletePersonId(personId);
     setDeleteCascade(false);
   };
 
   const confirmDeletePerson = async () => {
+    if (!canEdit) return;
     if (!deletePersonId) return;
     const ids = new Set([deletePersonId, ...(deleteCascade ? descendantIds(deletePersonId, familyData) : [])]);
     setDeleteBusy(true);
@@ -523,6 +541,7 @@ const DemoPage: React.FC = () => {
   };
 
   const handleResetTree = async () => {
+    if (!canEdit) return;
     if (window.confirm("Êtes-vous sûr de vouloir réinitialiser l'arbre à l'état initial ? Toutes les modifications seront perdues.")) {
       try {
         await applyExample(exampleId);
@@ -539,6 +558,7 @@ const DemoPage: React.FC = () => {
   };
 
   const toggleEditMode = () => {
+    if (!canEdit) return;
     setIsEditMode(prev => {
       if (prev === true) {
         setIsPersonFormModalOpen(false);
@@ -566,7 +586,8 @@ const DemoPage: React.FC = () => {
   };
 
   const handleExportTree = () => {
-    const blob = new Blob([serializeFamilyArchive(familyData, marriagesData, treeOptions)], { type: 'application/json' });
+    const predefined = currentTree.predefinedId ? { id: currentTree.predefinedId, focusId: currentTree.predefinedFocusId ?? treeOptions.focusPersonId } : undefined;
+    const blob = new Blob([serializeFamilyArchive(familyData, marriagesData, treeOptions, predefined)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -590,8 +611,7 @@ const DemoPage: React.FC = () => {
     try {
       const archive = pendingImport.archive;
       const treeName = pendingImport.fileName.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ');
-      await createLocalTree(treeName, { persons: archive.persons, marriages: archive.marriages }, 'imported');
-      await saveFamily(archive.persons, archive.marriages);
+      await createLocalTree(treeName, { persons: archive.persons, marriages: archive.marriages }, 'imported', archive.predefined);
       applySnapshot(archive.persons, archive.marriages, archive.view.focusPersonId);
       setTreeOptions(archive.view);
       setExampleId('imported');
@@ -662,10 +682,11 @@ const DemoPage: React.FC = () => {
             )}
             <div className="relative">
               <DemoControls
+                canEdit={canEdit}
                 viewType={treeOptions.viewType}
                 generations={treeOptions.generations}
                 focusPerson={treeOptions.focusPersonId}
-                isEditMode={isEditMode}
+                isEditMode={isEditMode && canEdit}
                 familyData={displayFamilyData}
                 exampleId={exampleId}
                 onExampleChange={(id) => { void applyExample(id); }}
@@ -700,16 +721,17 @@ const DemoPage: React.FC = () => {
         )}
       </div>
       <div data-tour="demo-tree" className="relative min-h-0 min-w-0 flex-1" ref={treeContainerRef}>
-        <Link
-          to="/assistant?from=demo"
-          data-print-control
-          data-tour="demo-assistant"
-          className="absolute right-3 top-3 z-30 inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white/90 px-3 py-2 text-[13px] font-medium text-primary-800 shadow-md backdrop-blur hover:bg-primary-50 dark:border-primary-400/30 dark:bg-zinc-950/90 dark:text-primary-200 dark:hover:bg-zinc-900"
-          title="Ouvrir l’assistant sans perdre cet arbre"
-        >
-          <Bot size={16} />
-          <span className="hidden sm:inline">Assistant</span>
-        </Link>
+        <div data-print-control className="absolute right-3 top-3 z-30 flex items-center gap-2">
+          <Link to="/assistant?new=1" className="inline-flex items-center gap-2 rounded-xl bg-primary-600 px-3 py-2 text-[13px] font-medium text-white shadow-md">
+            <Plus size={16} /><span>Nouvel arbre</span>
+          </Link>
+          <button type="button" disabled={!canEdit} onClick={() => navigate('/assistant?from=demo')} data-tour="demo-assistant"
+            className="inline-flex items-center gap-2 rounded-xl border border-primary-200 bg-white/90 px-3 py-2 text-[13px] font-medium text-primary-800 shadow-md disabled:cursor-not-allowed disabled:opacity-40 dark:border-primary-400/30 dark:bg-zinc-950/90 dark:text-primary-200"
+            title={canEdit ? 'Ouvrir l’assistant sans perdre cet arbre' : 'Arbre prédéfini en lecture seule'}>
+            <Bot size={16} /><span className="hidden sm:inline">Assistant</span>
+          </button>
+        </div>
+        {!canEdit && <p role="status" className="absolute left-3 top-16 z-20 max-w-[calc(100%-1.5rem)] rounded-xl bg-white/90 px-3 py-2 text-xs text-zinc-600 dark:bg-zinc-950/90 dark:text-zinc-300">Lecture seule · Vous pouvez parcourir et télécharger cet arbre.</p>}
         <button type="button" data-print-control onClick={() => setHelpExperienceOpen(true)} className="absolute bottom-3 right-3 z-30 inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white/90 px-3 py-2 text-xs font-medium text-zinc-700 shadow-md backdrop-blur hover:border-sky-400 dark:border-white/10 dark:bg-zinc-950/90 dark:text-zinc-200"><HelpCircle size={15} />Aide</button>
         {narrow && !sidebarOpen && (
           <button
@@ -729,7 +751,7 @@ const DemoPage: React.FC = () => {
             focusPerson={treeOptions.focusPersonId}
             familyData={displayFamilyData}
             marriagesData={marriagesData}
-            isEditMode={isEditMode}
+            isEditMode={isEditMode && canEdit}
             onPersonSelect={handlePersonSelect}
             onAddPersonClick={handleAddPersonClick}
             onDeletePerson={handleDeletePerson}
@@ -745,6 +767,7 @@ const DemoPage: React.FC = () => {
       </div>
       {profilePerson && profileAnchor && (
         <PersonProfileCard
+          canEdit={canEdit}
           person={profilePerson}
           anchor={profileAnchor}
           familyData={displayFamilyData}
@@ -797,7 +820,7 @@ const DemoPage: React.FC = () => {
         relatedPersonId={relatedPersonForAdd || undefined}
         relationshipType={addRelationshipType || undefined}
         selectedPerson={selectedPerson}
-        isEditMode={isEditMode}
+        isEditMode={isEditMode && canEdit}
         onPersonUpdate={handleSavePerson}
         onAddPerson={handleAddPersonClick}
         onDeletePerson={handleDeletePerson}
