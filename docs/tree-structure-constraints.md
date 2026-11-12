@@ -20,6 +20,14 @@ Contraintes à conserver lors des évolutions :
 - Les raccords sont calculés à partir des coordonnées finales des personnes.
   Les positions ne changent pas lors de l'ouverture du même arbre depuis la
   base ou le partage.
+- Reprendre une archive dans l'assistant conserve exactement les personnes,
+  leur ordre et les unions existantes (sens, rang et enfants). Le brouillon
+  fournit seulement les ajouts ; ses unions et liens déduits à l'ouverture
+  ne remplacent pas les données importées. Cette identité est vérifiée pour
+  les 73 archives du catalogue.
+- Le couple reliant deux familles reste adjacent. David ne peut être placé
+  ni entre Paul et Brigitte, ni au-delà de Brigitte par rapport à Paul. Le côté
+  est déterminé par les ascendances visibles, pas par les champs spouse1/spouse2.
 - Le zoom conserve tous les segments et une épaisseur de trait indépendante
   de l'échelle. Les segments structurels ne doivent pas recevoir de dégradés
   qui rendent une partie de la filiation transparente. Les losanges restent.
@@ -43,5 +51,9 @@ dans `GeneaTree/test-artifacts/asaph-family-boundaries/`.
 
 Contrôle du 12 novembre 2026 : captures examinées, huit personnes dans les
 trois vues, 17 segments présents avant et après zoom jusqu'à 3,2, aucun segment
-transparent. Le lot de positions couvre 85 arbres et 3 060 configurations,
-dont l'inversion de l'ordre des personnes et les jonctions parentales implicites.
+transparent. Après import réel d'une archive à quatre unions, reprise inchangée
+puis ajout de David : neuf personnes, fratrie préservée et couple non traversé.
+Captures `13-explicit-import.png` et `14-david-after-explicit-import.png`.
+Le lot de positions couvre 97 arbres et 3 492 configurations, dont l'inversion
+de l'ordre des personnes et du couple, les différents rangs des unions et les
+jonctions parentales implicites.

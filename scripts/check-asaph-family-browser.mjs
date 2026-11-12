@@ -160,6 +160,6 @@ try {
   assert.ok(b.x<Math.min(p.x,d.x)||b.x>Math.max(p.x,d.x)); assert.ok(d.x<Math.min(p.x,b.x)||d.x>Math.max(p.x,b.x));
   assert.ok(await evaluate('document.body.innerText.includes("4 unions")'));
   await shot('14-david-after-explicit-import');
-  await fs.writeFile(`${out}/results.json`, JSON.stringify({ assistantPositions, demoPositions, sharedPositions, resumedPositions, withDavid, initial, final:sharedLines, mononyms:true, mononymEdited:true, sharedTreeId:treeId },null,2));
-  console.log('Asaph → parents → parents de Paul → parents de Brigitte → deuxième épouse : huit personnes, foyers séparés, noms facultatifs, coordonnées identiques dans /demo et traits continus au zoom.');
+  await fs.writeFile(`${out}/results.json`, JSON.stringify({ assistantPositions, demoPositions, sharedPositions, resumedPositions, withDavid, importedPositions, importedWithDavid, initial, final:sharedLines, surnameFirst:true, optionalGivenName:true, mononymEdited:true, sharedTreeId:treeId },null,2));
+  console.log('Navigateur : nom puis prénom facultatif ; import inchangé à la reprise ; neuf personnes avec David hors du couple Paul–Brigitte ; quatre unions conservées ; partage et zoom vérifiés.');
 } finally { await page.close(); }
