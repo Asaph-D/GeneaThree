@@ -60,6 +60,7 @@ try {
               .replace('function draftFromFamily(', 'export function draftFromFamily(')
               .replace('function finishKin(', 'export function finishKin(')
               .replace('function buildFamily(', 'export function buildFamily(')
+              .replace('function mergeFamilies(', 'export function mergeFamilies(')
               .replace('function routeKin(', 'export function routeKin('),
             loader: 'tsx',
             resolveDir: dirname(path),
@@ -70,14 +71,20 @@ try {
     logLevel: 'silent',
   });
 
-  const { draftFromFamily, routeKin, finishKin, buildFamily } = await import(`${pathToFileURL(output).href}?v=${Date.now()}`);
+  const { draftFromFamily, routeKin, finishKin, buildFamily, mergeFamilies } = await import(`${pathToFileURL(output).href}?v=${Date.now()}`);
   const draft = draftFromFamily(people, [], 'david');
   assert.ok(draft, 'Le brouillon de David doit être construit.');
+  const initialProjection = buildFamily(draft);
+  assert.deepEqual(mergeFamilies({persons:people,marriages:[]}, initialProjection, initialProjection), {persons:people,marriages:[]},
+    'Reprendre un arbre ne doit ni ajouter des unions supposées ni modifier les données importées.');
+  const surnameOnly = buildFamily({ ...draft, anchor: { ...draft.anchor, firstName:'', lastName:'Essomba' } });
+  assert.ok(surnameOnly.persons.some(person=>person.id==='david' && person.firstName==='' && person.lastName==='Essomba'),
+    'Un nom de famille seul doit suffire à construire la personne focale.');
   assert.equal(draft.branches.find((branch) => branch.parentId === 'jean')?.grandfather?.id, 'paul');
   assert.equal(draft.branches.find((branch) => branch.parentId === 'jean')?.grandmother?.id, 'marie');
   assert.equal(draft.branches.find((branch) => branch.parentId === 'jean')?.cousins[0]?.id, 'aline');
   assert.deepEqual(draft.branches.find((branch) => branch.parentId === 'jean')?.collaterals[0]?.parentIds, ['paul', 'marie']);
-  assert.equal(routeKin('uncle', draft, 'jean').phase, 'kin-first', 'Jean ne doit pas redemander le parent commun.');
+  assert.equal(routeKin('uncle', draft, 'jean').phase, 'kin-last', 'Jean ne doit pas redemander le parent commun.');
   assert.equal(routeKin('uncle', draft, 'claire').phase, 'kin-link-role', 'Claire doit demander quel parent est commun.');
   const multiUnionDraft = draftFromFamily(people, [
     { id: 'union-paul-marie', spouse1Id: 'paul', spouse2Id: 'marie', rank: 1, childrenIds: ['jean', 'luc'] },
@@ -97,6 +104,17 @@ try {
   assert.ok(emma.childrenIds.includes('aline'));
   assert.deepEqual(noa.parentIds, ['aline']);
   assert.ok(rebuilt.persons.find(person => person.id === 'aline').childrenIds.includes(noa.id));
+  const preserved = mergeFamilies({persons:people,marriages:[]}, rebuilt, initialProjection);
+  assert.equal(preserved.marriages.length,0,'Les unions déduites par le brouillon ne doivent pas être enregistrées lors d’un ajout.');
+  assert.ok(preserved.persons.find(person=>person.id==='aline').parentIds.includes(emma.id));
+  assert.ok(preserved.persons.find(person=>person.id==='aline').childrenIds.includes(noa.id));
+  const catalogue=JSON.parse(await readFile('../api/geneatree/src/main/resources/discovery/popular-trees.json','utf8'));
+  for (const entry of catalogue.entries) {
+    const base={persons:entry.tree.persons,marriages:entry.tree.marriages};
+    const loaded=draftFromFamily(base.persons,base.marriages,entry.tree.view.focusPersonId);
+    const projection=buildFamily(loaded);
+    assert.deepEqual(mergeFamilies(base,projection,projection),base,`${entry.id}: la reprise doit conserver exactement l’archive`);
+  }
   console.log('Assistant : branches existantes et ajout réciproque de parent/enfant depuis un nœud validés.');
 } finally {
   await unlink(output).catch(() => undefined);

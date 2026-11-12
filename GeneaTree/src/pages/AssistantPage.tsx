@@ -8,7 +8,7 @@ import { createLocalTree, getCurrentLocalTree, listFamilyRevisions, listLocalTre
 import HelpExperience from '../components/help/HelpExperience';
 import { useAuth } from '../auth/AuthContext';
 import { canEditTree } from '../services/treePermissions';
-import { familyGenerationCount } from '../components/demo/bandLayout';
+import { familyGenerationCount, parentalHouseholds } from '../components/demo/bandLayout';
 
 type Phase =
   | 'anchor-first' | 'anchor-last' | 'anchor-gender' | 'anchor-birth' | 'anchor-city'
@@ -89,6 +89,7 @@ interface Pending {
 }
 
 interface AssistantSession {
+  nameOrderVersion?: number;
   treeId?: string;
   editingSavedTree?: boolean;
   phase: Phase;
@@ -107,6 +108,15 @@ function readAssistantSession(): AssistantSession | null {
   try {
     const parsed = JSON.parse(localStorage.getItem(ASSISTANT_SESSION_KEY) || 'null') as AssistantSession | null;
     if (parsed?.editingSavedTree && parsed.treeId !== getCurrentLocalTree().id) return null;
+    if (parsed?.draft?.anchor?.id && parsed.nameOrderVersion !== 2) {
+      const previous = parsed.phase;
+      if (previous.endsWith('first')) parsed.phase = previous.replace(/first$/, 'last') as Phase;
+      if (previous === 'kin-link') parsed.phase = 'kin-link-last';
+      if (previous.endsWith('first') || previous.endsWith('last') || previous === 'kin-link') {
+        const question = { role: 'assistant' as const, text: promptFor(parsed.phase, parsed.draft, parsed.pending) };
+        parsed.messages = parsed.messages[parsed.messages.length - 1]?.role === 'assistant' ? [...parsed.messages.slice(0, -1), question] : [...parsed.messages, question];
+      }
+    }
     return parsed?.draft?.anchor?.id ? parsed : null;
   } catch {
     return null;
@@ -235,10 +245,27 @@ function draftFromFamily(persons: Person[], marriages: Marriage[], focusId: stri
   };
 }
 
-function mergeFamilies(base: { persons: Person[]; marriages: Marriage[] }, changed: { persons: Person[]; marriages: Marriage[] }) {
+function mergeFamilies(base: { persons: Person[]; marriages: Marriage[] }, changed: { persons: Person[]; marriages: Marriage[] }, initialProjection?: { persons: Person[]; marriages: Marriage[] }) {
   const persons = new Map(base.persons.map((person) => [person.id, person]));
+  const projected = new Map(initialProjection?.persons.map(person => [person.id, person]));
+  const samePair = (a: Marriage, b: Marriage) => (a.spouse1Id === b.spouse1Id && a.spouse2Id === b.spouse2Id)
+    || (a.spouse1Id === b.spouse2Id && a.spouse2Id === b.spouse1Id);
   changed.persons.forEach((person) => {
     const previous = persons.get(person.id);
+    if (previous && initialProjection) {
+      // The assistant's draft is a projection, not a replacement for imported
+      // data. Apply only newly added links; keep the original order and fields.
+      const initial = projected.get(person.id);
+      const additions = (key: 'parentIds' | 'childrenIds' | 'spouseIds' | 'siblingIds') =>
+        (person[key] ?? []).filter(id => !(initial?.[key] ?? []).includes(id));
+      const updated = { ...previous };
+      for (const key of ['parentIds', 'childrenIds', 'spouseIds', 'siblingIds'] as const) {
+        const added = additions(key);
+        if (added.length) updated[key] = uniq([...(previous[key] ?? []), ...added]);
+      }
+      persons.set(person.id, updated);
+      return;
+    }
     persons.set(person.id, previous ? {
       ...previous,
       ...person,
@@ -257,10 +284,15 @@ function mergeFamilies(base: { persons: Person[]; marriages: Marriage[] }, chang
   });
   const marriages = [...base.marriages];
   changed.marriages.forEach((marriage) => {
-    const index = marriages.findIndex((current) =>
-      (current.spouse1Id === marriage.spouse1Id && current.spouse2Id === marriage.spouse2Id)
-      || (current.spouse1Id === marriage.spouse2Id && current.spouse2Id === marriage.spouse1Id));
-    if (index < 0) marriages.push(marriage);
+    const index = marriages.findIndex(current => samePair(current, marriage));
+    const initial = initialProjection?.marriages.find(current => samePair(current, marriage));
+    if (index < 0) {
+      if (!initial) marriages.push(marriage);
+    }
+    else if (initialProjection) {
+      const added = (marriage.childrenIds ?? []).filter(id => !initial?.childrenIds?.includes(id));
+      if (added.length) marriages[index] = { ...marriages[index], childrenIds: uniq([...(marriages[index].childrenIds ?? []), ...added]) };
+    }
     else marriages[index] = {
       ...marriage,
       ...marriages[index],
@@ -347,7 +379,7 @@ function hostSpouses(draft: Draft, hostId: string): (Bits & { rank: number })[] 
 }
 
 function buildFamily(draft: Draft): { persons: Person[]; marriages: Marriage[] } {
-  if (!draft.anchor.firstName.trim()) return { persons: [], marriages: [] };
+  if (!fullName(draft.anchor)) return { persons: [], marriages: [] };
   const marriages: Marriage[] = [];
   const people = new Map<string, Person>();
 
@@ -559,17 +591,17 @@ function siblingParentOptions(draft: Draft, parentId: string) {
   if (known.length === 2) {
     options.push({
       value: `${known[0].id}|${known[1].id}`,
-      label: `${known[0].firstName} et ${known[1].firstName}`,
+      label: `${fullName(known[0])} et ${fullName(known[1])}`,
       parentIds: [known[0].id, known[1].id],
     });
   } else if (known.length === 1) {
-    options.push({ value: `${known[0].id}|none`, label: `${known[0].firstName} seul · autre parent inconnu`, parentIds: [known[0].id] });
+    options.push({ value: `${known[0].id}|none`, label: `${fullName(known[0])} seul · autre parent inconnu`, parentIds: [known[0].id] });
   }
   known.forEach((grandparent) => {
     draft.extraSpouses.filter((item) => item.hostId === grandparent.id).forEach((item) => {
       options.push({
         value: `${grandparent.id}|${item.spouse.id}`,
-        label: `${grandparent.firstName} et ${item.spouse.firstName}`,
+        label: `${fullName(grandparent)} et ${fullName(item.spouse)}`,
         parentIds: [grandparent.id, item.spouse.id],
       });
     });
@@ -580,7 +612,7 @@ function siblingParentOptions(draft: Draft, parentId: string) {
 function routeKin(kin: KinKind, draft: Draft, parentId: string): { phase: Phase; pendingPatch: Partial<Pending> } {
   const branch = branchOf(draft, parentId);
   if (kin === 'brother' || kin === 'sister' || kin === 'grandfather' || kin === 'grandmother') {
-    return { phase: 'kin-first', pendingPatch: {} };
+    return { phase: 'kin-last', pendingPatch: {} };
   }
   if (kin === 'uncle' || kin === 'aunt') {
     if (!branch?.grandfather && !branch?.grandmother) return { phase: 'kin-link-role', pendingPatch: {} };
@@ -588,7 +620,7 @@ function routeKin(kin: KinKind, draft: Draft, parentId: string): { phase: Phase;
     if (options.length > 1) return { phase: 'kin-parent-union', pendingPatch: {} };
     const parentIds = options[0]?.parentIds ?? [];
     return {
-      phase: 'kin-first',
+      phase: 'kin-last',
       pendingPatch: { hostId: parentIds[0] ?? null, unionSpouseId: parentIds[1] ?? null },
     };
   }
@@ -616,7 +648,7 @@ function afterParents(pending: Pending, draft: Draft): { phase: Phase; pending: 
   if (pending.kin === 'node-spouse' || pending.kin === 'node-child' || pending.kin === 'collateral-spouse') {
     return { phase: 'kin-pick', pending: carryKin(pending) };
   }
-  if (pending.kin === 'brother' || pending.kin === 'sister') return { phase: 'kin-first', pending: carryKin(pending) };
+  if (pending.kin === 'brother' || pending.kin === 'sister') return { phase: 'kin-last', pending: carryKin(pending) };
   if (draft.parents.length <= 1) {
     const via = draft.parents[0]?.id ?? null;
     if (!via) return { phase: 'grow', pending: freshPending() };
@@ -636,7 +668,7 @@ function slotTaken(draft: Draft, parentId: string, kin: KinKind) {
 function peopleChoices(draft: Draft) {
   const items: { value: string; label: string }[] = [];
   const push = (bits?: Bits, hint = '') => {
-    if (!bits?.firstName) return;
+    if (!bits || !fullName(bits)) return;
     items.push({ value: bits.id, label: hint ? `${fullName(bits)} · ${hint}` : fullName(bits) });
   };
   push(draft.anchor);
@@ -649,7 +681,7 @@ function peopleChoices(draft: Draft) {
     push(branch.grandmother, 'grand-mère');
     branch.collaterals.forEach((collateral) => {
       push(collateral.person, collateral.person.gender === 'female' ? 'tante' : 'oncle');
-      collateral.spouses.forEach((spouse) => push(spouse, `conjoint de ${collateral.person.firstName}`));
+      collateral.spouses.forEach((spouse) => push(spouse, `conjoint de ${fullName(collateral.person)}`));
     });
     branch.cousins.forEach((cousin) => push(cousin));
   });
@@ -736,7 +768,7 @@ function finishKin(draft: Draft, source: Pending): { draft: Draft; phase: Phase;
     if (source.queue === 'cousin' || source.queue === 'cousine') {
       return {
         draft: next,
-        phase: 'kin-first',
+        phase: 'kin-last',
         pending: { ...freshPending(), kin: source.queue, gender: impliedGender(source.queue), viaParentId: source.viaParentId, viaUncleId: person.id },
         notice: '',
       };
@@ -842,7 +874,7 @@ const AssistantPage: React.FC = () => {
   const [showTree, setShowTree] = useState(false);
   const [initialSession] = useState(readAssistantSession);
   const [anchorId] = useState(() => initialSession?.draft.anchor.id ?? uid('as'));
-  const [phase, setPhase] = useState<Phase>(initialSession?.phase ?? 'anchor-first');
+  const [phase, setPhase] = useState<Phase>(initialSession?.phase ?? 'anchor-last');
   const [draft, setDraft] = useState<Draft>(() => initialSession?.draft ?? ({
     anchor: emptyBits(anchorId),
     spouses: [],
@@ -861,10 +893,11 @@ const AssistantPage: React.FC = () => {
   const [helpExperienceOpen, setHelpExperienceOpen] = useState(false);
   const [treeHistoryOpen, setTreeHistoryOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'assistant' | 'user'; text: string }[]>(initialSession?.messages ?? [
-    { role: 'assistant', text: 'Quel est le prénom qui ouvre l’arbre ?' },
+    { role: 'assistant', text: 'Quel est le nom de famille de la personne qui ouvre l’arbre ?' },
   ]);
   const [savedTreeSize, setSavedTreeSize] = useState(0);
   const [baseFamily, setBaseFamily] = useState<{ persons: Person[]; marriages: Marriage[] }>({ persons: [], marriages: [] });
+  const [baseProjection, setBaseProjection] = useState<{ persons: Person[]; marriages: Marriage[] }>({ persons: [], marriages: [] });
   const [savedFamily, setSavedFamily] = useState<{ persons: Person[]; marriages: Marriage[] } | null>(null);
   const [editingSavedTree, setEditingSavedTree] = useState(openedFromDemo || Boolean(initialSession?.editingSavedTree));
   const spokenRef = useRef('');
@@ -876,6 +909,7 @@ const AssistantPage: React.FC = () => {
     const loadedDraft = draftFromFamily(snapshot.persons, snapshot.marriages, focusId);
     if (!loadedDraft) return;
     setBaseFamily(snapshot);
+    setBaseProjection(buildFamily(loadedDraft));
     setDraft(loadedDraft);
     setSelectedNodeId(loadedDraft.anchor.id);
     setPhase('grow');
@@ -908,6 +942,8 @@ const AssistantPage: React.FC = () => {
         setSavedFamily(snapshot);
         if (initialSession?.editingSavedTree && initialSession.treeId === getCurrentLocalTree().id) {
           setBaseFamily(snapshot);
+          const originalDraft = draftFromFamily(snapshot.persons, snapshot.marriages, initialSession.draft.anchor.id);
+          setBaseProjection(originalDraft ? buildFamily(originalDraft) : { persons: [], marriages: [] });
         } else if (openedFromDemo) hydrateSavedFamily(snapshot);
       })
       .catch(() => setSavedTreeSize(0));
@@ -915,13 +951,13 @@ const AssistantPage: React.FC = () => {
   }, [hydrateSavedFamily, openedFromDemo, initialSession]);
 
   useEffect(() => {
-    localStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify({ phase, draft, pending, messages, treeId: getCurrentLocalTree().id, editingSavedTree } satisfies AssistantSession));
+    localStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify({ nameOrderVersion: 2, phase, draft, pending, messages, treeId: getCurrentLocalTree().id, editingSavedTree } satisfies AssistantSession));
   }, [phase, draft, pending, messages, editingSavedTree]);
 
   const family = useMemo(() => buildFamily(draft), [draft]);
-  const workingFamily = useMemo(() => mergeFamilies(baseFamily, family), [baseFamily, family]);
+  const workingFamily = useMemo(() => mergeFamilies(baseFamily, family, editingSavedTree ? baseProjection : undefined), [baseFamily, family, baseProjection, editingSavedTree]);
   const kind = kindOf(phase);
-  const optional = phase === 'anchor-birth' || phase === 'anchor-city';
+  const optional = phase === 'anchor-birth' || phase === 'anchor-city' || phase.endsWith('first') || phase === 'kin-link';
 
   const remember = () => {
     setHistory((items) => [...items, { phase, draft: structuredClone(draft), pending: { ...pending } }]);
@@ -941,7 +977,7 @@ const AssistantPage: React.FC = () => {
     if (said) {
       let follow = promptFor(next, nextDraft, nextPending);
       if (next === 'grow') follow = 'Sélectionnez une personne dans l’arbre, puis ajoutez son parent, son enfant ou son conjoint.';
-      if (next === 'parent-first' && nextPending.kin) follow = 'Pour le placer dans l’arbre, un parent d’abord. Quel est son prénom ?';
+      if (next === 'parent-last' && nextPending.kin) follow = 'Pour le placer dans l’arbre, un parent d’abord. Quel est son nom de famille ?';
       setMessages((items) => [...items, { role: 'user', text: said }, { role: 'assistant', text: follow }]);
     }
   };
@@ -955,7 +991,7 @@ const AssistantPage: React.FC = () => {
       setNotice('Sélectionnez une personne, puis choisissez le lien à ajouter.');
       return;
     }
-    const read = interpret(phase, value, optional, draft, pending);
+    const read = interpret(phase, value, optional, draft, pending, workingFamily);
     if (!read.ok) {
       setNotice(read.error);
       return;
@@ -971,11 +1007,11 @@ const AssistantPage: React.FC = () => {
     const nextPending = { ...pending };
 
     switch (phase) {
-      case 'anchor-first':
-        go('anchor-last', { ...draft, anchor: { ...anchor, firstName: clean } });
-        return;
       case 'anchor-last':
-        go('anchor-gender', { ...draft, anchor: { ...anchor, lastName: clean } });
+        go('anchor-first', { ...draft, anchor: { ...anchor, lastName: clean } });
+        return;
+      case 'anchor-first':
+        go('anchor-gender', { ...draft, anchor: { ...anchor, firstName: clean || anchor.firstName } });
         return;
       case 'anchor-gender':
         go('anchor-birth', { ...draft, anchor: { ...anchor, gender: clean as GenderType } });
@@ -987,13 +1023,13 @@ const AssistantPage: React.FC = () => {
         go('grow', { ...draft, anchor: { ...anchor, city: clean } });
         return;
       case 'spouse-ask':
-        go(value === 'oui' ? 'spouse-first' : 'child-ask', draft, freshPending());
-        return;
-      case 'spouse-first':
-        go('spouse-last', draft, { ...nextPending, firstName: clean });
+        go(value === 'oui' ? 'spouse-last' : 'child-ask', draft, freshPending());
         return;
       case 'spouse-last':
-        go('spouse-gender', draft, { ...nextPending, lastName: clean });
+        go('spouse-first', draft, { ...nextPending, lastName: clean });
+        return;
+      case 'spouse-first':
+        go('spouse-gender', draft, { ...nextPending, firstName: clean || pending.firstName });
         return;
       case 'spouse-gender': {
         const spouse = {
@@ -1007,7 +1043,7 @@ const AssistantPage: React.FC = () => {
         return;
       }
       case 'spouse-more':
-        go(value === 'oui' ? 'spouse-first' : 'child-ask', draft, freshPending());
+        go(value === 'oui' ? 'spouse-last' : 'child-ask', draft, freshPending());
         return;
       case 'child-ask':
         if (value !== 'oui') {
@@ -1015,16 +1051,16 @@ const AssistantPage: React.FC = () => {
           return;
         }
         if (draft.spouses.length > 1) go('child-union', draft, freshPending());
-        else go('child-first', draft, { ...freshPending(), unionSpouseId: draft.spouses[0]?.id ?? null });
+        else go('child-last', draft, { ...freshPending(), unionSpouseId: draft.spouses[0]?.id ?? null });
         return;
       case 'child-union':
-        go('child-first', draft, { ...nextPending, unionSpouseId: value });
-        return;
-      case 'child-first':
-        go('child-last', draft, { ...nextPending, firstName: clean });
+        go('child-last', draft, { ...nextPending, unionSpouseId: value });
         return;
       case 'child-last':
-        go('child-gender', draft, { ...nextPending, lastName: clean });
+        go('child-first', draft, { ...nextPending, lastName: clean });
+        return;
+      case 'child-first':
+        go('child-gender', draft, { ...nextPending, firstName: clean || pending.firstName });
         return;
       case 'child-gender': {
         const child = {
@@ -1043,16 +1079,16 @@ const AssistantPage: React.FC = () => {
           return;
         }
         if (draft.spouses.length > 1) go('child-union', draft, freshPending());
-        else go('child-first', draft, { ...freshPending(), unionSpouseId: draft.spouses[0]?.id ?? null });
+        else go('child-last', draft, { ...freshPending(), unionSpouseId: draft.spouses[0]?.id ?? null });
         return;
       case 'parent-ask':
-        go(value === 'oui' ? 'parent-first' : 'grow', draft, freshPending());
-        return;
-      case 'parent-first':
-        go('parent-last', draft, { ...nextPending, firstName: clean });
+        go(value === 'oui' ? 'parent-last' : 'grow', draft, freshPending());
         return;
       case 'parent-last':
-        go('parent-gender', draft, { ...nextPending, lastName: clean });
+        go('parent-first', draft, { ...nextPending, lastName: clean });
+        return;
+      case 'parent-first':
+        go('parent-gender', draft, { ...nextPending, firstName: clean || pending.firstName });
         return;
       case 'parent-gender': {
         const parent = { ...emptyBits(uid('pa')), firstName: pending.firstName, lastName: pending.lastName, gender: clean as GenderType };
@@ -1061,18 +1097,18 @@ const AssistantPage: React.FC = () => {
       }
       case 'parent-second': {
         if (value === 'oui') {
-          go('parent2-first', draft, carryKin(pending));
+          go('parent2-last', draft, carryKin(pending));
           return;
         }
         const next = afterParents(pending, draft);
         go(next.phase, draft, next.pending);
         return;
       }
-      case 'parent2-first':
-        go('parent2-last', draft, { ...nextPending, firstName: clean });
-        return;
       case 'parent2-last':
-        go('parent2-gender', draft, { ...nextPending, lastName: clean });
+        go('parent2-first', draft, { ...nextPending, lastName: clean });
+        return;
+      case 'parent2-first':
+        go('parent2-gender', draft, { ...nextPending, firstName: clean || pending.firstName });
         return;
       case 'parent2-gender': {
         const parent = { ...emptyBits(uid('pa')), firstName: pending.firstName, lastName: pending.lastName, gender: clean as GenderType };
@@ -1088,7 +1124,7 @@ const AssistantPage: React.FC = () => {
         }
         const taken = slotTaken(draft, clean, pending.kin);
         if (taken) {
-          go('grow', draft, freshPending(), `${taken.firstName} est déjà enregistré de ce côté.`);
+          go('grow', draft, freshPending(), `${fullName(taken)} est déjà enregistré de ce côté.`);
           return;
         }
         const route = routeKin(pending.kin, draft, clean);
@@ -1100,28 +1136,28 @@ const AssistantPage: React.FC = () => {
         const branch = pending.viaParentId ? branchOf(draft, pending.viaParentId) : undefined;
         const existing = linkAs === 'female' ? branch?.grandmother : branch?.grandfather;
         if (existing) {
-          go('kin-first', draft, { ...pending, linkAs, hostId: existing.id, unionSpouseId: null, firstName: '', lastName: '' });
+          go('kin-last', draft, { ...pending, linkAs, hostId: existing.id, unionSpouseId: null, firstName: '', lastName: '' });
           return;
         }
-        go('kin-link', draft, { ...pending, linkAs, firstName: '', lastName: '' });
+        go('kin-link-last', draft, { ...pending, linkAs, firstName: '', lastName: '' });
         return;
       }
-      case 'kin-link':
-        go('kin-link-last', draft, { ...nextPending, firstName: clean });
+      case 'kin-link-last':
+        go('kin-link', draft, { ...nextPending, lastName: clean });
         return;
-      case 'kin-link-last': {
+      case 'kin-link': {
         if (!pending.viaParentId || !pending.linkAs) {
           go('grow');
           return;
         }
         const key = pending.linkAs === 'female' ? 'grandmother' : 'grandfather';
-        const person = { ...emptyBits(uid(pending.linkAs === 'female' ? 'gm' : 'gf')), firstName: pending.firstName, lastName: clean, gender: pending.linkAs };
-        go('kin-first', withBranch(draft, pending.viaParentId, (branch) => ({ ...branch, [key]: person })), { ...pending, hostId: person.id, unionSpouseId: null, firstName: '', lastName: '' });
+        const person = { ...emptyBits(uid(pending.linkAs === 'female' ? 'gm' : 'gf')), firstName: clean || pending.firstName, lastName: pending.lastName, gender: pending.linkAs };
+        go('kin-last', withBranch(draft, pending.viaParentId, (branch) => ({ ...branch, [key]: person })), { ...pending, hostId: person.id, unionSpouseId: null, firstName: '', lastName: '' });
         return;
       }
       case 'kin-parent-union': {
         const [firstParentId, secondParentId] = clean.split('|');
-        go('kin-first', draft, { ...pending, hostId: firstParentId, unionSpouseId: secondParentId === 'none' ? null : secondParentId });
+        go('kin-last', draft, { ...pending, hostId: firstParentId, unionSpouseId: secondParentId === 'none' ? null : secondParentId });
         return;
       }
       case 'kin-pick': {
@@ -1129,7 +1165,7 @@ const AssistantPage: React.FC = () => {
           const kin = clean === 'new-aunt' ? 'aunt' : 'uncle';
           const parentId = pending.viaParentId ?? draft.parents[0]?.id ?? null;
           if (!parentId) {
-            go('parent-first', draft, { ...freshPending(), kin, gender: impliedGender(kin), queue: pending.kin });
+            go('parent-last', draft, { ...freshPending(), kin, gender: impliedGender(kin), queue: pending.kin });
             return;
           }
           const route = routeKin(kin, draft, parentId);
@@ -1140,21 +1176,21 @@ const AssistantPage: React.FC = () => {
           const found = findCollateral(draft, clean);
           const spouses = found?.collateral.spouses ?? [];
           const nextPending = { ...freshPending(), kin: pending.kin, gender: pending.gender, viaParentId: found?.branch.parentId ?? pending.viaParentId, viaUncleId: clean };
-          go(spouses.length ? 'kin-union' : 'kin-first', draft, nextPending);
+          go(spouses.length ? 'kin-union' : 'kin-last', draft, nextPending);
           return;
         }
         const next = { ...freshPending(), kin: pending.kin, gender: impliedGender(pending.kin ?? 'node-spouse'), hostId: clean, viaUncleId: findCollateral(draft, clean) ? clean : null };
-        go(pending.kin === 'node-child' ? 'kin-union' : 'kin-first', draft, next);
+        go(pending.kin === 'node-child' ? 'kin-union' : 'kin-last', draft, next);
         return;
       }
       case 'kin-union':
-        go('kin-first', draft, { ...pending, unionSpouseId: clean === 'none' ? null : clean });
+        go('kin-last', draft, { ...pending, unionSpouseId: clean === 'none' ? null : clean });
         return;
-      case 'kin-first':
-        go('kin-last', draft, { ...nextPending, firstName: clean });
+      case 'kin-last':
+        go('kin-first', draft, { ...nextPending, lastName: clean });
         return;
-      case 'kin-last': {
-        const named = { ...pending, lastName: clean };
+      case 'kin-first': {
+        const named = { ...pending, firstName: clean || pending.firstName };
         if (named.gender === 'unknown') {
           go('kin-gender', draft, named);
           return;
@@ -1190,18 +1226,18 @@ const AssistantPage: React.FC = () => {
       return;
     }
     if (draft.parents.length === 0) {
-      go('parent-first', draft, base);
+      go('parent-last', draft, base);
       return;
     }
     if (kin === 'brother' || kin === 'sister') {
-      go('kin-first', draft, base);
+      go('kin-last', draft, base);
       return;
     }
     if (draft.parents.length === 1) {
       const via = draft.parents[0].id;
       const taken = slotTaken(draft, via, kin);
       if (taken) {
-        go('grow', draft, freshPending(), `${taken.firstName} est déjà enregistré de ce côté.`);
+        go('grow', draft, freshPending(), `${fullName(taken)} est déjà enregistré de ce côté.`);
         return;
       }
       const route = routeKin(kin, draft, via);
@@ -1224,16 +1260,22 @@ const AssistantPage: React.FC = () => {
         const person = workingFamily.persons.find(p => p.id === (m.spouse1Id === hostId ? m.spouse2Id : m.spouse1Id));
         return person ? [{ ...bitsFromPerson(person), rank: m.rank ?? 1 }] : [];
       });
+    const parentalPartners = parentalHouseholds(workingFamily.persons, workingFamily.marriages)
+      .filter(union => union.spouse1Id === hostId || union.spouse2Id === hostId)
+      .flatMap(union => {
+        const partner = workingFamily.persons.find(person => person.id === (union.spouse1Id === hostId ? union.spouse2Id : union.spouse1Id));
+        return partner ? [bitsFromPerson(partner)] : [];
+      });
     const knownIds = new Set(hostSpouses(draft, hostId).map(p => p.id));
     const nextDraft = { ...draft,
-      linkedPeople: [...(draft.linkedPeople ?? []), bitsFromPerson(host)],
+      linkedPeople: [...(draft.linkedPeople ?? []), bitsFromPerson(host), ...parentalPartners],
       extraSpouses: [...draft.extraSpouses, ...knownSpouses.filter(p => !knownIds.has(p.id)).map(spouse => ({ hostId, spouse }))],
     };
     const nextPending = { ...freshPending(), kin: `node-${relation}` as KinKind, hostId };
     setSelectedNodeId(hostId);
     setShowTree(false);
     spokenRef.current = `Ajouter un ${relation === 'child' ? 'enfant' : relation === 'parent' ? 'parent' : 'conjoint'} de ${fullName(host)}`;
-    go(relation === 'child' && knownSpouses.length ? 'kin-union' : 'kin-first', nextDraft, nextPending);
+    go(relation === 'child' && parentalPartners.length ? 'kin-union' : 'kin-last', nextDraft, nextPending);
   };
 
   const back = () => {
@@ -1250,15 +1292,16 @@ const AssistantPage: React.FC = () => {
 
   const resetDraft = () => {
     setBaseFamily({ persons: [], marriages: [] });
+    setBaseProjection({ persons: [], marriages: [] });
     setEditingSavedTree(false);
     setDraft({ anchor: emptyBits(anchorId), spouses: [], children: [], parents: [], siblings: [], branches: [], extraSpouses: [], extraChildren: [] });
     setPending(freshPending());
-    setPhase('anchor-first');
+    setPhase('anchor-last');
     setHistory([]);
     setText('');
     setNotice('');
     setHelpExperienceOpen(false);
-    setMessages([{ role: 'assistant', text: 'Quel est le prénom qui ouvre l’arbre ?' }]);
+    setMessages([{ role: 'assistant', text: 'Quel est le nom de famille de la personne qui ouvre l’arbre ?' }]);
   };
 
   const listen = () => {
@@ -1309,7 +1352,7 @@ const AssistantPage: React.FC = () => {
 
   const selectedNode = workingFamily.persons.find(person => person.id === selectedNodeId) ?? workingFamily.persons.find(person => person.id === draft.anchor.id);
   const readOnly = editingSavedTree && !currentTreeEditable;
-  const chips = readOnly ? [] : chipsFor(phase, draft, optional, pending);
+  const chips = readOnly ? [] : chipsFor(phase, draft, optional, pending, workingFamily);
 
 
   return (
@@ -1320,7 +1363,7 @@ const AssistantPage: React.FC = () => {
           <span className="sr-only">{labelFor(kind)}</span>
           <div>
             <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-zinc-500">Assistant</p>
-            <h1 className="font-serif text-xl text-zinc-950 dark:text-white">{editingSavedTree && draft.anchor.firstName ? `Arbre de ${draft.anchor.firstName}` : 'Nouvel arbre'}</h1>
+            <h1 className="font-serif text-xl text-zinc-950 dark:text-white">{editingSavedTree && fullName(draft.anchor) ? `Arbre de ${fullName(draft.anchor)}` : 'Nouvel arbre'}</h1>
           </div>
           <div className="relative"><button type="button" onClick={() => setTreeHistoryOpen((open) => !open)} className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 px-2.5 py-1 text-[11px] text-zinc-500 hover:border-sky-400 dark:border-white/10" aria-expanded={treeHistoryOpen}><Clock3 size={13} />Historique</button>{treeHistoryOpen && <div className="absolute right-0 top-9 z-50 w-72 rounded-2xl border border-zinc-200 bg-white p-2 shadow-2xl dark:border-white/10 dark:bg-zinc-950"><p className="px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-500">Mes arbres</p>{listLocalTrees().map((tree) => <button key={tree.id} type="button" onClick={() => { selectLocalTree(tree.id); window.location.reload(); }} className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-left text-sm hover:bg-zinc-100 dark:hover:bg-white/5 ${tree.id === getCurrentLocalTree().id ? 'text-sky-500' : ''}`}><span className="truncate">{tree.name}</span><span className="ml-2 text-[10px] text-zinc-500">{tree.role === 'READER' ? 'lecture' : tree.source === 'imported' ? 'importé' : 'actif'}</span></button>)}<div className="my-1 border-t border-zinc-200 dark:border-white/10" /><p className="px-2 py-1 text-[10px] uppercase tracking-wider text-zinc-500">Dernières sauvegardes</p>{listFamilyRevisions().slice(0, 4).map((revision) => <div key={revision.id} className="flex items-center justify-between px-3 py-1.5 text-xs text-zinc-500"><span>{revision.personCount} personne{revision.personCount > 1 ? 's' : ''}</span><time>{new Date(revision.savedAt).toLocaleString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</time></div>)}</div>}</div>
         </div>
@@ -1422,7 +1465,7 @@ const AssistantPage: React.FC = () => {
           />
         ) : (
           <div className="flex h-full items-center justify-center px-8 text-center text-zinc-500">
-            La vue de la démonstration apparaît avec le premier prénom.
+            La vue de la démonstration apparaît avec le premier nom.
           </div>
         )}
       </div>
@@ -1475,20 +1518,22 @@ function labelFor(kind: ReturnType<typeof kindOf>) {
 }
 
 function namedParent(draft: Draft, pending?: Pending) {
-  return draft.parents.find((parent) => parent.id === pending?.viaParentId)?.firstName || 'ce parent';
+  const parent = draft.parents.find((person) => person.id === pending?.viaParentId);
+  return parent ? fullName(parent) : 'ce parent';
 }
 
 function namedHost(draft: Draft, pending?: Pending) {
   if (!pending?.hostId && !pending?.viaUncleId) return 'cette personne';
-  return hostPerson(draft, pending.hostId || pending.viaUncleId || '')?.firstName || 'cette personne';
+  const person = hostPerson(draft, pending.hostId || pending.viaUncleId || '');
+  return person ? fullName(person) : 'cette personne';
 }
 
 function promptFor(phase: Phase, draft: Draft, pending?: Pending) {
-  const name = draft.anchor.firstName || 'cette personne';
+  const name = fullName(draft.anchor) || 'cette personne';
   const parent = namedParent(draft, pending);
   switch (phase) {
-    case 'anchor-first': return 'Quel est le prénom qui ouvre l’arbre ?';
-    case 'anchor-last': return 'Quel est le nom de famille ?';
+    case 'anchor-last': return 'Quel est le nom de famille de la personne qui ouvre l’arbre ?';
+    case 'anchor-first': return 'Quel est son prénom ? Vous pouvez passer.';
     case 'anchor-gender': return 'Quel genre enregistrer ?';
     case 'anchor-birth': return 'Quelle est la date de naissance ?';
     case 'anchor-city':
@@ -1496,29 +1541,29 @@ function promptFor(phase: Phase, draft: Draft, pending?: Pending) {
       if (draft.anchor.gender === 'male') return `Dans quelle ville ${name} est-il né ?`;
       return `Dans quelle ville ${name} est né ?`;
     case 'spouse-ask': return `Enregistrer un conjoint de ${name} ?`;
-    case 'spouse-first': return 'Quel est le prénom du conjoint ?';
+    case 'spouse-first': return 'Quel est le prénom du conjoint ? Vous pouvez passer.';
     case 'spouse-last': return 'Quel est le nom du conjoint ?';
     case 'spouse-gender': return 'Quel genre pour ce conjoint ?';
     case 'spouse-more': return 'Ajouter un autre conjoint, avec le rang suivant ?';
     case 'child-ask': return draft.spouses.length > 1 ? 'Ajouter un enfant à l’une des unions ?' : `Ajouter un enfant de ${name} ?`;
     case 'child-union': return 'De quelle union est cet enfant ?';
-    case 'child-first': return 'Quel est le prénom de l’enfant ?';
+    case 'child-first': return 'Quel est le prénom de l’enfant ? Vous pouvez passer.';
     case 'child-last': return 'Quel est le nom de l’enfant ?';
     case 'child-gender': return 'Quel genre pour cet enfant ?';
     case 'child-more': return 'Ajouter un autre enfant ?';
     case 'parent-ask': return `Connaissez-vous un parent de ${name} ?`;
-    case 'parent-first': return 'Quel est le prénom du parent ?';
+    case 'parent-first': return 'Quel est le prénom du parent ? Vous pouvez passer.';
     case 'parent-last': return 'Quel est le nom du parent ?';
     case 'parent-gender': return 'Quel genre pour ce parent ?';
     case 'parent-second': return 'Connaissez-vous l’autre parent ?';
-    case 'parent2-first': return 'Quel est le prénom de l’autre parent ?';
+    case 'parent2-first': return 'Quel est le prénom de l’autre parent ? Vous pouvez passer.';
     case 'parent2-last': return 'Quel est le nom de l’autre parent ?';
     case 'parent2-gender': return 'Quel genre pour l’autre parent ?';
     case 'grow': return 'Sélectionnez une personne dans l’arbre, puis ajoutez son parent, son enfant ou son conjoint.';
     case 'kin-side': return 'Ce lien est du côté de quel parent ?';
     case 'kin-link-role': return `Qui est le parent commun de ${parent} et de cette personne ?`;
-    case 'kin-link': return pending?.linkAs === 'female' ? `Quel est le prénom de la mère de ${parent} ?` : `Quel est le prénom du père de ${parent} ?`;
-    case 'kin-link-last': return 'Quel est son nom ?';
+    case 'kin-link': return 'Quel est son prénom ? Vous pouvez passer.';
+    case 'kin-link-last': return 'Quel est le nom de famille de ce parent ?';
     case 'kin-pick':
       if (pending?.kin === 'cousin' || pending?.kin === 'cousine') return 'Cet enfant est celui de quel oncle ou quelle tante ?';
       if (pending?.kin === 'collateral-spouse') return 'Le conjoint de quel oncle ou quelle tante ?';
@@ -1527,25 +1572,18 @@ function promptFor(phase: Phase, draft: Draft, pending?: Pending) {
     case 'kin-union': return 'Avec quel parent ou quelle union rattacher cet enfant ?';
     case 'kin-parent-union': return `De quelle union des parents de ${parent} cette personne est-elle issue ?`;
     case 'kin-gender': return 'Quel genre enregistrer ?';
-    case 'kin-last': return 'Quel est le nom ?';
-    case 'kin-first':
-      if (pending?.kin === 'sister') return 'Quel est le prénom de la sœur ?';
-      if (pending?.kin === 'brother') return 'Quel est le prénom du frère ?';
-      if (pending?.kin === 'aunt') return `Quel est le prénom de la sœur de ${parent} ?`;
-      if (pending?.kin === 'uncle') return `Quel est le prénom du frère de ${parent} ?`;
-      if (pending?.kin === 'cousine') return 'Quel est le prénom de la cousine ?';
-      if (pending?.kin === 'cousin') return 'Quel est le prénom du cousin ?';
-      if (pending?.kin === 'grandmother') return `Quel est le prénom de la mère de ${parent} ?`;
-      if (pending?.kin === 'grandfather') return `Quel est le prénom du père de ${parent} ?`;
-      if (pending?.kin === 'collateral-spouse' || pending?.kin === 'node-spouse') return `Quel est le prénom du conjoint de ${namedHost(draft, pending)} ?`;
-      if (pending?.kin === 'node-child') return `Quel est le prénom de l’enfant de ${namedHost(draft, pending)} ?`;
-      if (pending?.kin === 'node-parent') return `Quel est le prénom du parent de ${namedHost(draft, pending)} ?`;
-      return 'Quel est le prénom ?';
+    case 'kin-last': {
+      if (pending?.kin === 'node-parent') return `Quel est le nom de famille du parent de ${namedHost(draft, pending)} ?`;
+      if (pending?.kin === 'node-child') return `Quel est le nom de famille de l’enfant de ${namedHost(draft, pending)} ?`;
+      if (pending?.kin === 'node-spouse') return `Quel est le nom de famille du conjoint de ${namedHost(draft, pending)} ?`;
+      return 'Quel est le nom de famille ?';
+    }
+    case 'kin-first': return 'Quel est son pr\u00e9nom ? Vous pouvez passer.';
     default: return 'Le lignage est prêt.';
   }
 }
 
-function interpret(phase: Phase, raw: string, optional: boolean, draft: Draft, pending?: Pending): { ok: true; value: string; label: string } | { ok: false; error: string } {
+function interpret(phase: Phase, raw: string, optional: boolean, draft: Draft, pending?: Pending, context?: { persons: Person[]; marriages: Marriage[] }): { ok: true; value: string; label: string } | { ok: false; error: string } {
   const clean = raw.trim();
   const kind = kindOf(phase);
   if (kind === 'yesno') {
@@ -1567,7 +1605,7 @@ function interpret(phase: Phase, raw: string, optional: boolean, draft: Draft, p
   if (phase === 'kin-side') {
     const parent = draft.parents.find((item) => item.id === clean);
     if (!parent) return { ok: false, error: 'Choisissez le parent.' };
-    return { ok: true, value: parent.id, label: parent.firstName };
+    return { ok: true, value: parent.id, label: fullName(parent) };
   }
   if (phase === 'kin-link-role') {
     if (clean === 'father' || /p[eè]re/i.test(clean)) return { ok: true, value: 'father', label: 'Son père' };
@@ -1575,7 +1613,7 @@ function interpret(phase: Phase, raw: string, optional: boolean, draft: Draft, p
     return { ok: false, error: 'Choisissez le père ou la mère.' };
   }
   if (phase === 'kin-pick' || phase === 'kin-union' || phase === 'kin-parent-union') {
-    const choice = (pending ? chipsFor(phase, draft, false, pending) : []).find((item) => item.value === clean);
+    const choice = (pending ? chipsFor(phase, draft, false, pending, context) : []).find((item) => item.value === clean);
     if (!choice) return { ok: false, error: 'Choisissez une pastille.' };
     return { ok: true, value: choice.value, label: choice.label };
   }
@@ -1585,11 +1623,11 @@ function interpret(phase: Phase, raw: string, optional: boolean, draft: Draft, p
   return { ok: true, value: clean, label: clean || 'Passé' };
 }
 
-function chipsFor(phase: Phase, draft: Draft, optional: boolean, pending?: Pending) {
+function chipsFor(phase: Phase, draft: Draft, optional: boolean, pending?: Pending, context?: { persons: Person[]; marriages: Marriage[] }) {
   if (kindOf(phase) === 'yesno') return [{ label: 'Oui', value: 'oui' }, { label: 'Non', value: 'non' }];
   if (phase.endsWith('gender')) return genders.map((item) => ({ label: item.label, value: item.value }));
-  if (phase === 'child-union') return draft.spouses.map((spouse) => ({ label: `${spouse.firstName} · rang ${spouse.rank}`, value: spouse.id }));
-  if (phase === 'kin-side') return draft.parents.map((parent) => ({ label: parent.firstName, value: parent.id }));
+  if (phase === 'child-union') return draft.spouses.map((spouse) => ({ label: `${fullName(spouse)} · rang ${spouse.rank}`, value: spouse.id }));
+  if (phase === 'kin-side') return draft.parents.map((parent) => ({ label: fullName(parent), value: parent.id }));
   if (phase === 'kin-link-role') return [{ label: 'Son père', value: 'father' }, { label: 'Sa mère', value: 'mother' }];
   if (phase === 'kin-pick' && pending) {
     if (pending.kin === 'cousin' || pending.kin === 'cousine') {
@@ -1603,10 +1641,15 @@ function chipsFor(phase: Phase, draft: Draft, optional: boolean, pending?: Pendi
     const hostId = pending.hostId || pending.viaUncleId;
     if (!hostId) return [];
     const host = hostPerson(draft, hostId);
-    const spouses = hostSpouses(draft, hostId);
+    const spouses = context ? parentalHouseholds(context.persons, context.marriages)
+      .filter(union => union.spouse1Id === hostId || union.spouse2Id === hostId)
+      .flatMap(union => {
+        const partner = context.persons.find(person => person.id === (union.spouse1Id === hostId ? union.spouse2Id : union.spouse1Id));
+        return partner ? [bitsFromPerson(partner)] : [];
+      }) : hostSpouses(draft, hostId);
     return [
-      { label: host?.firstName ? `${host.firstName} seul · sans conjoint` : 'Un seul parent connu', value: 'none' },
-      ...spouses.map((spouse) => ({ label: `${host?.firstName ?? ''} et ${spouse.firstName}`, value: spouse.id })),
+      { label: host && fullName(host) ? `${fullName(host)} seul · sans conjoint` : 'Un seul parent connu', value: 'none' },
+      ...spouses.map((spouse) => ({ label: `${host ? fullName(host) : ''} et ${fullName(spouse)}`, value: spouse.id })),
     ];
   }
   if (phase === 'kin-parent-union' && pending?.viaParentId) return siblingParentOptions(draft, pending.viaParentId);
@@ -1616,6 +1659,10 @@ function chipsFor(phase: Phase, draft: Draft, optional: boolean, pending?: Pendi
     return surnameChip([draft.anchor, spouse].filter((item): item is Bits => Boolean(item)));
   }
   if (phase === 'kin-last' && pending) return kinSurnameChip(draft, pending);
+  if (phase.endsWith('first') || phase === 'kin-link') {
+    const existing = phase === 'anchor-first' ? draft.anchor.firstName : pending?.firstName;
+    return [...(existing ? [{ label: existing, value: existing }] : []), { label: 'Passer', value: '' }];
+  }
   if (optional) return [{ label: 'Passer', value: '' }];
   return [];
 }

@@ -74,7 +74,7 @@ export async function buildFamilyPdf(persons: Person[], marriages: Marriage[], g
       pdf.setFont(design.fontFamily, 'bold');
       pdf.setFontSize(Math.max(7, 13 * visualScale));
       pdf.setTextColor('#ffffff');
-      pdf.text((node.person.firstName || '?').charAt(0).toUpperCase(), centerX, centerY + 4 * visualScale, { align: 'center' });
+      pdf.text((node.person.firstName || node.person.lastName || '?').charAt(0).toUpperCase(), centerX, centerY + 4 * visualScale, { align: 'center' });
     }
     if (design.borderEnabled) {
       pdf.setDrawColor(design.borderColor);

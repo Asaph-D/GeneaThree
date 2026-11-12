@@ -14,7 +14,7 @@ function letter(person: Person): string {
 }
 
 function displayFirst(person: Person): string {
-  return person.firstName?.trim() || 'Sans nom';
+  return person.firstName?.trim() || person.lastName?.trim() || 'Sans nom';
 }
 
 export function drawBandTree(
@@ -49,40 +49,10 @@ export function drawBandTree(
   });
 
   const linkGroup = g.append('g').attr('class', 'links');
-  const defs = linkGroup.append('defs');
   const paper = dark ? '#09090b' : '#f4f1ea';
   const joints: { x: number; y: number }[] = [];
 
-  const fadeToward = (id: string, x1: number, y1: number, x2: number, y2: number) => {
-    const gradient = defs.append('linearGradient')
-      .attr('id', id)
-      .attr('gradientUnits', 'userSpaceOnUse')
-      .attr('x1', x1)
-      .attr('y1', y1)
-      .attr('x2', x2)
-      .attr('y2', y2);
-    gradient.append('stop').attr('offset', '0%').attr('stop-color', line).attr('stop-opacity', 1);
-    gradient.append('stop').attr('offset', '58%').attr('stop-color', line).attr('stop-opacity', 0.9);
-    gradient.append('stop').attr('offset', '100%').attr('stop-color', line).attr('stop-opacity', 0);
-    return `url(#${id})`;
-  };
-
-  const fadeBothEnds = (id: string, x1: number, y1: number, x2: number, y2: number) => {
-    const gradient = defs.append('linearGradient')
-      .attr('id', id)
-      .attr('gradientUnits', 'userSpaceOnUse')
-      .attr('x1', x1)
-      .attr('y1', y1)
-      .attr('x2', x2)
-      .attr('y2', y2);
-    gradient.append('stop').attr('offset', '0%').attr('stop-color', line).attr('stop-opacity', 0);
-    gradient.append('stop').attr('offset', '24%').attr('stop-color', line).attr('stop-opacity', 1);
-    gradient.append('stop').attr('offset', '76%').attr('stop-color', line).attr('stop-opacity', 1);
-    gradient.append('stop').attr('offset', '100%').attr('stop-color', line).attr('stop-opacity', 0);
-    return `url(#${id})`;
-  };
-
-  layout.unions.forEach((union, index) => {
+  layout.unions.forEach((union) => {
     if (union.rail) {
       const xs = [...new Set(union.ticks.map((tick) => tick.x))].sort((a, b) => a - b);
       xs.forEach((x, tickIndex) => {
@@ -93,7 +63,7 @@ export function drawBandTree(
             .attr('x2', next)
             .attr('y1', union.y)
             .attr('y2', union.y)
-            .attr('stroke', fadeBothEnds(`rail-joint-${index}-${tickIndex}`, x, union.y, next, union.y))
+            .attr('stroke', line)
             .attr('stroke-width', 1.5)
             .attr('class', 'link');
         }
@@ -102,7 +72,7 @@ export function drawBandTree(
           .attr('x2', x)
           .attr('y1', union.y - 42)
           .attr('y2', union.y)
-          .attr('stroke', fadeToward(`tick-joint-${index}-${tickIndex}`, x, union.y - 42, x, union.y))
+          .attr('stroke', line)
           .attr('stroke-width', 1.5)
           .attr('class', 'link');
         joints.push({ x, y: union.y });
@@ -115,7 +85,7 @@ export function drawBandTree(
       .attr('x2', mid)
       .attr('y1', union.y)
       .attr('y2', union.y)
-      .attr('stroke', fadeToward(`union-left-${index}`, union.x1, union.y, mid, union.y))
+      .attr('stroke', line)
       .attr('stroke-width', 1.5)
       .attr('class', 'link');
     linkGroup.append('line')
@@ -123,19 +93,19 @@ export function drawBandTree(
       .attr('x2', mid)
       .attr('y1', union.y)
       .attr('y2', union.y)
-      .attr('stroke', fadeToward(`union-right-${index}`, union.x2, union.y, mid, union.y))
+      .attr('stroke', line)
       .attr('stroke-width', 1.5)
       .attr('class', 'link');
     joints.push({ x: mid, y: union.y });
   });
 
-  layout.drops.forEach((drop, index) => {
+  layout.drops.forEach((drop) => {
     linkGroup.append('line')
       .attr('x1', drop.x1)
       .attr('x2', drop.x1)
       .attr('y1', drop.y1)
       .attr('y2', drop.barY)
-      .attr('stroke', fadeToward(`stem-joint-${index}`, drop.x1, drop.barY, drop.x1, drop.y1))
+      .attr('stroke', line)
       .attr('stroke-width', 1.5)
       .attr('class', 'link');
     if (drop.span.x1 !== drop.span.x2) {
@@ -169,6 +139,7 @@ export function drawBandTree(
       .attr('class', 'fusion-diamond')
       .attr('transform', `translate(${x},${y})`);
     diamond.append('rect')
+      .attr('vector-effect', 'non-scaling-stroke')
       .attr('x', -6)
       .attr('y', -6)
       .attr('width', 12)
@@ -178,6 +149,7 @@ export function drawBandTree(
       .attr('stroke', line)
       .attr('stroke-width', 1.35);
     diamond.append('rect')
+      .attr('vector-effect', 'non-scaling-stroke')
       .attr('x', -2.6)
       .attr('y', -2.6)
       .attr('width', 5.2)
@@ -293,7 +265,7 @@ export function drawBandTree(
     .attr('fill', ink)
     .attr('font-size', 12)
     .attr('font-family', 'Inter, sans-serif')
-    .text((node) => node.person.lastName?.trim() || '');
+    .text((node) => node.person.firstName?.trim() ? node.person.lastName?.trim() || '' : '');
 
   cards.filter((node) => Boolean(node.person.birthDate))
     .append('text')

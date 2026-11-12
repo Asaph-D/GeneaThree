@@ -419,7 +419,7 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
           .style("opacity", 0)
           .html(`
             <div style="font-weight: bold; margin-bottom: 4px;">
-              ${d.data.firstName || 'Inconnu'} ${d.data.lastName || ''}
+              ${d.data.firstName || ''} ${d.data.lastName || ''}
             </div>
             ${d.data.birthDate ? `<div>Né${d.data.gender === 'female' ? 'e' : ''} en ${new Date(d.data.birthDate).getFullYear()}</div>` : ''}
             ${d.data.occupation ? `<div>${d.data.occupation}</div>` : ''}
@@ -618,9 +618,9 @@ const TreeVisualization = forwardRef<HTMLDivElement, TreeVisualizationProps>(({
       .attr("font-family", "Inter, sans-serif")
       .text(d => {
         console.log("Node data for name:", d.data); // Log pour vérifier les données du nœud
-        const firstName = d.data.firstName || 'Inconnu';
+        const firstName = d.data.firstName || '';
         const lastName = d.data.lastName || '';
-        return `${firstName} ${lastName}`.trim();
+        return `${firstName} ${lastName}`.trim() || 'Sans nom';
       })
       .style("text-shadow", "0 1px 2px rgba(255,255,255,0.8)");
 

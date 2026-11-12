@@ -47,7 +47,30 @@ const mixedFamilies = [1, 2].flatMap(count => [false, true].map(secondary => ({
       : person.id === 'jean' ? { ...person, parentIds: ['anne'] } : person) : mixedPeople,
   marriages: mixedUnions.slice(2 - count),
 })));
-const families = [...SAMPLE_FAMILIES, ...catalog.entries.map((entry) => ({ id: entry.id, ...entry.tree })), { id: 'brigitte-paul', persons: fixturePeople, marriages: fixtureUnions }, ...mixedFamilies];
+const asaphPeople = [
+  { id:'asaph', parentIds:['paul','brigitte'], childrenIds:[], spouseIds:[] },
+  { id:'paul', parentIds:['innocent','elise'], childrenIds:['asaph'], spouseIds:['brigitte'] },
+  { id:'brigitte', parentIds:['antoine','marceline'], childrenIds:['asaph'], spouseIds:['paul'] },
+  { id:'innocent', parentIds:[], childrenIds:['paul'], spouseIds:['marie'] },
+  { id:'elise', parentIds:[], childrenIds:['paul'], spouseIds:[] },
+  { id:'antoine', parentIds:[], childrenIds:['brigitte'], spouseIds:[] },
+  { id:'marceline', parentIds:[], childrenIds:['brigitte'], spouseIds:[] },
+  { id:'marie', parentIds:[], childrenIds:[], spouseIds:['innocent'] },
+].map(p => ({ ...p, firstName:p.id, lastName:'', siblingIds:[], gender:['brigitte','elise','marie','marceline'].includes(p.id) ? 'female' : 'male' }));
+const asaphUnions = [{ id:'parents-asaph', spouse1Id:'paul', spouse2Id:'brigitte', childrenIds:['asaph'], rank:1 }, { id:'second-wife', spouse1Id:'innocent', spouse2Id:'marie', childrenIds:[], rank:1 }];
+const asaphFamilies = [
+  { id:'asaph-parent-junction', persons:asaphPeople.filter(p => !['antoine','marceline','marie'].includes(p.id)).map(p => p.id==='brigitte'?{...p,parentIds:[]}:p), marriages:asaphUnions.slice(0,1) },
+  { id:'asaph-two-ancestries', persons:asaphPeople, marriages:asaphUnions },
+  { id:'asaph-explicit-unions', persons:asaphPeople, marriages:[...asaphUnions, { id:'parents-paul', spouse1Id:'innocent', spouse2Id:'elise', childrenIds:['paul'], rank:0 }, { id:'parents-brigitte', spouse1Id:'antoine', spouse2Id:'marceline', childrenIds:['brigitte'], rank:1 }] },
+];
+for (const explicit of [false,true]) for (const reversed of [false,true]) for (const parentRank of [0,1,2]) {
+  const persons=[...asaphPeople.map(person=>['innocent','elise'].includes(person.id)?{...person,childrenIds:[...person.childrenIds,'david']}:person),
+    {id:'david',firstName:'david',lastName:'',gender:'male',parentIds:['innocent','elise'],childrenIds:[],spouseIds:[],siblingIds:[]}];
+  const marriages=(explicit?asaphFamilies[2].marriages:asaphUnions).map(union=>union.id==='parents-asaph'&&reversed?{...union,spouse1Id:'brigitte',spouse2Id:'paul'}
+    :union.id==='parents-paul'?{...union,rank:parentRank,childrenIds:['paul','david']}:union);
+  asaphFamilies.push({id:`asaph-david-${explicit}-${reversed}-${parentRank}`,persons,marriages});
+}
+const families = [...SAMPLE_FAMILIES, ...catalog.entries.map((entry) => ({ id: entry.id, ...entry.tree })), { id: 'brigitte-paul', persons: fixturePeople, marriages: fixtureUnions }, ...mixedFamilies, ...asaphFamilies];
 let scenarios = 0;
 for (const family of families) {
   const variants = [family, JSON.parse(JSON.stringify(family)), { ...family, persons: [...family.persons].reverse() }];
@@ -63,6 +86,34 @@ for (const family of families) {
         for (const other of layout.nodes.slice(i + 1)) {
           const node = layout.nodes[i];
           if (node.depth === other.depth) assert.ok(Math.abs(node.x - other.x) >= 115.999, `${label}: chevauchement ${node.person.id}/${other.person.id}`);
+        }
+      }
+      // A household with no competing ancestry is an indivisible interval.
+      // No person from another family may stand between its partners.
+      const known = new Map(variant.persons.map(person => [person.id,person]));
+      const edges = [
+        ...variant.marriages.map(union => [union.spouse1Id,union.spouse2Id]),
+        ...variant.persons.map(person => person.parentIds.filter(id => known.has(id))).filter(ids => ids.length === 2),
+      ];
+      const adjacency = new Map(layout.nodes.map(node => [node.person.id,new Set()]));
+      for (const [a,b] of edges) {
+        if (!adjacency.has(a) || !adjacency.has(b)) continue;
+        if (known.get(a).parentIds.some(id=>known.has(id)) && known.get(b).parentIds.some(id=>known.has(id))) continue;
+        adjacency.get(a).add(b); adjacency.get(b).add(a);
+      }
+      const checked = new Set();
+      for (const [id] of adjacency) {
+        if (checked.has(id)) continue;
+        const component = new Set([id]), queue = [id];
+        while (queue.length) for (const neighbour of adjacency.get(queue.pop())) {
+          if (!component.has(neighbour)) { component.add(neighbour); queue.push(neighbour); }
+        }
+        component.forEach(member => checked.add(member));
+        if (component.size < 2) continue;
+        const own = [...component].map(member=>byId.get(member));
+        const min = Math.min(...own.map(node=>node.x)), max = Math.max(...own.map(node=>node.x));
+        for (const foreign of layout.nodes.filter(node=>node.depth===own[0].depth && !component.has(node.person.id))) {
+          assert.ok(foreign.x < min || foreign.x > max, `${label}: foyer traversé par ${foreign.person.id}`);
         }
       }
       for (const union of variant.marriages) {
@@ -90,6 +141,24 @@ for (const family of families) {
         assert.ok(byId.get('dagobert').x < byId.get('brigitte').x, `${label}: Dagobert traverse la famille de Paul`);
         assert.ok(byId.get('david').x > byId.get('paul').x, `${label}: David traverse la famille de Brigitte`);
         assert.notEqual(byId.get('marceline').x, byId.get('elisabeth').x, `${label}: les mères se superposent`);
+      }
+      if (family.id.startsWith('asaph-')) {
+        if (family.id !== 'asaph-parent-junction') {
+          const own = ['innocent','elise','marie'].map(id => byId.get(id));
+          const min = Math.min(...own.map(n => n.x)), max = Math.max(...own.map(n => n.x));
+          for (const id of ['antoine','marceline']) assert.ok(byId.get(id).x < min || byId.get(id).x > max, `${label}: ${id} traverse le foyer d'Innocent`);
+        }
+        if (generations > 1) {
+          const first = byId.get('innocent'), second = byId.get('elise'), child = byId.get('paul');
+          assert.ok(layout.drops.some(drop => drop.drops.some(end => close(end.x,child.x) && close(end.y,child.y-28))
+            && (close(drop.x1,(first.x+second.x)/2) || (close(drop.x1,second.x) && close(drop.y1,first.y+100)))), `${label}: Paul doit partir d'une jonction parentale commune`);
+          assert.equal(layout.drops.filter(drop=>drop.drops.some(end=>close(end.x,child.x)&&close(end.y,child.y-28))).length,1,`${label}: Paul ne doit pas recevoir deux traits parentaux indépendants`);
+          if (byId.has('david')) {
+            const paul=byId.get('paul'), david=byId.get('david'), brigitte=byId.get('brigitte');
+            assert.ok(brigitte.x < Math.min(paul.x,david.x) || brigitte.x > Math.max(paul.x,david.x),`${label}: David traverse la famille de Brigitte`);
+            assert.ok(david.x < Math.min(paul.x,brigitte.x) || david.x > Math.max(paul.x,brigitte.x),`${label}: David traverse le couple Paul–Brigitte`);
+          }
+        }
       }
       scenarios++;
     }

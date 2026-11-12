@@ -39,7 +39,28 @@ export interface BandLayout {
   height: number;
 }
 
-export function layoutBands(people: Person[], marriages: Marriage[], maxGenerations: number): BandLayout {
+// A shared parental junction does not imply a marriage. Build display-only
+// households for known parent pairs, without changing the stored family.
+export function parentalHouseholds(people: Person[], marriages: Marriage[]): Marriage[] {
+  const byId = new Map(people.map(person => [person.id, person]));
+  const result = marriages.map(union => ({ ...union, childrenIds: [...(union.childrenIds ?? [])] }));
+  for (const child of people) {
+    const parents = [...new Set(child.parentIds)].filter(id => byId.has(id));
+    if (parents.length !== 2) continue;
+    let household = result.find(union => parents.includes(union.spouse1Id) && parents.includes(union.spouse2Id));
+    if (!household) {
+      const owner = parents.find(id => marriages.some(union => union.spouse1Id === id))
+        ?? parents.find(id => byId.get(id)?.gender === 'male') ?? parents[0];
+      household = { id: `parental-${[...parents].sort().join('-')}`, spouse1Id: owner, spouse2Id: parents.find(id => id !== owner)!, childrenIds: [], rank: 0 };
+      result.push(household);
+    }
+    if (!household.childrenIds.includes(child.id)) household.childrenIds.push(child.id);
+  }
+  return result;
+}
+
+export function layoutBands(people: Person[], recordedMarriages: Marriage[], maxGenerations: number): BandLayout {
+  const marriages = parentalHouseholds(people, recordedMarriages);
   const byId = new Map(people.map((person) => [person.id, person]));
   const maxDepth = Math.max(0, maxGenerations - 1);
   const nodes: BandNode[] = [];
@@ -329,14 +350,126 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
     row.push(node);
     rows.set(node.depth, row);
   });
-  rows.forEach((row) => {
+  const nodeById = new Map(nodes.map(node => [node.person.id, node]));
+  [...rows.entries()].sort(([a], [b]) => a - b).forEach(([, row]) => {
     row.sort((a, b) => a.x - b.x);
+    // Keep a household's partners together. Aligning a second ancestry to an
+    // already placed child must not insert its parents between two partners.
+    // Partners with their own ancestry retain that family's boundary instead.
+    const groups = new Map(row.map(node => [node.person.id, node.person.id]));
+    const groupOf = (id: string): string => {
+      const parent = groups.get(id)!;
+      if (parent === id) return id;
+      const root = groupOf(parent);
+      groups.set(id, root);
+      return root;
+    };
+    for (const union of marriages) {
+      if (!groups.has(union.spouse1Id) || !groups.has(union.spouse2Id)) continue;
+      const first = byId.get(union.spouse1Id)!;
+      const second = byId.get(union.spouse2Id)!;
+      if (first.parentIds.some(id => byId.has(id)) && second.parentIds.some(id => byId.has(id))) continue;
+      groups.set(groupOf(second.id), groupOf(first.id));
+    }
+    const blocks = new Map<string, BandNode[]>();
+    row.forEach(node => {
+      const key = groupOf(node.person.id);
+      const block = blocks.get(key) ?? [];
+      block.push(node);
+      blocks.set(key, block);
+    });
+    const ordered = [...blocks.values()].flat();
+    if (ordered.some((node, index) => row[index] !== node)) {
+      blocks.forEach(block => {
+        const start = block[0].x;
+        block.forEach((node, index) => { node.x = start + index * (CARD_W + 20); });
+      });
+      row.splice(0, row.length, ...ordered);
+    }
     const originalCenter = row.reduce((sum, node) => sum + node.x, 0) / row.length;
     for (let index = 1; index < row.length; index += 1) {
       row[index].x = Math.max(row[index].x, row[index - 1].x + CARD_W);
     }
     const offset = row.reduce((sum, node) => sum + node.x, 0) / row.length - originalCenter;
     row.forEach((node) => { node.x -= offset; });
+
+    // A bridge couple must be adjacent at the boundary of its two families.
+    // Choosing a side from spouse1/spouse2 alone fails when an archive or an
+    // assistant round trip reverses the couple, or changes the order of roots.
+    const partners = new Map(row.map(node => [node.person.id, node.person.id]));
+    const partnerGroup = (id: string): string => {
+      const parent = partners.get(id)!;
+      if (parent === id) return id;
+      const root = partnerGroup(parent);
+      partners.set(id, root);
+      return root;
+    };
+    for (const union of marriages) {
+      if (partners.has(union.spouse1Id) && partners.has(union.spouse2Id)) {
+        partners.set(partnerGroup(union.spouse2Id), partnerGroup(union.spouse1Id));
+      }
+    }
+    const couples = new Map<string, BandNode[]>();
+    row.forEach(node => {
+      const key = partnerGroup(node.person.id);
+      const unit = couples.get(key) ?? [];
+      unit.push(node);
+      couples.set(key, unit);
+    });
+    const siblingGroups = new Map<string, BandNode[]>();
+    row.forEach(node => {
+      const parents = node.person.parentIds.filter(id => byId.has(id)).sort();
+      if (!parents.length) return;
+      const key = JSON.stringify(parents);
+      const siblings = siblingGroups.get(key) ?? [];
+      siblings.push(node);
+      siblingGroups.set(key, siblings);
+    });
+    const constraints = [
+      ...blocks.values(), ...couples.values(),
+      ...[...siblingGroups.values()].filter(siblings => siblings.length > 1).map(siblings =>
+        siblings.flatMap(sibling => blocks.get(groupOf(sibling.person.id)) ?? [sibling])),
+    ].map(members => new Set(members.map(member => member.person.id))).filter(members => members.size > 1);
+    const violations = (order: BandNode[]) => {
+      const indices = new Map(order.map((node, index) => [node.person.id, index]));
+      return constraints.reduce((count, members) => {
+        const positions = [...members].map(id => indices.get(id)!);
+        return count + Math.max(...positions) - Math.min(...positions) + 1 - members.size;
+      }, 0);
+    };
+    const crossedSiblingFamilies = (order: BandNode[]) => {
+      const indices = new Map(order.map((node, index) => [node.person.id, index]));
+      return marriages.reduce((count, union) => {
+        const children = kidsOf(union).filter(id => indices.has(id));
+        if (children.length < 2) return count;
+        const related = new Set(children.flatMap(id => [id, ...(byId.get(id)?.spouseIds ?? [])]));
+        const positions = children.map(id => indices.get(id)!);
+        return count + order.slice(Math.min(...positions), Math.max(...positions) + 1).filter(node => !related.has(node.person.id)).length;
+      }, 0);
+    };
+    if (violations(row) > 0) {
+      const ancestryCenter = (members: BandNode[]) => {
+        const parents = [...new Set(members.flatMap(member => member.person.parentIds))]
+          .map(id => nodeById.get(id)).filter((parent): parent is BandNode => Boolean(parent));
+        return parents.length ? parents.reduce((sum, parent) => sum + parent.x, 0) / parents.length
+          : members.reduce((sum, member) => sum + member.x, 0) / members.length;
+      };
+      const candidate = [...couples.values()].sort((a, b) => ancestryCenter(a) - ancestryCenter(b)).flatMap(unit => {
+        const inner = new Map<string, BandNode[]>();
+        unit.forEach(node => {
+          const key = groupOf(node.person.id);
+          const group = inner.get(key) ?? [];
+          group.push(node);
+          inner.set(key, group);
+        });
+        return [...inner.values()].sort((a, b) => ancestryCenter(a) - ancestryCenter(b)).flat();
+      });
+      if (violations(candidate) < violations(row) && crossedSiblingFamilies(candidate) <= crossedSiblingFamilies(row)) {
+        const slots = row.map(node => node.x);
+        candidate.forEach((node, index) => { node.x = slots[index]; });
+        row.splice(0, row.length, ...candidate);
+      }
+    }
   });
 
   // A spouse may already have been placed by their own ancestry. Rebuild links
@@ -382,7 +515,7 @@ export function layoutBands(people: Person[], marriages: Marriage[], maxGenerati
 }
 
 export function familyGenerationCount(people: Person[], marriages: Marriage[]): number {
-  return Math.max(0, ...calculateGenerations(people, marriages).values()) + 1;
+  return Math.max(0, ...calculateGenerations(people, parentalHouseholds(people, marriages)).values()) + 1;
 }
 
 function calculateGenerations(people: Person[], marriages: Marriage[]): Map<string, number> {

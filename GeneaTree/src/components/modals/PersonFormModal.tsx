@@ -112,7 +112,7 @@ const PersonFormModal: React.FC<PersonFormModalProps> = ({
 
   const validate = () => {
     const next: string[] = [];
-    if (!firstName.trim() || !lastName.trim()) next.push('Le prénom et le nom sont obligatoires.');
+    if (!firstName.trim() && !lastName.trim()) next.push('Renseignez au moins un nom.');
     if (birthDate && birthDate > today) next.push('La naissance ne peut pas être dans le futur.');
     if (deceased && deathDate && birthDate && deathDate < birthDate) next.push('Le décès doit suivre la naissance.');
     if (deceased && deathDate && deathDate > today) next.push('Le décès ne peut pas être dans le futur.');
@@ -230,11 +230,11 @@ const PersonFormModal: React.FC<PersonFormModalProps> = ({
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className={labelClass}>Prénom
-              <input className={inputClass} value={firstName} onChange={(event) => setFirstName(event.target.value)} />
+            <label className={labelClass}>Nom de famille
+              <input name="lastName" className={inputClass} value={lastName} onChange={(event) => setLastName(event.target.value)} />
             </label>
-            <label className={labelClass}>Nom
-              <input className={inputClass} value={lastName} onChange={(event) => setLastName(event.target.value)} />
+            <label className={labelClass}>Prénom (facultatif)
+              <input name="firstName" className={inputClass} value={firstName} onChange={(event) => setFirstName(event.target.value)} />
             </label>
           </div>
 

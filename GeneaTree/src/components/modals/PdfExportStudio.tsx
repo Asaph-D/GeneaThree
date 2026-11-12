@@ -1,5 +1,6 @@
 import { AlignCenter, AlignLeft, AlignRight, ChevronDown, Download, Layers3, Maximize2, Minus, Palette, Plus, Shapes, Sparkles, Type, X } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import { treeActionButtonClassName } from '../ui/actionButtonStyles';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { layoutBands } from '../demo/bandLayout';
 import { Marriage, Person } from '../../types/family';
@@ -48,7 +49,7 @@ export default function PdfExportStudio({ persons, marriages, generations, initi
       <main className="relative flex h-[56dvh] min-h-0 min-w-0 flex-none flex-col overflow-hidden md:h-auto md:flex-1">
         <header className="flex h-16 items-center justify-between border-b border-white/10 px-4 sm:px-6">
           <div><p className="text-[10px] uppercase tracking-[0.2em] text-sky-300">Validation avant export</p><h2 id="pdf-studio-title" className="font-serif text-xl text-white">Studio PDF</h2></div>
-          <div className="flex items-center gap-2"><button onClick={onClose} disabled={busy} className="rounded-xl border border-white/10 p-2 text-zinc-300 hover:bg-white/10" aria-label="Fermer"><X size={18} /></button><button onClick={() => void download()} disabled={busy} className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 disabled:opacity-50"><Download size={16} />{busy ? 'Génération…' : 'Télécharger'}</button></div>
+          <div className="flex items-center gap-2"><button onClick={onClose} disabled={busy} className="rounded-xl border border-white/10 p-2 text-zinc-300 hover:bg-white/10" aria-label="Fermer"><X size={18} /></button><button onClick={() => void download()} disabled={busy} className={treeActionButtonClassName}><Download size={16} />{busy ? 'Génération…' : 'Télécharger'}</button></div>
         </header>
         <div className="relative grid min-h-0 flex-1 place-items-center overflow-hidden bg-[radial-gradient(circle_at_20%_10%,rgba(56,189,248,.14),transparent_28%),radial-gradient(circle_at_85%_90%,rgba(99,102,241,.13),transparent_32%)] p-3 sm:p-6">
           <div className="relative h-full max-h-full w-full max-w-full overflow-hidden rounded-md shadow-[0_30px_100px_rgba(0,0,0,.55)] ring-1 ring-white/10" style={{ backgroundColor: options.backgroundColor }}>

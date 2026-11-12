@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Link, NavLink, useLocation } from 'react-router-dom';
 import AccountButton from '../auth/AccountButton';
+import { treeActionButtonClassName } from '../ui/actionButtonStyles';
 
 interface NavbarProps {
   darkMode: boolean;
@@ -65,7 +66,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
                 {item.label}
               </NavLink>
             ))}
-            <Link to="/assistant?new=1" className="ml-3 inline-flex items-center rounded-lg bg-gradient-to-r from-sky-500 to-indigo-600 px-3.5 py-2 text-[13px] font-semibold text-white shadow-[0_8px_24px_-12px_rgba(79,70,229,0.9)] transition hover:from-sky-400 hover:to-indigo-500">
+            <Link to="/assistant?new=1" className={`${treeActionButtonClassName} ml-3`}>
               Créer
             </Link>
             <AccountButton />
@@ -102,7 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ darkMode, toggleTheme }) => {
             <Link
               to="/assistant?new=1"
               onClick={() => setIsMenuOpen(false)}
-              className="mt-1 block rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 px-3 py-3 text-center text-[15px] font-semibold text-white hover:from-sky-400 hover:to-indigo-500"
+              className={`${treeActionButtonClassName} mt-1 w-full justify-center py-3`}
             >
               Créer
             </Link>
