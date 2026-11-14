@@ -1,5 +1,41 @@
 # Stratégie de positionnement
 
+## Règle appliquée aux foyers polygamiques (14 novembre 2026)
+
+Le moteur commun à l’assistant, à la démonstration, au partage et aux exports
+classe les foyers selon leur nombre de descendants distincts : enfants,
+petits-enfants et générations suivantes. Les conjoints de ces descendants ne
+comptent pas. Le calcul porte sur tout l’arbre enregistré, même lorsque le
+curseur masque certaines générations. Une égalité se départage par le rang
+de l’union, puis par son identifiant, afin de conserver un résultat stable.
+
+La branche principale occupe le côté intérieur du foyer. Lorsque sa priorité
+change, l’autre ascendance est replacée à la frontière de la branche avec
+laquelle elle est réellement alliée. Les descendants exclusifs de deux
+conjointes conservent le même ordre horizontal que leurs branches parentales.
+Une branche réduite à un seul enfant bénéficie aussi de cette contrainte.
+La personne focale sélectionnée et les liens enregistrés ne sont pas modifiés.
+
+Les nœuds et leurs liens prennent leurs nouvelles coordonnées simultanément.
+Seule l’apparition des nouveaux nœuds est animée : un rééquilibrage ne fait
+pas glisser une famille au travers d’une autre pendant une transition.
+
+Le scénario `GeneaTree/scripts/fixtures/polygamy-construction.mjs` conserve
+25 états successifs : parents de Paul et Brigitte, deux conjointes, David,
+Léon, égalité des descendances, basculement vers Mamouo, retour à égalité,
+nouveau basculement et troisième conjointe. Le test associé contrôle les
+ordres inversés, les unions stockées dans les deux sens et les limites de
+générations. `scripts/check-polygamy-priority-browser.mjs` capture chaque état
+dans le navigateur et construit aussi la descendance de Léon avec les
+contrôles réels de l’assistant, puis compare le résultat avec `/demo`.
+`scripts/check-polygamy-shared-browser.mjs` enregistre les états 9, 10, 14 et
+25 dans un compte de test du backend local, ouvre leurs vrais liens partagés
+et compare les positions avec celles de `/demo`.
+
+Les principes historiques ci-dessous restent la cible générale. L’ordre
+visuel des foyers est désormais déterminé par cette priorité de descendance,
+le rang servant à départager les égalités.
+
 Objectif : un lignage lisible à 7 générations, où un chef, ses épouses et les enfants de chaque foyer restent distincts, et où un cousin partage le niveau de son cousin sans jamais emprunter la même barre de filiation.
 
 La vue par défaut proposée est le **lignage descendant** depuis un fondateur (le chef, l’ancêtre de la chefferie). Ce graphe, tant que l’on ne dessine pas en même temps tous les ascendants de toutes les alliances, reste presque planaire : on peut promettre des couloirs qui ne se croisent pas. L’heure en sablier (ancêtres au-dessus, descendants en dessous) reste un mode focal, pas la vue d’ensemble.

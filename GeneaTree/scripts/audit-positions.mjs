@@ -138,8 +138,9 @@ for (const family of families) {
         }
       }
       if (family.id === 'brigitte-paul' && generations >= 2) {
-        assert.ok(byId.get('dagobert').x < byId.get('brigitte').x, `${label}: Dagobert traverse la famille de Paul`);
-        assert.ok(byId.get('david').x > byId.get('paul').x, `${label}: David traverse la famille de Brigitte`);
+        const brigitteLeft = byId.get('brigitte').x < byId.get('paul').x;
+        assert.ok(brigitteLeft ? byId.get('dagobert').x < byId.get('brigitte').x : byId.get('dagobert').x > byId.get('brigitte').x, `${label}: Dagobert traverse la famille de Paul`);
+        assert.ok(brigitteLeft ? byId.get('david').x > byId.get('paul').x : byId.get('david').x < byId.get('paul').x, `${label}: David traverse la famille de Brigitte`);
         assert.notEqual(byId.get('marceline').x, byId.get('elisabeth').x, `${label}: les mères se superposent`);
       }
       if (family.id.startsWith('asaph-')) {

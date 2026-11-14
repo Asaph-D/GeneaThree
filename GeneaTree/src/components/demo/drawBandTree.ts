@@ -167,20 +167,9 @@ export function drawBandTree(
     .enter()
     .append('g')
     .attr('class', (node) => `tree-node node-${node.person.id}${node.person.relationship ? ` relationship-${node.person.relationship}` : ''}`)
-    .attr('transform', (node) => {
-      const previous = previousPositions.get(node.person.id);
-      if (previous) return `translate(${previous.x},${previous.y})`;
-      const related = [...node.person.parentIds, ...node.person.spouseIds, ...node.person.childrenIds]
-        .map((id) => previousPositions.get(id))
-        .filter((point): point is { x: number; y: number } => Boolean(point));
-      const origin = related.length
-        ? {
-            x: related.reduce((sum, point) => sum + point.x, 0) / related.length,
-            y: related.reduce((sum, point) => sum + point.y, 0) / related.length,
-          }
-        : { x: node.x, y: node.y };
-      return `translate(${origin.x},${origin.y}) scale(0.2)`;
-    })
+    // Publish nodes and links at the same final coordinates. In particular a
+    // priority change must not animate a whole branch through another family.
+    .attr('transform', node => `translate(${node.x},${node.y})`)
     .style('opacity', (node) => previousPositions.has(node.person.id) ? 1 : 0)
     .style('cursor', 'pointer')
     .on('mousedown', function onNodePress(event, node) {
@@ -205,9 +194,7 @@ export function drawBandTree(
     });
 
   cards.transition('layout')
-    .duration(620)
-    .ease(d3.easeCubicInOut)
-    .attr('transform', (node) => `translate(${node.x},${node.y}) scale(1)`)
+    .duration(180)
     .style('opacity', 1);
 
   cards.append('circle')
@@ -266,6 +253,20 @@ export function drawBandTree(
     .attr('font-size', 12)
     .attr('font-family', 'Inter, sans-serif')
     .text((node) => node.person.firstName?.trim() ? node.person.lastName?.trim() || '' : '');
+
+  // Labels share the same horizontal allowance as their cards. Preserve the
+  // full name on hover instead of drawing a long surname over its neighbour.
+  cards.append('title').text(node => [node.person.firstName, node.person.lastName].filter(Boolean).join(' '));
+  cards.selectAll<SVGTextElement, unknown>('.node-first-name, .node-secondary-detail')
+    .each(function fitName() {
+      const text = d3.select(this);
+      const characters = Array.from(this.textContent ?? '');
+      if (this.getComputedTextLength() <= 104) return;
+      while (characters.length && this.getComputedTextLength() > 104) {
+        characters.pop();
+        text.text(`${characters.join('').trimEnd()}…`);
+      }
+    });
 
   cards.filter((node) => Boolean(node.person.birthDate))
     .append('text')

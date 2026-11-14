@@ -62,6 +62,37 @@ export function parentalHouseholds(people: Person[], marriages: Marriage[]): Mar
 export function layoutBands(people: Person[], recordedMarriages: Marriage[], maxGenerations: number): BandLayout {
   const marriages = parentalHouseholds(people, recordedMarriages);
   const byId = new Map(people.map((person) => [person.id, person]));
+  const partnersOf = new Map(people.map(person => [person.id, new Set<string>()]));
+  marriages.forEach(union => {
+    partnersOf.get(union.spouse1Id)?.add(union.spouse2Id);
+    partnersOf.get(union.spouse2Id)?.add(union.spouse1Id);
+  });
+  // A family hub can be stored as either spouse. This is a display-only copy.
+  marriages.forEach(union => {
+    if ((partnersOf.get(union.spouse2Id)?.size ?? 0) > (partnersOf.get(union.spouse1Id)?.size ?? 0)) {
+      [union.spouse1Id, union.spouse2Id] = [union.spouse2Id, union.spouse1Id];
+    }
+  });
+  const childrenById = new Map(people.map(person => [person.id, new Set(person.childrenIds.filter(id => byId.has(id)))]));
+  people.forEach(child => child.parentIds.forEach(id => childrenById.get(id)?.add(child.id)));
+  marriages.forEach(union => (union.childrenIds ?? []).forEach(id => {
+    if (!byId.has(id)) return;
+    childrenById.get(union.spouse1Id)?.add(id);
+    childrenById.get(union.spouse2Id)?.add(id);
+  }));
+  const descendantsByUnion = new Map(marriages.map(union => {
+    const descendants = new Set<string>();
+    const queue = [...(union.childrenIds ?? [])];
+    while (queue.length) {
+      const id = queue.pop()!;
+      if (!byId.has(id) || descendants.has(id) || id === union.spouse1Id || id === union.spouse2Id) continue;
+      descendants.add(id);
+      queue.push(...(childrenById.get(id) ?? []));
+    }
+    return [union.id, descendants] as const;
+  }));
+  const principalSide = new Map<string, -1 | 1>();
+  const bridgeRoots = new Map<string, Set<string>>();
   const maxDepth = Math.max(0, maxGenerations - 1);
   const nodes: BandNode[] = [];
   const unions: BandUnion[] = [];
@@ -70,11 +101,25 @@ export function layoutBands(people: Person[], recordedMarriages: Marriage[], max
   const rootHints = new Map<string, { childId: string; side: -1 | 1 }>();
   const generationById = calculateGenerations(people, marriages);
 
-  const householdsOf = (id: string) =>
-    marriages
+  const householdsOf = (id: string) => {
+    const households = marriages
       .filter((marriage) => marriage.spouse1Id === id && byId.has(marriage.spouse2Id))
       .slice()
-      .sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99));
+      .sort((a, b) => (principalSide.get(id) ?? 1) * (
+        (descendantsByUnion.get(a.id)?.size ?? 0) - (descendantsByUnion.get(b.id)?.size ?? 0)
+        || (b.rank ?? 99) - (a.rank ?? 99) || b.id.localeCompare(a.id)
+      ));
+    if (households.length > 2) {
+      const bridges = households.filter(union => (bridgeRoots.get(union.id)?.size ?? 0) > 0);
+      const side = principalSide.get(id) ?? 1;
+      const principal = side > 0 ? households[households.length - 1] : households[0];
+      if (bridges.length === 1 && bridges[0] !== principal) {
+        const bridge = households.splice(households.indexOf(bridges[0]), 1)[0];
+        if (side > 0) households.unshift(bridge); else households.push(bridge);
+      }
+    }
+    return households;
+  };
 
   const kidsOf = (marriage: Marriage) =>
     (marriage.childrenIds ?? []).filter((id) => byId.has(id));
@@ -101,7 +146,11 @@ export function layoutBands(people: Person[], recordedMarriages: Marriage[], max
     if (!byId.has(id) || depth > maxDepth || measuring.has(id)) return CARD_W;
     if (placed.has(id)) return CARD_W;
     const households = householdsOf(id);
-    if (depth === maxDepth) return CARD_W;
+    if (depth === maxDepth) {
+      if (!households.length) return CARD_W;
+      if (households.length === 1) return CARD_W * 2 + 20;
+      return CARD_W * (households.length + 1) + GAP * households.length;
+    }
     if (households.length === 0) {
       const loose = looseKids(id);
       if (!loose.length) return CARD_W;
@@ -204,7 +253,7 @@ export function layoutBands(people: Person[], recordedMarriages: Marriage[], max
     }
     const width = measure(id, depth);
     const y = 56 + generation * ROW;
-    const households = generation === maxDepth ? [] : householdsOf(id);
+    const households = householdsOf(id);
 
     if (households.length === 0) {
       const x = left + width / 2;
@@ -306,7 +355,77 @@ export function layoutBands(people: Person[], recordedMarriages: Marriage[], max
       .filter((id) => !childIds.has(id) && !marriages.some((marriage) => marriage.spouse1Id === id))
   );
   const roots = people.filter((person) => !childIds.has(person.id) && !secondarySpouses.has(person.id));
-  const rootList = roots.length ? roots : people.slice(0, 1);
+  let rootList = roots.length ? roots : people.slice(0, 1);
+  const rootIndex = new Map(rootList.map((root, index) => [root.id, index]));
+  const ancestryRoots = (id: string) => {
+    const found = new Set<string>();
+    const visited = new Set<string>();
+    const queue = [id];
+    while (queue.length) {
+      const current = queue.pop()!;
+      if (visited.has(current)) continue;
+      visited.add(current);
+      if (rootIndex.has(current)) { found.add(current); continue; }
+      const parents = byId.get(current)?.parentIds.filter(parent => byId.has(parent)) ?? [];
+      if (parents.length) queue.push(...parents);
+      else marriages.filter(union => union.spouse2Id === current).forEach(union => queue.push(union.spouse1Id));
+    }
+    return found;
+  };
+  for (const root of rootList) {
+    const households = householdsOf(root.id);
+    if (households.length < 2) continue;
+    for (const household of households) {
+      const descendants = descendantsByUnion.get(household.id)!;
+      const external = new Set<string>();
+      marriages.forEach(union => {
+        const other = descendants.has(union.spouse1Id) && !descendants.has(union.spouse2Id) ? union.spouse2Id
+          : descendants.has(union.spouse2Id) && !descendants.has(union.spouse1Id) ? union.spouse1Id : null;
+        if (other && byId.get(other)?.parentIds.some(id => byId.has(id))) {
+          ancestryRoots(other).forEach(id => { if (id !== root.id) external.add(id); });
+        }
+      });
+      bridgeRoots.set(household.id, external);
+    }
+    const neighbours = households.flatMap(household => [...(bridgeRoots.get(household.id) ?? [])]);
+    if (neighbours.length) {
+      const average = neighbours.reduce((sum, id) => sum + rootIndex.get(id)!, 0) / neighbours.length;
+      principalSide.set(root.id, average < rootIndex.get(root.id)! ? -1 : 1);
+    }
+  }
+  // When the largest branch changes, move the other ancestry to the boundary
+  // used by its actual bridge child, rather than stretching through a co-wife.
+  const before = new Map(rootList.map(root => [root.id, new Set<string>()]));
+  const reaches = (from: string, target: string, visited = new Set<string>()): boolean => {
+    if (from === target) return true;
+    if (visited.has(from)) return false;
+    visited.add(from);
+    return [...(before.get(from) ?? [])].some(id => reaches(id, target, visited));
+  };
+  const rootLinks: { left: string; right: string; weight: number }[] = [];
+  for (const root of rootList) {
+    const households = householdsOf(root.id);
+    if (households.length < 2) continue;
+    households.forEach((household, index) => {
+      const side = index < households.length / 2 ? -1 : 1;
+      bridgeRoots.get(household.id)?.forEach(other => rootLinks.push({
+        left: side < 0 ? other : root.id, right: side < 0 ? root.id : other,
+        weight: descendantsByUnion.get(household.id)?.size ?? 0,
+      }));
+    });
+  }
+  rootLinks.sort((a, b) => b.weight - a.weight || a.left.localeCompare(b.left) || a.right.localeCompare(b.right)).forEach(link => {
+    if (!reaches(link.right, link.left)) before.get(link.left)?.add(link.right);
+  });
+  const pendingRoots = new Set(rootList.map(root => root.id));
+  const orderedRoots: Person[] = [];
+  while (pendingRoots.size) {
+    const next = rootList.find(root => pendingRoots.has(root.id) && ![...pendingRoots].some(id => before.get(id)?.has(root.id)));
+    if (!next) break;
+    orderedRoots.push(next);
+    pendingRoots.delete(next.id);
+  }
+  if (orderedRoots.length === rootList.length) rootList = orderedRoots;
 
   let cursor = 48;
   rootList.forEach((root) => {
@@ -432,10 +551,26 @@ export function layoutBands(people: Person[], recordedMarriages: Marriage[], max
     ].map(members => new Set(members.map(member => member.person.id))).filter(members => members.size > 1);
     const violations = (order: BandNode[]) => {
       const indices = new Map(order.map((node, index) => [node.person.id, index]));
-      return constraints.reduce((count, members) => {
+      let count = constraints.reduce((count, members) => {
         const positions = [...members].map(id => indices.get(id)!);
         return count + Math.max(...positions) - Math.min(...positions) + 1 - members.size;
       }, 0);
+      // Half-sibling branches must follow their own parental columns, even if
+      // one branch currently contains just one child (for example Léon).
+      for (const owner of people) {
+        const households = householdsOf(owner.id).filter(union => nodeById.has(union.spouse2Id));
+        for (let first = 0; first < households.length; first++) for (let second = first + 1; second < households.length; second++) {
+          const a = households[first], b = households[second];
+          const da = descendantsByUnion.get(a.id)!, db = descendantsByUnion.get(b.id)!;
+          const ia = order.filter(node => da.has(node.person.id) && !db.has(node.person.id)).map(node => indices.get(node.person.id)!);
+          const ib = order.filter(node => db.has(node.person.id) && !da.has(node.person.id)).map(node => indices.get(node.person.id)!);
+          if (!ia.length || !ib.length) continue;
+          const leftFirst = nodeById.get(a.spouse2Id)!.x < nodeById.get(b.spouse2Id)!.x;
+          count += leftFirst ? ia.filter(index => index > Math.min(...ib)).length + ib.filter(index => index < Math.max(...ia)).length
+            : ib.filter(index => index > Math.min(...ia)).length + ia.filter(index => index < Math.max(...ib)).length;
+        }
+      }
+      return count;
     };
     const crossedSiblingFamilies = (order: BandNode[]) => {
       const indices = new Map(order.map((node, index) => [node.person.id, index]));

@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "test:assistant": "node scripts/test-assistant-flow.mjs",
     "test:discovery": "node scripts/test-discovery-service.mjs && node scripts/test-discovery-opening.mjs",
-    "test:visual-logic": "node scripts/test-tree-layout.mjs && node scripts/audit-positions.mjs",
+    "test:visual-logic": "node scripts/test-tree-layout.mjs && node scripts/audit-positions.mjs && node scripts/test-polygamy-construction.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
